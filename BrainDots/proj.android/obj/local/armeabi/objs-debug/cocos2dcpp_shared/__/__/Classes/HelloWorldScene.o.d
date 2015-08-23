@@ -9,58 +9,58 @@ obj/local/armeabi/objs-debug/cocos2dcpp_shared/__/__/Classes/HelloWorldScene.o: 
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../base/ccConfig.h \
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../platform/CCPlatformDefine.h \
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../platform/android/CCPlatformDefine-android.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/android/log.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/android/log.h \
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../base/CCDirector.h \
  D:/Cocos2d/SETUP/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/stack \
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../base/CCRef.h \
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../base/CCVector.h \
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../base/ccMacros.h \
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../base/CCConsole.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/sys/select.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/sys/cdefs.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/sys/cdefs_elf.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/android/api-level.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/sys/time.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/sys/types.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/stdint.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/sys/_types.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/machine/_types.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/sys/_wchar_limits.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/linux/posix_types.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/linux/stddef.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/linux/compiler.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/asm/posix_types.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/asm/types.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/linux/types.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/machine/kernel.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/sys/sysmacros.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/linux/time.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/signal.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/limits.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/sys/limits.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/linux/limits.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/machine/internal_types.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/machine/limits.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/sys/syslimits.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/asm/page.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/string.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/malloc.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/asm/signal.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/asm-generic/signal.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/asm/sigcontext.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/asm/siginfo.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/asm-generic/siginfo.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/select.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/cdefs.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/cdefs_elf.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/android/api-level.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/time.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/types.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/stdint.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/_types.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/machine/_types.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/_wchar_limits.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/posix_types.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/stddef.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/compiler.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/posix_types.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/types.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/types.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/machine/kernel.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/sysmacros.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/time.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/signal.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/limits.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/limits.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/limits.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/machine/internal_types.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/machine/limits.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/syslimits.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/page.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/string.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/malloc.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/signal.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm-generic/signal.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/sigcontext.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/siginfo.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm-generic/siginfo.h \
  D:/Cocos2d/SETUP/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/thread \
  D:/Cocos2d/SETUP/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/vector \
  D:/Cocos2d/SETUP/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/map \
  D:/Cocos2d/SETUP/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/mutex \
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../platform/CCStdC.h \
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../platform/android/CCStdC-android.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/math.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/stdlib.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/alloca.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/strings.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/memory.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/math.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/stdlib.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/alloca.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/strings.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/memory.h \
  D:/Cocos2d/SETUP/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cassert \
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../base/ccRandom.h \
  D:/Cocos2d/SETUP/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/random \
@@ -88,10 +88,10 @@ obj/local/armeabi/objs-debug/cocos2dcpp_shared/__/__/Classes/HelloWorldScene.o: 
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../math/Quaternion.inl \
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../platform/CCGL.h \
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../platform/android/CCGL-android.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/GLES2/gl2platform.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/KHR/khrplatform.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/GLES2/gl2.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/GLES2/gl2ext.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/GLES2/gl2platform.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h \
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../renderer/CCTexture2D.h \
  D:/Cocos2d/SETUP/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/unordered_map \
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../base/CCScriptSupport.h \
@@ -106,7 +106,7 @@ obj/local/armeabi/objs-debug/cocos2dcpp_shared/__/__/Classes/HelloWorldScene.o: 
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../base/CCScheduler.h \
  D:/Cocos2d/SETUP/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/set \
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../base/uthash.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/inttypes.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/inttypes.h \
  D:/Cocos2d/SETUP/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/queue \
  D:/Cocos2d/SETUP/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/condition_variable \
  D:/Cocos2d/SETUP/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/future \
@@ -144,8 +144,8 @@ obj/local/armeabi/objs-debug/cocos2dcpp_shared/__/__/Classes/HelloWorldScene.o: 
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../base/ZipUtils.h \
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../platform/android/CCFileUtils-android.h \
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../platform/CCFileUtils.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/jni.h \
- D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/android/asset_manager.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/jni.h \
+ D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/android/asset_manager.h \
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../base/base64.h \
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../base/ccMacros.h \
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../base/ccTypes.h \
@@ -374,7 +374,44 @@ obj/local/armeabi/objs-debug/cocos2dcpp_shared/__/__/Classes/HelloWorldScene.o: 
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../deprecated/CCNotificationCenter.h \
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../deprecated/CCSet.h \
  D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../deprecated/CCString.h \
- D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../deprecated/CCDeprecated.h
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../deprecated/CCDeprecated.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Box2D.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Common/b2Settings.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Common/b2Draw.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Common/b2Math.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Common/b2Timer.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Collision/Shapes/b2CircleShape.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Collision/Shapes/b2Shape.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Common/b2BlockAllocator.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Collision/b2Collision.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Collision/Shapes/b2EdgeShape.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Collision/Shapes/b2ChainShape.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Collision/Shapes/b2PolygonShape.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Collision/b2BroadPhase.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Collision/b2DynamicTree.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Common/b2GrowableStack.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Collision/b2Distance.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Collision/b2TimeOfImpact.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/b2Body.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/b2Fixture.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/b2WorldCallbacks.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/b2TimeStep.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/b2World.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Common/b2StackAllocator.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/b2ContactManager.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Contacts/b2Contact.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2DistanceJoint.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2Joint.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2FrictionJoint.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2GearJoint.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2MotorJoint.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2MouseJoint.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2PrismaticJoint.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2PulleyJoint.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2RevoluteJoint.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2RopeJoint.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2WeldJoint.h \
+ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2WheelJoint.h
 
 jni/../../Classes/HelloWorldScene.h:
 
@@ -394,7 +431,7 @@ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../platform/CCPla
 
 D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../platform/android/CCPlatformDefine-android.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/android/log.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/android/log.h:
 
 D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../base/CCDirector.h:
 
@@ -408,73 +445,73 @@ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../base/ccMacros.
 
 D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../base/CCConsole.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/sys/select.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/select.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/sys/cdefs.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/cdefs.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/sys/cdefs_elf.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/cdefs_elf.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/android/api-level.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/android/api-level.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/sys/time.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/time.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/sys/types.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/types.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/stdint.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/stdint.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/sys/_types.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/_types.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/machine/_types.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/machine/_types.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/sys/_wchar_limits.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/_wchar_limits.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/linux/posix_types.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/posix_types.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/linux/stddef.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/stddef.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/linux/compiler.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/compiler.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/asm/posix_types.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/posix_types.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/asm/types.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/types.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/linux/types.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/types.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/machine/kernel.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/machine/kernel.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/sys/sysmacros.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/sysmacros.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/linux/time.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/time.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/signal.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/signal.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/limits.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/limits.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/sys/limits.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/limits.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/linux/limits.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/limits.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/machine/internal_types.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/machine/internal_types.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/machine/limits.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/machine/limits.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/sys/syslimits.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/syslimits.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/asm/page.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/page.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/string.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/string.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/malloc.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/malloc.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/asm/signal.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/signal.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/asm-generic/signal.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm-generic/signal.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/asm/sigcontext.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/sigcontext.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/asm/siginfo.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/siginfo.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/asm-generic/siginfo.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm-generic/siginfo.h:
 
 D:/Cocos2d/SETUP/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/thread:
 
@@ -488,15 +525,15 @@ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../platform/CCStd
 
 D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../platform/android/CCStdC-android.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/math.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/math.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/stdlib.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/stdlib.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/alloca.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/alloca.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/strings.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/strings.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/memory.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/memory.h:
 
 D:/Cocos2d/SETUP/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cassert:
 
@@ -552,13 +589,13 @@ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../platform/CCGL.
 
 D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../platform/android/CCGL-android.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/GLES2/gl2platform.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/GLES2/gl2platform.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/KHR/khrplatform.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/GLES2/gl2.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/GLES2/gl2ext.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h:
 
 D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../renderer/CCTexture2D.h:
 
@@ -588,7 +625,7 @@ D:/Cocos2d/SETUP/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/set:
 
 D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../base/uthash.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/inttypes.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/inttypes.h:
 
 D:/Cocos2d/SETUP/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/queue:
 
@@ -664,9 +701,9 @@ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../platform/andro
 
 D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../platform/CCFileUtils.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/jni.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/jni.h:
 
-D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/android/asset_manager.h:
+D:/Cocos2d/SETUP/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/android/asset_manager.h:
 
 D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../base/base64.h:
 
@@ -1125,3 +1162,77 @@ D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../deprecated/CCS
 D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../deprecated/CCString.h:
 
 D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/cocos/3d/../deprecated/CCDeprecated.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Box2D.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Common/b2Settings.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Common/b2Draw.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Common/b2Math.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Common/b2Timer.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Collision/Shapes/b2CircleShape.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Collision/Shapes/b2Shape.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Common/b2BlockAllocator.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Collision/b2Collision.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Collision/Shapes/b2EdgeShape.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Collision/Shapes/b2ChainShape.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Collision/Shapes/b2PolygonShape.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Collision/b2BroadPhase.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Collision/b2DynamicTree.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Common/b2GrowableStack.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Collision/b2Distance.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Collision/b2TimeOfImpact.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/b2Body.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/b2Fixture.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/b2WorldCallbacks.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/b2TimeStep.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/b2World.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Common/b2StackAllocator.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/b2ContactManager.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Contacts/b2Contact.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2DistanceJoint.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2Joint.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2FrictionJoint.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2GearJoint.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2MotorJoint.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2MouseJoint.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2PrismaticJoint.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2PulleyJoint.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2RevoluteJoint.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2RopeJoint.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2WeldJoint.h:
+
+D:\Github\BrainDots\BrainDots\proj.android\../cocos2d/external/bullet/../Box2D/Dynamics/Joints/b2WheelJoint.h:

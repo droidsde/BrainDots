@@ -148,7 +148,17 @@ else()
   endif ( WIN32 )
 endif()
 
-target_link_libraries(${APP_NAME} cocos2d)
+target_link_libraries(${APP_NAME}
+ui
+network
+storage
+spine
+cocostudio
+cocosbuilder
+extensions 
+audio
+cocos2d
+box2d)
 
 set(APP_BIN_DIR "${CMAKE_BINARY_DIR}/bin")
 

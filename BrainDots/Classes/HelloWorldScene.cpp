@@ -1,16 +1,26 @@
 #include "HelloWorldScene.h"
+#include <sstream>
 
 USING_NS_CC;
 #define PTM_RATIO 32.0
 
-HelloWorld::HelloWorld(): world(nullptr), currentPlatformBody(nullptr), target(nullptr)
-{}
+template <typename T>
+std::string to_string(T value)
+{
+	std::ostringstream os ;
+	os << value ;
+	return os.str() ;
+}
+HelloWorld::HelloWorld() :
+		world(nullptr), currentPlatformBody(nullptr), target(nullptr), brush(
+				nullptr), m_bClearBox(false) {
+}
 
 HelloWorld::~HelloWorld() {
-    delete world;
-    world = NULL;
-    CC_SAFE_RELEASE(target);
-    std::vector<Vec2>().swap(platformPoints);
+	delete world;
+	world = NULL;
+	CC_SAFE_RELEASE(target);
+	std::vector<Vec2>().swap(platformPoints);
 }
 
 Scene* HelloWorld::createScene() {
@@ -34,14 +44,13 @@ bool HelloWorld::init() {
 	if (!Layer::init()) {
 		return false;
 	}
-    m_bClearBox = false;
+
 	visibleSize = Director::getInstance()->getVisibleSize();
 	origin = Director::getInstance()->getVisibleOrigin();
 
 	// add a "close" icon to exit the progress. it's an autorelease object
 	auto closeItem = MenuItemImage::create("CloseNormal.png",
-			"CloseSelected.png",
-			CC_CALLBACK_1(HelloWorld::clearScreen, this));
+			"CloseSelected.png", CC_CALLBACK_1(HelloWorld::clearScreen, this));
 
 	closeItem->setPosition(
 			Vec2(
@@ -84,61 +93,65 @@ void HelloWorld::initPhysics() {
 
 	uint32 flags = 0;
 	flags += b2Draw::e_shapeBit;
-    
-    //Define the ground body
-    b2BodyDef groundBodyDef;
-    groundBodyDef.position.Set(0, 0); // bottom-left corner
-    
-    // create body
-    b2Body* groundBody = world->CreateBody(&groundBodyDef);
-    
-    //Define the ground box shape
-    b2EdgeShape groundBox;
-    
-    //ground
-    groundBox.Set(b2Vec2(0,0), b2Vec2(visibleSize.width/PTM_RATIO,0));
-    groundBody->CreateFixture(&groundBox,0);
-    
-    // top
-    groundBox.Set(b2Vec2(0,visibleSize.height/PTM_RATIO), b2Vec2(visibleSize.width/PTM_RATIO,visibleSize.height/PTM_RATIO));
-    groundBody->CreateFixture(&groundBox,0);
-    
-    // left
-    groundBox.Set(b2Vec2(0,visibleSize.height/PTM_RATIO), b2Vec2(0,0));
-    groundBody->CreateFixture(&groundBox,0);
-    
-    // right
-    groundBox.Set(b2Vec2(visibleSize.width/PTM_RATIO,visibleSize.height/PTM_RATIO), b2Vec2(visibleSize.width/PTM_RATIO,0));
-    groundBody->CreateFixture(&groundBox,0);
+
+	//Define the ground body
+	b2BodyDef groundBodyDef;
+	groundBodyDef.position.Set(0, 0); // bottom-left corner
+
+	// create body
+	b2Body* groundBody = world->CreateBody(&groundBodyDef);
+
+	//Define the ground box shape
+	b2EdgeShape groundBox;
+
+	//ground
+	groundBox.Set(b2Vec2(0, 0), b2Vec2(visibleSize.width / PTM_RATIO, 0));
+	groundBody->CreateFixture(&groundBox, 0);
+
+	// top
+	groundBox.Set(b2Vec2(0, visibleSize.height / PTM_RATIO),
+			b2Vec2(visibleSize.width / PTM_RATIO,
+					visibleSize.height / PTM_RATIO));
+	groundBody->CreateFixture(&groundBox, 0);
+
+	// left
+//	groundBox.Set(b2Vec2(0, visibleSize.height / PTM_RATIO), b2Vec2(0, 0));
+//	groundBody->CreateFixture(&groundBox, 0);
+
+	// right
+//	groundBox.Set(
+//			b2Vec2(visibleSize.width / PTM_RATIO,
+//					visibleSize.height / PTM_RATIO),
+//			b2Vec2(visibleSize.width / PTM_RATIO, 0));
+	groundBody->CreateFixture(&groundBox, 0);
 
 }
 
-
 void HelloWorld::update(float dt) {
-    
-    if (m_bClearBox) {
-        // ç”»é�¢ã‚¯ãƒªã‚¢å‡¦ç�†
-        this->removeChild(target, true);
-        target->release();
-        
-        this->removeAllChildren();
-        m_bClearBox = false;
-        
-        for (b2Body* b = world->GetBodyList(); b; b = b->GetNext())
-        {
-            if (b->GetUserData() != NULL) {
-                world->DestroyBody(b);
-            }
-        }
-        
-        target = RenderTexture::create(visibleSize.width, visibleSize.height, Texture2D::PixelFormat::RGBA8888);
-        target->retain();
-        target->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
-        this->addChild(target);
-        
-        return;
-    }
-    
+
+	if (m_bClearBox) {
+		this->removeChild(target, true);
+		target->release();
+
+		this->removeAllChildren();
+		m_bClearBox = false;
+
+		for (b2Body* b = world->GetBodyList(); b; b = b->GetNext()) {
+			if (b->GetUserData() != NULL) {
+				world->DestroyBody(b);
+			}
+		}
+
+		target = RenderTexture::create(visibleSize.width, visibleSize.height,
+				Texture2D::PixelFormat::RGBA8888);
+		target->retain();
+		target->setPosition(
+				Vec2(visibleSize.width / 2, visibleSize.height / 2));
+		this->addChild(target);
+
+		return;
+	}
+
 	int positionIterations = 8;
 	int velocityIterations = 1;
 
@@ -158,36 +171,36 @@ void HelloWorld::update(float dt) {
 }
 
 bool HelloWorld::onTouchBegan(Touch* touch, Event* event) {
-    int r = rand()%128+128;
-    int b = rand()%128+128;
-    int g = rand()%128+128;
-    brush->setColor(Color3B(r, b, g));
-    
-    platformPoints.clear();
-    Vec2 location = touch->getLocationInView();
-    location = Director::getInstance()->convertToGL(location);
-    platformPoints.push_back(location);
-    previousLocation = location;
-    
-    b2BodyDef myBodyDef;
-    myBodyDef.type = b2_staticBody;
-    myBodyDef.position.Set(location.x/PTM_RATIO,location.y/PTM_RATIO);
-    currentPlatformBody = world->CreateBody(&myBodyDef);
-    return true;
+	int r = rand() % 128 + 128;
+	int b = rand() % 128 + 128;
+	int g = rand() % 128 + 128;
+	brush->setColor(Color3B(r, b, g));
+
+	platformPoints.clear();
+	Vec2 location = touch->getLocationInView();
+	location = Director::getInstance()->convertToGL(location);
+	platformPoints.push_back(location);
+	previousLocation = location;
+
+	b2BodyDef myBodyDef;
+	myBodyDef.type = b2_staticBody;
+	myBodyDef.position.Set(location.x / PTM_RATIO, location.y / PTM_RATIO);
+	currentPlatformBody = world->CreateBody(&myBodyDef);
+	return true;
 }
 
 void HelloWorld::onTouchMoved(Touch* touch, Event* event) {
-    
-    Vec2 start = touch->getLocationInView();
-    start = Director::getInstance()->convertToGL(start);
-    Vec2 end = touch->getPreviousLocationInView();
-    end = Director::getInstance()->convertToGL(end);
-    
-    target->begin();
-    
-    float distance = start.getDistance(end);
-    CCLOG("distance %f",distance);
-    
+
+	Vec2 start = touch->getLocationInView();
+	start = Director::getInstance()->convertToGL(start);
+	Vec2 end = touch->getPreviousLocationInView();
+	end = Director::getInstance()->convertToGL(end);
+
+	target->begin();
+
+	float distance = start.getDistance(end);
+	CCLOG("distance %f", distance);
+
 //    for (int i = 0; i < distance; i++) {
 //        float difX = end.x - start.x;
 //        float difY = end.y - start.y;
@@ -195,70 +208,75 @@ void HelloWorld::onTouchMoved(Touch* touch, Event* event) {
 //        brush->setPosition(Vec2(start.x + (difX * delta), start.y + (difY * delta)));
 //        brush->visit();
 //    }
-    _brushs.clear();
-    for(int i = 0; i < distance; ++i)
-    {
-        Sprite * sprite = Sprite::create("largeBrush.png");
-        _brushs.push_back(sprite);
-    }
-    for (int i = 0; i < distance; i++)
-    {
-        float difx = end.x - start.x;
-        float dify = end.y - start.y;
-        float delta = (float)i / distance;
-        _brushs.at(i)->setPosition(Vec2(start.x + (difx * delta), start.y + (dify * delta)));
-        _brushs.at(i)->setRotation(rand() % 360);
-        _brushs.at(i)->visit();
-    }
-    target->end();
-    
-    platformPoints.push_back(start);
-    previousLocation = start;
+	_brushs.clear();
+	for (int i = 0; i < distance; ++i) {
+		Sprite * sprite = Sprite::create("largeBrush.png");
+		_brushs.push_back(sprite);
+	}
+	for (int i = 0; i < distance; i++) {
+		float difx = end.x - start.x;
+		float dify = end.y - start.y;
+		float delta = (float) i / distance;
+		_brushs.at(i)->setPosition(
+				Vec2(start.x + (difx * delta), start.y + (dify * delta)));
+		_brushs.at(i)->setRotation(rand() % 360);
+		_brushs.at(i)->visit();
+	}
+	target->end();
+
+	platformPoints.push_back(start);
+	previousLocation = start;
 }
 
 void HelloWorld::onTouchEnded(Touch* touch, Event* event) {
-    
-    if (platformPoints.size()>1) {
-        //Add a new body/atlas sprite at the touched location
-        b2BodyDef myBodyDef;
-        myBodyDef.type = b2_dynamicBody; //this will be a dynamic body
-        myBodyDef.position.Set(currentPlatformBody->GetPosition().x, currentPlatformBody->GetPosition().y); //set the starting position
-        world->DestroyBody(currentPlatformBody);
-        b2Body* newBody = world->CreateBody(&myBodyDef);
-        for(int i=0; i < platformPoints.size()-1; i++)
-        {
-            Vec2 start = platformPoints[i];
-            Vec2 end = platformPoints[i+1];
-            this->addRectangleBetweenPointsToBody(newBody,start,end);
-        }
-        Rect bodyRectangle = getBodyRectangle(newBody);
-        float anchorX = newBody->GetPosition().x * PTM_RATIO - bodyRectangle.origin.x;
-        float anchorY = bodyRectangle.size.height - (visibleSize.height - bodyRectangle.origin.y - newBody->GetPosition().y * PTM_RATIO);
-        
-        Vec2 anchorPoint = Vec2(anchorX / bodyRectangle.size.width,  anchorY / bodyRectangle.size.height);
-        
-        // draw sprite use render texture
-        auto _image = target->newImage();
-        auto _key = std::to_string((int)time(NULL));
-        auto _texture2D = Director::getInstance()->getTextureCache()->addImage(_image, _key);
-        CC_SAFE_DELETE(_image);
-        
-        auto texture2D = Sprite::createWithTexture(_texture2D, bodyRectangle);
-        texture2D->setAnchorPoint(anchorPoint);
-        addChild(texture2D);
-        newBody->SetUserData(texture2D);
-    }
-    removeChild(target, true);
-    target->release();
-    target = RenderTexture::create(visibleSize.width, visibleSize.height,Texture2D::PixelFormat::RGBA8888);
-    target->retain();
-    target->setPosition(visibleSize.width / 2, visibleSize.height / 2);
-    addChild(target);
+
+	if (platformPoints.size() > 1) {
+		//Add a new body/atlas sprite at the touched location
+		b2BodyDef myBodyDef;
+		myBodyDef.type = b2_dynamicBody; //this will be a dynamic body
+		myBodyDef.position.Set(currentPlatformBody->GetPosition().x,
+				currentPlatformBody->GetPosition().y); //set the starting position
+		world->DestroyBody(currentPlatformBody);
+		b2Body* newBody = world->CreateBody(&myBodyDef);
+		for (int i = 0; i < platformPoints.size() - 1; i++) {
+			Vec2 start = platformPoints[i];
+			Vec2 end = platformPoints[i + 1];
+			this->addRectangleBetweenPointsToBody(newBody, start, end);
+		}
+		Rect bodyRectangle = getBodyRectangle(newBody);
+		float anchorX = newBody->GetPosition().x * PTM_RATIO
+				- bodyRectangle.origin.x;
+		float anchorY = bodyRectangle.size.height
+				- (visibleSize.height - bodyRectangle.origin.y
+						- newBody->GetPosition().y * PTM_RATIO);
+
+		Vec2 anchorPoint = Vec2(anchorX / bodyRectangle.size.width,
+				anchorY / bodyRectangle.size.height);
+
+		// draw sprite use render texture
+		auto _image = target->newImage();
+		auto _key = to_string((int) time(NULL));
+		auto _texture2D = Director::getInstance()->getTextureCache()->addImage(
+				_image, _key);
+		CC_SAFE_DELETE(_image);
+
+		auto texture2D = Sprite::createWithTexture(_texture2D, bodyRectangle);
+		texture2D->setAnchorPoint(anchorPoint);
+		addChild(texture2D);
+		newBody->SetUserData(texture2D);
+	}
+	removeChild(target, true);
+	target->release();
+	target = RenderTexture::create(visibleSize.width, visibleSize.height,
+			Texture2D::PixelFormat::RGBA8888);
+	target->retain();
+	target->setPosition(visibleSize.width / 2, visibleSize.height / 2);
+	addChild(target);
 }
 
 void HelloWorld::addRectangleBetweenPointsToBody(b2Body* body, Vec2 start,
 		Vec2 end) {
-	float min = brush->getContentSize().width*brush->getScale()/PTM_RATIO;
+	float min = brush->getContentSize().width * brush->getScale() / PTM_RATIO;
 
 	float sx = start.x;
 	float sy = start.y;
@@ -334,9 +352,8 @@ Rect HelloWorld::getBodyRectangle(b2Body* body) {
 	return Rect(minX2, remY2, width2, height2);
 }
 
-void HelloWorld::clearScreen(cocos2d::Ref *pSender)
-{
-    this->m_bClearBox = true;
+void HelloWorld::clearScreen(cocos2d::Ref *pSender) {
+	this->m_bClearBox = true;
 }
 
 void HelloWorld::menuCloseCallback(Ref* pSender) {

@@ -1,3 +1,5 @@
 BrainDots/proj.android/bin/*
 BrainDots/proj.android/gen/*
+BrainDots/proj.android/obj/*
+BrainDots/proj.android/libs/*
 BrainDots/cocos2d/*

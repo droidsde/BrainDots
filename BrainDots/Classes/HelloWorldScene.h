@@ -8,6 +8,8 @@ USING_NS_CC;
 
 class HelloWorld: public cocos2d::Layer {
 public:
+    HelloWorld();
+    virtual ~HelloWorld();
 	// there's no 'id' in cpp, so we recommend returning the class instance pointer
 	static cocos2d::Scene* createScene();
 
@@ -18,8 +20,7 @@ public:
 	void menuCloseCallback(cocos2d::Ref* pSender);
 
 	// implement the "static create()" method manually
-	CREATE_FUNC(HelloWorld)
-	;
+	CREATE_FUNC(HelloWorld);
 
 	virtual bool onTouchBegan(Touch* touch, Event* event);
 	virtual void onTouchMoved(Touch* touch, Event* event);
@@ -30,16 +31,14 @@ public:
 	void update(float dt);
 	void addRectangleBetweenPointsToBody(b2Body* body, Vec2 start, Vec2 end);
 	Rect getBodyRectangle(b2Body* body);
-
-	b2BodyDef bodyDef;
-	b2FixtureDef fixtureDef;
-	b2CircleShape bodyShape;
-
-	void addWall(float w, float h, float px, float py);
+    
+    void clearScreen(Ref* pSender);
+    
 private:
 	Size visibleSize;
 	Vec2 origin;
-
+    
+    bool m_bClearBox;
 	b2World* world;
 	b2Body* currentPlatformBody;
 
@@ -48,6 +47,7 @@ private:
 
 	RenderTexture *target;
 	Sprite *brush;
+    std::vector<Sprite*> _brushs;
 };
 
 #endif // __HELLOWORLD_SCENE_H__

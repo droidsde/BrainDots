@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>A59135DA-36E6-4B92-AE00-1663162E3776</string>
+	<key>IDESourceControlProjectName</key>
+	<string>BrainDots</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>5CA7AD0C09115B363270DE4330D2D7DE6A9A4ABD</key>
+		<string>https://github.com/reddevil138/BrainDots.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>BrainDots/proj.ios_mac/BrainDots.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>5CA7AD0C09115B363270DE4330D2D7DE6A9A4ABD</key>
+		<string>../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/reddevil138/BrainDots.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>5CA7AD0C09115B363270DE4330D2D7DE6A9A4ABD</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>5CA7AD0C09115B363270DE4330D2D7DE6A9A4ABD</string>
+			<key>IDESourceControlWCCName</key>
+			<string>BrainDots</string>
+		</dict>
+	</array>
+</dict>
+</plist>

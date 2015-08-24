@@ -3,7 +3,8 @@
 USING_NS_CC;
 #define PTM_RATIO 32.0
 
-HelloWorld::HelloWorld(): world(nullptr), currentPlatformBody(nullptr), target(nullptr){}
+HelloWorld::HelloWorld(): world(nullptr), currentPlatformBody(nullptr), target(nullptr)
+{}
 
 HelloWorld::~HelloWorld() {
     delete world;
@@ -116,7 +117,7 @@ void HelloWorld::initPhysics() {
 void HelloWorld::update(float dt) {
     
     if (m_bClearBox) {
-        // 画面クリア処理
+        // ç”»é�¢ã‚¯ãƒªã‚¢å‡¦ç�†
         this->removeChild(target, true);
         target->release();
         

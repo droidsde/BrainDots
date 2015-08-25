@@ -2,7 +2,7 @@
 #include <sstream>
 
 USING_NS_CC;
-#define PTM_RATIO 32.0
+#define PTM_RATIO 32.0 // 32px = 1m in Box2D
 
 template <typename T>
 std::string to_string(T value)
@@ -13,7 +13,7 @@ std::string to_string(T value)
 }
 HelloWorld::HelloWorld() :
 		world(nullptr), currentPlatformBody(nullptr), target(nullptr), brush(
-				nullptr), m_bClearBox(false) {
+				nullptr), m_bClearBox(false), _ballContactListener(nullptr) {
 }
 
 HelloWorld::~HelloWorld() {
@@ -21,6 +21,9 @@ HelloWorld::~HelloWorld() {
 	world = NULL;
 	CC_SAFE_RELEASE(target);
 	std::vector<Vec2>().swap(platformPoints);
+    delete _ballContactListener;
+    delete this->debugDraw;
+    this->debugDraw = NULL;
 }
 
 Scene* HelloWorld::createScene() {
@@ -65,7 +68,8 @@ bool HelloWorld::init() {
 
 	// init physics
 	this->initPhysics();
-
+    this->initBalls();
+    
 	target = RenderTexture::create(visibleSize.width, visibleSize.height,
 			Texture2D::PixelFormat::RGBA8888);
 	target->retain();
@@ -75,7 +79,8 @@ bool HelloWorld::init() {
 	brush = CCSprite::create("largeBrush.png");
 	brush->retain();
 	scheduleUpdate();
-
+    
+    // add touch
 	auto listener = EventListenerTouchOneByOne::create();
 	listener->setSwallowTouches(true);
 	listener->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan, this);
@@ -85,6 +90,16 @@ bool HelloWorld::init() {
 	return true;
 }
 
+void HelloWorld::draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformUpdated) {
+    Layer::draw(renderer, transform, transformUpdated);
+    Director* director = Director::getInstance();
+    
+    GL::enableVertexAttribs( cocos2d::GL::VERTEX_ATTRIB_FLAG_POSITION );
+    director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+    world->DrawDebugData();
+    director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+}
+
 void HelloWorld::initPhysics() {
 	b2Vec2 gravity = b2Vec2(0.0f, -10.0f);
 	world = new b2World(gravity);
@@ -92,9 +107,18 @@ void HelloWorld::initPhysics() {
 	world->SetContinuousPhysics(true);
     world->SetAutoClearForces(true);
     
+    // add debug draw
+    this->debugDraw = new GLESDebugDraw( PTM_RATIO );
+    this->world->SetDebugDraw(debugDraw);
+    
+    // add contact
+    _ballContactListener = new BallContactListener();
+    world->SetContactListener(_ballContactListener);
+    
 	uint32 flags = 0;
 	flags += b2Draw::e_shapeBit;
-
+    this->debugDraw->SetFlags(flags);
+    
 	//Define the ground body
 	b2BodyDef groundBodyDef;
 	groundBodyDef.position.Set(0, 0); // bottom-left corner
@@ -128,6 +152,49 @@ void HelloWorld::initPhysics() {
 
 }
 
+void HelloWorld::initBalls()
+{
+    auto ballASprite = Sprite::create("ball_red.png");
+    addChild(ballASprite);
+    ballASprite->setPosition(Vec2(visibleSize.width/4, visibleSize.height/2));
+    
+    auto ballBSprite = Sprite::create("ball_blue.png");
+    addChild(ballBSprite);
+    ballBSprite->setPosition(Vec2(visibleSize.width*3/4, visibleSize.height/2));
+    
+    
+    // shape of body
+    b2CircleShape circleShape;
+    circleShape.m_radius = 12.5f/PTM_RATIO;
+    
+    // fixturedef
+    b2FixtureDef ballFixtureDef;
+    ballFixtureDef.shape = &circleShape;
+    ballFixtureDef.density = 10.0f;
+    ballFixtureDef.friction = 0.2f;
+    ballFixtureDef.restitution = 0.1f;
+    
+    // body definition
+    b2BodyDef mBallDefA;
+    mBallDefA.position.Set(ballASprite->getPositionX() / PTM_RATIO, ballASprite->getPositionY()/ PTM_RATIO);
+    mBallDefA.type = b2_staticBody;
+    
+    b2BodyDef mBallDefB;
+    mBallDefB.position.Set(ballBSprite->getPositionX() / PTM_RATIO, ballBSprite->getPositionY()/ PTM_RATIO);
+    mBallDefB.type = b2_staticBody;
+    
+    ballA = world->CreateBody(&mBallDefA);
+    ballA->CreateFixture(&ballFixtureDef);
+    ballA->SetUserData(ballASprite);
+    ballA->SetGravityScale(10);
+    
+    ballB = world->CreateBody(&mBallDefB);
+    ballB->CreateFixture(&ballFixtureDef);
+    ballB->SetUserData(ballBSprite);
+    ballB->SetGravityScale(10);
+
+}
+
 void HelloWorld::update(float dt) {
 
 	if (m_bClearBox) {
@@ -155,9 +222,11 @@ void HelloWorld::update(float dt) {
 
 	int positionIterations = 8;
 	int velocityIterations = 1;
-
-	world->Step(dt, velocityIterations, positionIterations);
-//    CCLOG("list body %d", world->GetBodyCount());
+    if (!gameOver) {
+        world->Step(dt, velocityIterations, positionIterations);
+    } else {
+        this->unschedule(schedule_selector(HelloWorld::update));
+    }
 	for (b2Body *body = world->GetBodyList(); body != NULL; body =
 			body->GetNext()) {
 		if (body->GetUserData()) {
@@ -168,8 +237,61 @@ void HelloWorld::update(float dt) {
 			sprite->setRotation(-1 * CC_RADIANS_TO_DEGREES(body->GetAngle()));
 		}
 	}
+//    for (b2Contact* contact = world->GetContactList(); contact; contact = contact->GetNext()) {
+//        b2Fixture* a = contact->GetFixtureA();
+//        b2Fixture* b = contact->GetFixtureB();
+//        auto bodyA = a->GetBody();
+//        auto bodyB = b->GetBody();
+//        
+//        if (bodyA && bodyB) {
+//            if ((bodyA == ballA && bodyB == ballB) || (bodyA == ballB && bodyB == ballA)) {
+//                if (bodyA->GetType() == b2_dynamicBody) {
+//                    bodyA->SetType(b2_staticBody);
+//                }
+//                
+//                if (bodyB->GetType() == b2_dynamicBody) {
+//                    bodyB->SetType(b2_staticBody);
+//                }
+//                gameOver = true;
+//            }
+//        }
+//    }
+    
+    std::vector<b2Body *>toStatic;
+    std::vector<BallContact>::iterator pos;
+    for (pos = _ballContactListener->_contacts.begin(); pos != _ballContactListener->_contacts.end(); ++pos) {
+        BallContact contact = *pos;
+        if (contact.fixtureA && contact.fixtureB) {
+            b2Body* bodyA = contact.fixtureA->GetBody();
+            b2Body* bodyB = contact.fixtureB->GetBody();
+            
+            if (bodyA && bodyB && ballA && ballB) {
+                if ((bodyA == ballA && bodyB == ballB) || (bodyA == ballB && bodyB == ballA)) {
+                    if (bodyA->GetType() == b2_dynamicBody) {
+                        CCLOG("collide");
+                        toStatic.push_back(bodyA);
+                        toStatic.push_back(bodyB);
+                    }
+                    
+                    if (bodyB->GetType() == b2_dynamicBody) {
+                        CCLOG("collide");
+                        toStatic.push_back(bodyA);
+                        toStatic.push_back(bodyB);
+                    }
+//                    gameOver = true;
+                }
+            }
+        }
+    }
+    std::vector<b2Body *>::iterator pos2;
+    for(pos2 = toStatic.begin(); pos2 != toStatic.end(); ++pos2) {
+        b2Body *body = *pos2;
+        if (body->GetType() == b2_dynamicBody) {
+            body->SetType(b2_staticBody);
+        }
+    }
+    
 	world->ClearForces();
-//	world->DrawDebugData();
 }
 
 bool HelloWorld::onTouchBegan(Touch* touch, Event* event) {
@@ -232,6 +354,14 @@ void HelloWorld::onTouchMoved(Touch* touch, Event* event) {
 
 void HelloWorld::onTouchEnded(Touch* touch, Event* event) {
 
+    if (ballA && ballB) {
+        if (ballA->GetType() == b2_staticBody) {
+            ballA->SetType(b2_dynamicBody);
+        }
+        if (ballB->GetType() == b2_staticBody) {
+            ballB->SetType(b2_dynamicBody);
+        }
+    }
 	if (platformPoints.size() > 1) {
 		//Add a new body/atlas sprite at the touched location
 		b2BodyDef myBodyDef;
@@ -356,6 +486,9 @@ Rect HelloWorld::getBodyRectangle(b2Body* body) {
 
 void HelloWorld::clearScreen(cocos2d::Ref *pSender) {
 	this->m_bClearBox = true;
+    auto scene = HelloWorld::createScene();
+    auto changeScene = TransitionFade::create(1.0f, scene);
+    Director::getInstance()->replaceScene(changeScene);
 }
 
 void HelloWorld::menuCloseCallback(Ref* pSender) {

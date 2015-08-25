@@ -90,7 +90,8 @@ void HelloWorld::initPhysics() {
 	world = new b2World(gravity);
 	world->SetAllowSleeping(true);
 	world->SetContinuousPhysics(true);
-
+    world->SetAutoClearForces(true);
+    
 	uint32 flags = 0;
 	flags += b2Draw::e_shapeBit;
 
@@ -156,6 +157,7 @@ void HelloWorld::update(float dt) {
 	int velocityIterations = 1;
 
 	world->Step(dt, velocityIterations, positionIterations);
+//    CCLOG("list body %d", world->GetBodyCount());
 	for (b2Body *body = world->GetBodyList(); body != NULL; body =
 			body->GetNext()) {
 		if (body->GetUserData()) {
@@ -167,7 +169,7 @@ void HelloWorld::update(float dt) {
 		}
 	}
 	world->ClearForces();
-	world->DrawDebugData();
+//	world->DrawDebugData();
 }
 
 bool HelloWorld::onTouchBegan(Touch* touch, Event* event) {

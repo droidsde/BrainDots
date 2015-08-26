@@ -15,6 +15,7 @@
 struct BallContact {
     b2Fixture* fixtureA;
     b2Fixture* fixtureB;
+    b2Vec2 collisionPoint;
     bool operator==(const BallContact& other) const
     {
         return (fixtureA == other.fixtureA) && (fixtureB == other.fixtureB);

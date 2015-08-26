@@ -59,6 +59,7 @@ private:
     
     // contacts
     BallContactListener* _ballContactListener;
+    Vec2 collisionPoint = Vec2::ZERO;
 };
 
 #endif // __HELLOWORLD_SCENE_H__

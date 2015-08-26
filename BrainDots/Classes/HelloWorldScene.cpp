@@ -4,6 +4,12 @@
 USING_NS_CC;
 #define PTM_RATIO 32.0 // 32px = 1m in Box2D
 
+enum TAG
+{
+    ballA = 1,
+    ballB,
+};
+
 template <typename T>
 std::string to_string(T value)
 {
@@ -13,7 +19,7 @@ std::string to_string(T value)
 }
 HelloWorld::HelloWorld() :
 		world(nullptr), currentPlatformBody(nullptr), target(nullptr), brush(
-				nullptr), m_bClearBox(false), _ballContactListener(nullptr) {
+				nullptr), _brushs(), m_bClearBox(false), _ballContactListener(nullptr) {
 }
 
 HelloWorld::~HelloWorld() {
@@ -42,8 +48,7 @@ Scene* HelloWorld::createScene() {
 
 // on "init" you need to initialize your instance
 bool HelloWorld::init() {
-	//////////////////////////////
-	// 1. super init first
+    
 	if (!Layer::init()) {
 		return false;
 	}
@@ -76,9 +81,10 @@ bool HelloWorld::init() {
 	target->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
 	this->addChild(target);
 
-	brush = CCSprite::create("largeBrush.png");
+	brush = CCSprite::create("brush.png");
 	brush->retain();
-	scheduleUpdate();
+//	scheduleUpdate();
+    this->schedule(schedule_selector(HelloWorld::update));
     
     // add touch
 	auto listener = EventListenerTouchOneByOne::create();
@@ -157,10 +163,12 @@ void HelloWorld::initBalls()
     auto ballASprite = Sprite::create("ball_red.png");
     addChild(ballASprite);
     ballASprite->setPosition(Vec2(visibleSize.width/4, visibleSize.height/2));
+    ballASprite->setTag(TAG::ballA);
     
     auto ballBSprite = Sprite::create("ball_blue.png");
     addChild(ballBSprite);
     ballBSprite->setPosition(Vec2(visibleSize.width*3/4, visibleSize.height/2));
+    ballBSprite->setTag(TAG::ballB);
     
     
     // shape of body
@@ -170,9 +178,7 @@ void HelloWorld::initBalls()
     // fixturedef
     b2FixtureDef ballFixtureDef;
     ballFixtureDef.shape = &circleShape;
-    ballFixtureDef.density = 10.0f;
-    ballFixtureDef.friction = 0.2f;
-    ballFixtureDef.restitution = 0.1f;
+    ballFixtureDef.density = 30.0f;
     
     // body definition
     b2BodyDef mBallDefA;
@@ -186,46 +192,47 @@ void HelloWorld::initBalls()
     ballA = world->CreateBody(&mBallDefA);
     ballA->CreateFixture(&ballFixtureDef);
     ballA->SetUserData(ballASprite);
-    ballA->SetGravityScale(10);
+//    ballA->SetGravityScale(10);
     
     ballB = world->CreateBody(&mBallDefB);
     ballB->CreateFixture(&ballFixtureDef);
     ballB->SetUserData(ballBSprite);
-    ballB->SetGravityScale(10);
+//    ballB->SetGravityScale(10);
 
 }
 
 void HelloWorld::update(float dt) {
-
-	if (m_bClearBox) {
-		this->removeChild(target, true);
-		target->release();
-
-		this->removeAllChildren();
-		m_bClearBox = false;
-
-		for (b2Body* b = world->GetBodyList(); b; b = b->GetNext()) {
-			if (b->GetUserData() != NULL) {
-				world->DestroyBody(b);
-			}
-		}
-
-		target = RenderTexture::create(visibleSize.width, visibleSize.height,
-				Texture2D::PixelFormat::RGBA8888);
-		target->retain();
-		target->setPosition(
-				Vec2(visibleSize.width / 2, visibleSize.height / 2));
-		this->addChild(target);
-
-		return;
-	}
 
 	int positionIterations = 8;
 	int velocityIterations = 1;
     if (!gameOver) {
         world->Step(dt, velocityIterations, positionIterations);
     } else {
+        CCLOG("endgames %f %f", collisionPoint.x, collisionPoint.y);
+        ParticleSystemQuad* starParticle = ParticleSystemQuad::create("star_particle.plist");
+        starParticle->setPosition(collisionPoint);
+        starParticle->setAutoRemoveOnFinish(true);
+        starParticle->retain();
+        
+        ParticleSystemQuad* ringParticle = ParticleSystemQuad::create("ring_particle.plist");
+        ringParticle->setPosition(collisionPoint);
+        ringParticle->setAutoRemoveOnFinish(true);
+        ringParticle->retain();
+        
+        auto call1 = CallFunc::create([=]()
+                                     {
+                                         this->addChild(ringParticle);
+                                     });
+        auto call2 = CallFunc::create([=]()
+                                      {
+                                          this->addChild(starParticle);
+                                      });
+
+        this->runAction(Sequence::create(call1, DelayTime::create(1.0f), call2,  NULL));
+
+        
         this->unschedule(schedule_selector(HelloWorld::update));
+        return;
     }
 	for (b2Body *body = world->GetBodyList(); body != NULL; body =
 			body->GetNext()) {
@@ -259,30 +266,24 @@ void HelloWorld::update(float dt) {
     
     std::vector<b2Body *>toStatic;
     std::vector<BallContact>::iterator pos;
-    for (pos = _ballContactListener->_contacts.begin(); pos != _ballContactListener->_contacts.end(); ++pos) {
+    for (pos = _ballContactListener->_contacts.begin(); pos != _ballContactListener->_contacts.end(); ++pos)
+    {
         BallContact contact = *pos;
-        if (contact.fixtureA && contact.fixtureB) {
-            b2Body* bodyA = contact.fixtureA->GetBody();
-            b2Body* bodyB = contact.fixtureB->GetBody();
-            
-            if (bodyA && bodyB && ballA && ballB) {
-                if ((bodyA == ballA && bodyB == ballB) || (bodyA == ballB && bodyB == ballA)) {
-                    if (bodyA->GetType() == b2_dynamicBody) {
-                        CCLOG("collide");
-                        toStatic.push_back(bodyA);
-                        toStatic.push_back(bodyB);
-                    }
-                    
-                    if (bodyB->GetType() == b2_dynamicBody) {
-                        CCLOG("collide");
-                        toStatic.push_back(bodyA);
-                        toStatic.push_back(bodyB);
-                    }
-//                    gameOver = true;
+        b2Body* bodyA = contact.fixtureA->GetBody();
+        b2Body* bodyB = contact.fixtureB->GetBody();
+        if (bodyA && bodyB && ballA && ballB && bodyA->GetUserData() != NULL && bodyB->GetUserData() != NULL) {
+            if ((bodyA == ballA && bodyB == ballB) || (bodyA == ballB && bodyB == ballA)) {
+                if (bodyA->GetType() == b2_dynamicBody && bodyB->GetType() == b2_dynamicBody) {
+                    toStatic.push_back(bodyA);
+                    toStatic.push_back(bodyB);
+                    collisionPoint = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
+                    gameOver = true;
+
                 }
             }
         }
     }
+    
     std::vector<b2Body *>::iterator pos2;
     for(pos2 = toStatic.begin(); pos2 != toStatic.end(); ++pos2) {
         b2Body *body = *pos2;
@@ -290,7 +291,7 @@ void HelloWorld::update(float dt) {
             body->SetType(b2_staticBody);
         }
     }
-    
+
 	world->ClearForces();
 }
 
@@ -301,8 +302,7 @@ bool HelloWorld::onTouchBegan(Touch* touch, Event* event) {
 	brush->setColor(Color3B(r, b, g));
 
 	platformPoints.clear();
-	Vec2 location = touch->getLocationInView();
-	location = Director::getInstance()->convertToGL(location);
+	Vec2 location = touch->getLocation();
 	platformPoints.push_back(location);
 	previousLocation = location;
 
@@ -315,15 +315,12 @@ bool HelloWorld::onTouchBegan(Touch* touch, Event* event) {
 
 void HelloWorld::onTouchMoved(Touch* touch, Event* event) {
 
-	Vec2 start = touch->getLocationInView();
-	start = Director::getInstance()->convertToGL(start);
-	Vec2 end = touch->getPreviousLocationInView();
-	end = Director::getInstance()->convertToGL(end);
+    Vec2 start = touch->getLocation();
+    Vec2 end = touch->getPreviousLocation();
 
 	target->begin();
 
 	float distance = start.getDistance(end);
-	CCLOG("distance %f", distance);
 
 //    for (int i = 0; i < distance; i++) {
 //        float difX = end.x - start.x;
@@ -334,7 +331,7 @@ void HelloWorld::onTouchMoved(Touch* touch, Event* event) {
 //    }
 	_brushs.clear();
 	for (int i = 0; i < distance; ++i) {
-		Sprite * sprite = Sprite::create("largeBrush.png");
+		Sprite * sprite = Sprite::createWithTexture(brush->getTexture());
 		_brushs.push_back(sprite);
 	}
 	for (int i = 0; i < distance; i++) {
@@ -343,7 +340,7 @@ void HelloWorld::onTouchMoved(Touch* touch, Event* event) {
 		float delta = (float) i / distance;
 		_brushs.at(i)->setPosition(
 				Vec2(start.x + (difx * delta), start.y + (dify * delta)));
-		_brushs.at(i)->setRotation(rand() % 360);
+//		_brushs.at(i)->setRotation(rand() % 360);
 		_brushs.at(i)->visit();
 	}
 	target->end();
@@ -363,6 +360,7 @@ void HelloWorld::onTouchEnded(Touch* touch, Event* event) {
         }
     }
 	if (platformPoints.size() > 1) {
+        CCLOG("size of platformPoints %zd", platformPoints.size());
 		//Add a new body/atlas sprite at the touched location
 		b2BodyDef myBodyDef;
 		myBodyDef.type = b2_dynamicBody; //this will be a dynamic body
@@ -432,7 +430,6 @@ void HelloWorld::addRectangleBetweenPointsToBody(b2Body* body, Vec2 start,
 	b2FixtureDef boxFixtureDef;
 	boxFixtureDef.shape = &boxShape;
 	boxFixtureDef.density = 5;
-	boxFixtureDef.filter.categoryBits = 2;
 
 	body->CreateFixture(&boxFixtureDef);
 }
@@ -486,6 +483,18 @@ Rect HelloWorld::getBodyRectangle(b2Body* body) {
 
 void HelloWorld::clearScreen(cocos2d::Ref *pSender) {
 	this->m_bClearBox = true;
+    if (m_bClearBox) {
+        this->removeChild(target, true);
+        _brushs.clear();
+        this->removeAllChildren();
+        m_bClearBox = false;
+        
+        for (b2Body* b = world->GetBodyList(); b; b = b->GetNext()) {
+            if (b->GetUserData() != NULL) {
+                world->DestroyBody(b);
+            }
+        }
+    }
     auto scene = HelloWorld::createScene();
     auto changeScene = TransitionFade::create(1.0f, scene);
     Director::getInstance()->replaceScene(changeScene);

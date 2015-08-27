@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-up" width="36" height="20" tilewidth="38" tileheight="38" nextobjectid="8">
+ <tileset firstgid="1" name="base" tilewidth="38" tileheight="38">
+  <image source="Rock.png" width="512" height="512"/>
+ </tileset>
+ <layer name="background" width="36" height="20">
+  <data encoding="base64" compression="zlib">
+   eJztysUNA0EABMEzsxO4qM0oM2bpSmLlz7RUv66qlFJKKaX0zxq0aNOhS48+A4aMGDOhWfifMmfBkhVrNmzZsefAkVnhv+bMhSs37jx48uLNhy+nwv8PQtcsMA==
+  </data>
+ </layer>
+ <objectgroup name="ground">
+  <object id="5" name="groundDown" type="ground" x="13.3333" y="662.667">
+   <polygon points="0,0 1354.67,-4 1354.67,96 0,97.3333"/>
+  </object>
+ </objectgroup>
+ <objectgroup name="ball">
+  <object id="6" name="ballA" type="ball" x="362.667" y="285.333"/>
+  <object id="7" name="ballB" type="ball" x="1013.33" y="285.333"/>
+ </objectgroup>
+</map>

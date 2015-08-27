@@ -49,6 +49,9 @@ private:
 	b2Body* currentPlatformBody;
     b2Body* ballA;
     b2Body* ballB;
+    Vec2 posballA, posballB;
+    b2Vec2 vertices[b2_maxPolygonVertices];
+    int vindex = 0;
 
 	Vec2 previousLocation;
 	std::vector<Vec2> platformPoints;

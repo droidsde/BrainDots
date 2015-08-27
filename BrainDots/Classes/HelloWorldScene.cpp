@@ -55,7 +55,7 @@ bool HelloWorld::init() {
 
 	visibleSize = Director::getInstance()->getVisibleSize();
 	origin = Director::getInstance()->getVisibleOrigin();
-
+    CCLOG("size screen %f %f", visibleSize.width, visibleSize.height);
 	// add a "close" icon to exit the progress. it's an autorelease object
 	auto closeItem = MenuItemImage::create("CloseNormal.png",
 			"CloseSelected.png", CC_CALLBACK_1(HelloWorld::clearScreen, this));
@@ -70,7 +70,48 @@ bool HelloWorld::init() {
 	auto menu = Menu::create(closeItem, NULL);
 	menu->setPosition(Vec2::ZERO);
 	this->addChild(menu, 1);
-
+    
+    //reading in a tiled map
+    auto map = TMXTiledMap::create("test.tmx");
+    addChild(map, 0, 99);
+    
+    // get ball group
+    auto ballGroup = map->getObjectGroup("ball");
+    CCASSERT(NULL != ballGroup, "Ball group not found");
+    
+    auto ballA_map = ballGroup->getObject("ballA");
+    CCASSERT(!ballA_map.empty(), "ball A not found");
+    float xA = ballA_map["x"].asFloat();
+    float yA = ballA_map["y"].asFloat();
+    posballA = Vec2(xA, yA);
+    CCLOG("%f %f",xA,yA);
+    
+    auto ballB_map = ballGroup->getObject("ballB");
+    CCASSERT(!ballB_map.empty(), "ball B not found");
+    float xB = ballB_map["x"].asFloat();
+    float yB = ballB_map["y"].asFloat();
+    posballB = Vec2(xB, yB);
+    CCLOG("%f %f",xB,yB);
+    
+    // get group ground
+    auto groundGroup = map->getObjectGroup("ground");
+    CCASSERT(groundGroup!=NULL, "Ground group not found");
+    auto groundDown = groundGroup->getObject("groundDown");
+    CCLOG("%s",groundDown["type"].asString().c_str());
+    
+    auto position = Vec2(groundDown["x"].asFloat() / PTM_RATIO, groundDown["y"].asFloat() / PTM_RATIO);
+    auto pointsVector = groundDown["points"].asValueVector();
+    if(pointsVector.size() > b2_maxPolygonVertices) {
+        CCLOG("Skipping TMX polygon at x=%d,y=%d for exceeding %d vertices", groundDown["x"].asInt(), groundDown["y"].asInt(), b2_maxPolygonVertices);
+        return NULL;
+    }
+    
+    for(Value point : pointsVector) {
+        vertices[vindex].x = (point.asValueMap()["x"].asFloat() / PTM_RATIO + position.x);
+        vertices[vindex].y = (-point.asValueMap()["y"].asFloat() / PTM_RATIO + position.y);
+        vindex++;
+    }
+    
 	// init physics
 	this->initPhysics();
     this->initBalls();
@@ -83,7 +124,6 @@ bool HelloWorld::init() {
 
 	brush = CCSprite::create("brush.png");
 	brush->retain();
-//	scheduleUpdate();
     this->schedule(schedule_selector(HelloWorld::update));
     
     // add touch
@@ -134,10 +174,13 @@ void HelloWorld::initPhysics() {
 
 	//Define the ground box shape
 	b2EdgeShape groundBox;
+    b2PolygonShape groundShape;
 
 	//ground
-	groundBox.Set(b2Vec2(0, 0), b2Vec2(visibleSize.width / PTM_RATIO, 0));
-	groundBody->CreateFixture(&groundBox, 0);
+//	groundBox.Set(b2Vec2(0, 0), b2Vec2(visibleSize.width / PTM_RATIO, 0));
+//	groundBody->CreateFixture(&groundBox, 0);
+    groundShape.Set(vertices, vindex);
+    groundBody->CreateFixture(&groundShape, 0);
 
 	// top
 	groundBox.Set(b2Vec2(0, visibleSize.height / PTM_RATIO),
@@ -162,18 +205,20 @@ void HelloWorld::initBalls()
 {
     auto ballASprite = Sprite::create("ball_red.png");
     addChild(ballASprite);
-    ballASprite->setPosition(Vec2(visibleSize.width/4, visibleSize.height/2));
+//    ballASprite->setPosition(Vec2(visibleSize.width/4, visibleSize.height/2));
+    ballASprite->setPosition(posballA);
     ballASprite->setTag(TAG::ballA);
     
     auto ballBSprite = Sprite::create("ball_blue.png");
     addChild(ballBSprite);
-    ballBSprite->setPosition(Vec2(visibleSize.width*3/4, visibleSize.height/2));
+//    ballBSprite->setPosition(Vec2(visibleSize.width*3/4, visibleSize.height/2));
+    ballBSprite->setPosition(posballB);
     ballBSprite->setTag(TAG::ballB);
     
     
     // shape of body
     b2CircleShape circleShape;
-    circleShape.m_radius = 12.5f/PTM_RATIO;
+    circleShape.m_radius = 25/PTM_RATIO;
     
     // fixturedef
     b2FixtureDef ballFixtureDef;

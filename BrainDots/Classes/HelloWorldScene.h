@@ -5,6 +5,7 @@
 #include "Box2D/Box2D.h"
 #include "GLESDebugDraw.h"
 #include "BallContactListener.h"
+#include "2d/SpritePolygon.h"
 
 USING_NS_CC;
 
@@ -63,6 +64,9 @@ private:
     // contacts
     BallContactListener* _ballContactListener;
     Vec2 collisionPoint = Vec2::ZERO;
+    
+    // test draw node
+    DrawNode* drawnode;
 };
 
 #endif // __HELLOWORLD_SCENE_H__

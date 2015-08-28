@@ -71,6 +71,10 @@ bool HelloWorld::init() {
 	menu->setPosition(Vec2::ZERO);
 	this->addChild(menu, 1);
     
+    // draw node
+    drawnode = DrawNode::create();
+    addChild(drawnode);
+    
     //reading in a tiled map
     auto map = TMXTiledMap::create("test.tmx");
     addChild(map, 0, 99);
@@ -341,6 +345,7 @@ void HelloWorld::update(float dt) {
 }
 
 bool HelloWorld::onTouchBegan(Touch* touch, Event* event) {
+    drawnode->clear();
 	int r = rand() % 128 + 128;
 	int b = rand() % 128 + 128;
 	int g = rand() % 128 + 128;
@@ -389,7 +394,7 @@ void HelloWorld::onTouchMoved(Touch* touch, Event* event) {
 		_brushs.at(i)->visit();
 	}
 	target->end();
-
+//    addRectangleBetweenPointsToBody(currentPlatformBody, start, end);
 	platformPoints.push_back(start);
 	previousLocation = start;
 }
@@ -434,11 +439,11 @@ void HelloWorld::onTouchEnded(Touch* touch, Event* event) {
 		auto _texture2D = Director::getInstance()->getTextureCache()->addImage(
 				_image, _key);
 		CC_SAFE_DELETE(_image);
-
-		auto texture2D = Sprite::createWithTexture(_texture2D, bodyRectangle);
-		texture2D->setAnchorPoint(anchorPoint);
-		addChild(texture2D);
-		newBody->SetUserData(texture2D);
+        
+//		auto texture2D = Sprite::createWithTexture(_texture2D, bodyRectangle);
+//		texture2D->setAnchorPoint(anchorPoint);
+//		addChild(texture2D);
+//		newBody->SetUserData(texture2D);
 	}
 	removeChild(target, true);
 	target->release();
@@ -451,8 +456,14 @@ void HelloWorld::onTouchEnded(Touch* touch, Event* event) {
 
 void HelloWorld::addRectangleBetweenPointsToBody(b2Body* body, Vec2 start,
 		Vec2 end) {
-	float min = brush->getContentSize().width * brush->getScale() / PTM_RATIO;
-
+//    CCLOG("start(%f,%f) end(%f,%f)", start.x, start.y, end.x, end.y);
+    drawnode->drawDot(start, 1, Color4F::RED);
+    drawnode->drawDot(end, 1, Color4F::GREEN);
+    
+//	float min = brush->getContentSize().width * brush->getScale() / PTM_RATIO;
+    float minW = brush->boundingBox().size.width / PTM_RATIO ;
+    float minH = brush->boundingBox().size.height / PTM_RATIO;
+    
 	float sx = start.x;
 	float sy = start.y;
 	float ex = end.x;
@@ -464,11 +475,14 @@ void HelloWorld::addRectangleBetweenPointsToBody(b2Body* body, Vec2 start,
 	float px = (sx + ex) / 2 / PTM_RATIO - body->GetPosition().x;
 	float py = (sy + ey) / 2 / PTM_RATIO - body->GetPosition().y;
 
-//	float width = abs(distance) / PTM_RATIO;
-//	float height = brush->boundingBox().size.height / PTM_RATIO;
-	float width = MAX(abs(dist_x) / PTM_RATIO, min);
-	float height = MAX(abs(dist_y) / PTM_RATIO, min);
-
+	float height = brush->boundingBox().size.height / PTM_RATIO;
+    if (dist_x < minW) {
+        dist_x = start.distance(end);
+    }
+	float width = MAX(abs(dist_x) / PTM_RATIO, minW);
+//	float height = MAX(abs(dist_y) / PTM_RATIO, minH);
+    
+    CCLOG("width=%f height=%f", width, height);
 	b2PolygonShape boxShape;
 	boxShape.SetAsBox(width / 2, height / 2, b2Vec2(px, py), angle);
 

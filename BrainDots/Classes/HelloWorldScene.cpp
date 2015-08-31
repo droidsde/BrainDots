@@ -390,7 +390,6 @@ void HelloWorld::onTouchMoved(Touch* touch, Event* event) {
 		float delta = (float) i / distance;
 		_brushs.at(i)->setPosition(
 				Vec2(start.x + (difx * delta), start.y + (dify * delta)));
-//		_brushs.at(i)->setRotation(rand() % 360);
 		_brushs.at(i)->visit();
 	}
 	target->end();
@@ -440,13 +439,13 @@ void HelloWorld::onTouchEnded(Touch* touch, Event* event) {
 				_image, _key);
 		CC_SAFE_DELETE(_image);
         
-//		auto texture2D = Sprite::createWithTexture(_texture2D, bodyRectangle);
-//		texture2D->setAnchorPoint(anchorPoint);
-//		addChild(texture2D);
-//		newBody->SetUserData(texture2D);
+		auto texture2D = Sprite::createWithTexture(_texture2D, bodyRectangle);
+		texture2D->setAnchorPoint(anchorPoint);
+		addChild(texture2D);
+		newBody->SetUserData(texture2D);
 	}
 	removeChild(target, true);
-	target->release();
+//	target->release();
 	target = RenderTexture::create(visibleSize.width, visibleSize.height,
 			Texture2D::PixelFormat::RGBA8888);
 	target->retain();
@@ -478,11 +477,16 @@ void HelloWorld::addRectangleBetweenPointsToBody(b2Body* body, Vec2 start,
 	float height = brush->boundingBox().size.height / PTM_RATIO;
     if (dist_x < minW) {
         dist_x = start.distance(end);
+        CCLOG("dist_x = %f", dist_x);
+    } else {
+        if (abs(dist_y) > minH) {
+            dist_x = start.distance(end);
+        }
     }
 	float width = MAX(abs(dist_x) / PTM_RATIO, minW);
 //	float height = MAX(abs(dist_y) / PTM_RATIO, minH);
     
-    CCLOG("width=%f height=%f", width, height);
+    CCLOG("width=%f height=%f", width* PTM_RATIO, height* PTM_RATIO);
 	b2PolygonShape boxShape;
 	boxShape.SetAsBox(width / 2, height / 2, b2Vec2(px, py), angle);
 

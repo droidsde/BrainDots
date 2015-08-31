@@ -29,14 +29,16 @@ public:
 	virtual void onTouchMoved(Touch* touch, Event* event);
 	virtual void onTouchEnded(Touch* touch, Event* event);
     
+    void initMapLevel();
     void initPhysics();
+    void initWall(b2Body* body, b2Fixture* _wallFixture[],float outside, uint16 categorybits, uint16 maskbits);
     void initBalls();
 	
 	// adds a new sprite at a given coordinate
 	void update(float dt);
 	void addRectangleBetweenPointsToBody(b2Body* body, Vec2 start, Vec2 end);
 	Rect getBodyRectangle(b2Body* body);
-    
+    bool checkBodyWeighOnSomebody(Vec2 start, Vec2 end, float distance);
     void clearScreen(Ref* pSender);
     
 private:
@@ -50,6 +52,11 @@ private:
 	b2Body* currentPlatformBody;
     b2Body* ballA;
     b2Body* ballB;
+    b2Fixture* _ballAFixture;
+    b2Fixture* _ballBFixture;
+    b2Fixture* _wallFixture1[4];
+    b2Fixture* _wallFixture2[4];
+    
     Vec2 posballA, posballB;
     b2Vec2 vertices[b2_maxPolygonVertices];
     int vindex = 0;

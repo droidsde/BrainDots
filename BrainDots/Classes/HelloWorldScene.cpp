@@ -90,7 +90,7 @@ bool HelloWorld::init() {
     this->initPhysics();
     
     // init map level
-    this->initMapLevel(10);
+    this->initMapLevel(23);
     
 	// init physics object
     this->initPhysicObjects();
@@ -178,6 +178,12 @@ void HelloWorld::initMapLevel(int level)
     float yB = ballB_map["y"].asFloat();
     posballB = Vec2(xB, yB);
     CCLOG("%f %f",xB,yB);
+    
+    // hex grid
+    auto gridGroup = map->getObjectGroup("hexgridobjects");
+    if (gridGroup==nullptr) {
+        CCLOG("hexgridobjects group not found");
+    }
 }
 
 void HelloWorld::initPhysicObjects()

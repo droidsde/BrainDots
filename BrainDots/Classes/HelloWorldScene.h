@@ -5,7 +5,7 @@
 #include "Box2D/Box2D.h"
 #include "GLESDebugDraw.h"
 #include "BallContactListener.h"
-#include "2d/SpritePolygon.h"
+#include "TiledBodyCreator.h"
 
 USING_NS_CC;
 
@@ -29,8 +29,9 @@ public:
 	virtual void onTouchMoved(Touch* touch, Event* event);
 	virtual void onTouchEnded(Touch* touch, Event* event);
     
-    void initMapLevel();
     void initPhysics();
+    void initMapLevel(int level);
+    void initPhysicObjects();
     void initWall(b2Body* body, b2Fixture* _wallFixture[],float outside, uint16 categorybits, uint16 maskbits);
     void initBalls();
 	

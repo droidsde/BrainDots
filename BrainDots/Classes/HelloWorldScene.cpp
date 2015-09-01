@@ -86,20 +86,24 @@ bool HelloWorld::init() {
     drawnode = DrawNode::create();
     addChild(drawnode);
     
-    // init map level
-    this->initMapLevel();
+    // init physics
+    this->initPhysics();
     
-	// init physics
-	this->initPhysics();
+    // init map level
+    this->initMapLevel(10);
+    
+	// init physics object
+    this->initPhysicObjects();
     this->initBalls();
     
+    // init rendertexture and sprite draw
 	target = RenderTexture::create(visibleSize.width, visibleSize.height,
 			Texture2D::PixelFormat::RGBA8888);
 	target->retain();
 	target->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
 	this->addChild(target);
 
-	brush = CCSprite::create("brush.png");
+	brush = Sprite::create("brush.png");
 	brush->retain();
     this->schedule(schedule_selector(HelloWorld::update));
     
@@ -123,56 +127,14 @@ void HelloWorld::draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transfor
     director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
 }
 
-void HelloWorld::initMapLevel()
+void HelloWorld::initPhysics()
 {
-    //reading in a tiled map
-    auto map = TMXTiledMap::create("test.tmx");
-    addChild(map, 0, 99);
-    
-    // get ball group
-    auto ballGroup = map->getObjectGroup("ball");
-    CCASSERT(NULL != ballGroup, "Ball group not found");
-    
-    auto ballA_map = ballGroup->getObject("ballA");
-    CCASSERT(!ballA_map.empty(), "ball A not found");
-    float xA = ballA_map["x"].asFloat();
-    float yA = ballA_map["y"].asFloat();
-    posballA = Vec2(xA, yA);
-    CCLOG("%f %f",xA,yA);
-    
-    auto ballB_map = ballGroup->getObject("ballB");
-    CCASSERT(!ballB_map.empty(), "ball B not found");
-    float xB = ballB_map["x"].asFloat();
-    float yB = ballB_map["y"].asFloat();
-    posballB = Vec2(xB, yB);
-    CCLOG("%f %f",xB,yB);
-    
-    // get group ground
-    auto groundGroup = map->getObjectGroup("ground");
-    CCASSERT(groundGroup!=NULL, "Ground group not found");
-    auto groundDown = groundGroup->getObject("groundDown");
-    CCLOG("%s",groundDown["type"].asString().c_str());
-    
-    auto position = Vec2(groundDown["x"].asFloat() / PTM_RATIO, groundDown["y"].asFloat() / PTM_RATIO);
-    auto pointsVector = groundDown["points"].asValueVector();
-    if(pointsVector.size() > b2_maxPolygonVertices) {
-        CCLOG("Skipping TMX polygon at x=%d,y=%d for exceeding %d vertices", groundDown["x"].asInt(), groundDown["y"].asInt(), b2_maxPolygonVertices);
-        return;
-    }
-    
-    for(Value point : pointsVector) {
-        vertices[vindex].x = (point.asValueMap()["x"].asFloat() / PTM_RATIO + position.x);
-        vertices[vindex].y = (-point.asValueMap()["y"].asFloat() / PTM_RATIO + position.y);
-        vindex++;
-    }
-}
-
-void HelloWorld::initPhysics() {
-	b2Vec2 gravity = b2Vec2(0.0f, -10.0f);
-	world = new b2World(gravity);
-	world->SetAllowSleeping(true);
-	world->SetContinuousPhysics(true);
-    world->SetAutoClearForces(true);
+    // create physics world box2d
+    b2Vec2 gravity = b2Vec2(0.0f, -10.0f);
+    world = new b2World(gravity);
+    world->SetAllowSleeping(true);
+    world->SetContinuousPhysics(true);
+//    world->SetAutoClearForces(true);
     
     // add debug draw
     this->debugDraw = new GLESDebugDraw( PTM_RATIO );
@@ -182,22 +144,52 @@ void HelloWorld::initPhysics() {
     _ballContactListener = new BallContactListener();
     world->SetContactListener(_ballContactListener);
     
-	uint32 flags = 0;
-	flags += b2Draw::e_shapeBit;
+    uint32 flags = 0;
+    flags += b2Draw::e_shapeBit;
     this->debugDraw->SetFlags(flags);
-    
-	//Define the ground body
-	b2BodyDef groundBodyDef;
-	groundBodyDef.position.Set(0, 0); // bottom-left corner
+}
 
-	// create body
-	b2Body* groundBody = world->CreateBody(&groundBodyDef);
+void HelloWorld::initMapLevel(int level)
+{
+    //reading in a tiled map
+    std::string nameLevel = "level" + to_string(level) + ".tmx";
+    auto map = TMXTiledMap::create(nameLevel);
+    addChild(map, 0, 99);
     
-    // ground load map level
-    b2PolygonShape groundShape;
-    groundShape.Set(vertices, vindex);
-    groundBody->CreateFixture(&groundShape, 0);
+    // auto create physics objects
+    TiledBodyCreator::initMapLevel(map, world, "braindots", CATEGORY_BARRAGE, MASK_BARRAGE);
     
+    // get ball group
+    auto group = map->getObjectGroup("braindots");
+    CCASSERT(NULL != group, "braindots group not found");
+    
+    // ball A
+    auto ballA_map = group->getObject("ballA");
+    CCASSERT(!ballA_map.empty(), "ball A not found");
+    float xA = ballA_map["x"].asFloat();
+    float yA = ballA_map["y"].asFloat();
+    posballA = Vec2(xA, yA);
+    CCLOG("%f %f",xA,yA);
+    
+    // ball B
+    auto ballB_map = group->getObject("ballB");
+    CCASSERT(!ballB_map.empty(), "ball B not found");
+    float xB = ballB_map["x"].asFloat();
+    float yB = ballB_map["y"].asFloat();
+    posballB = Vec2(xB, yB);
+    CCLOG("%f %f",xB,yB);
+}
+
+void HelloWorld::initPhysicObjects()
+{
+    //Define the ground body
+    b2BodyDef groundBodyDef;
+    groundBodyDef.position.Set(0, 0); // bottom-left corner
+    
+    // create body
+    b2Body* groundBody = world->CreateBody(&groundBodyDef);
+    
+    // create 2 box wall
     initWall(groundBody, _wallFixture1, BALL_RADIUS, CATEGORY_WALL1, MASK_WALL1);
     initWall(groundBody, _wallFixture2, OUTSIDE, CATEGORY_WALL2, MASK_WALL2);
 }
@@ -257,7 +249,7 @@ void HelloWorld::initBalls()
     // fixturedef
     b2FixtureDef ballFixtureDef;
     ballFixtureDef.shape = &circleShape;
-    ballFixtureDef.density = 30.0f;
+    ballFixtureDef.density = 1.0f;
     ballFixtureDef.filter.categoryBits = CATEGORY_BALL;
     ballFixtureDef.filter.maskBits = MASK_BALL;
     
@@ -370,11 +362,15 @@ void HelloWorld::update(float dt) {
         for (int i=0; i<4; i++) {
             if (contact.fixtureA == _wallFixture2[i])
             {
-                toDestroy.push_back(bodyB);
+                if (std::find(toDestroy.begin(), toDestroy.end(), bodyB) == toDestroy.end()) {
+                    toDestroy.push_back(bodyB);
+                }
             }
             else if( contact.fixtureB == _wallFixture2[i])
             {
-                toDestroy.push_back(bodyA);
+                if (std::find(toDestroy.begin(), toDestroy.end(), bodyA) == toDestroy.end()) {
+                    toDestroy.push_back(bodyA);
+                }
             }
         }
         
@@ -411,8 +407,6 @@ void HelloWorld::update(float dt) {
         world->DestroyBody(body);
         CCLOG("remove a body");
     }
-
-	world->ClearForces();
 }
 
 bool HelloWorld::onTouchBegan(Touch* touch, Event* event) {

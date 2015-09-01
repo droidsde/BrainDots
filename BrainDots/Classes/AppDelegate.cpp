@@ -35,6 +35,17 @@ static int register_all_packages()
 }
 
 bool AppDelegate::applicationDidFinishLaunching() {
+    // initialize path resource
+    std::vector<std::string> paths;
+    paths.push_back("fonts");
+    paths.push_back("images");
+    paths.push_back("sounds");
+    paths.push_back("res");
+    paths.push_back("level");
+    paths.push_back("particle");
+    paths.push_back(cocos2d::FileUtils::getInstance()->getWritablePath());
+    FileUtils::getInstance()->setSearchPaths(paths);
+
     // initialize director
     auto director = Director::getInstance();
     auto glview = director->getOpenGLView();

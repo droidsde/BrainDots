@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-up" width="36" height="20" tilewidth="38" tileheight="38" nextobjectid="29">
+ <tileset firstgid="1" name="base" tilewidth="38" tileheight="38">
+  <image source="../images/Rock.png" width="512" height="512"/>
+ </tileset>
+ <tileset firstgid="170" name="background" tilewidth="38" tileheight="38">
+  <image source="../images/background.png" width="380" height="380"/>
+ </tileset>
+ <tileset firstgid="270" name="triangle" tilewidth="38" tileheight="38">
+  <image source="../images/triangle1.png" trans="ff00ff" width="380" height="190"/>
+ </tileset>
+ <layer name="background" width="36" height="20">
+  <data encoding="base64" compression="zlib">
+   eJzF1GdPAkEUheHFjuX//wewl8WCvYtdsWHvvYu9vCa7yWQy0TvZURKeL5N7IHeYnITneUnUog71aEAjmtCMFiQizknzrWiDjxTa0YFOdCGNbgdz0nwPetGHfgxgEEMYxghGHcxJ82MYxwQymMQUpjGDWcw5mJPm57GARWSxhGWsYBVryDmYk+bXsYFNbGEbO9jFHvZx4GBOmj/EEY5xglOc4RwXuMSVgzlp/ho3uMUd7vGAPB7xhGcHc9L8C17xhnd84BNejA+KUByLPifNl6AUZShHBeKoRBWqURNh7nv/uEVe2pvquaTb/CCf9+z6Xdqb6rmk2/yAbb9Le1M9V7st/F2923yFTb9Le1M9T2nUXU172/S7tDfDcz/YT6Xvqu9t0+/S3gzP9bv56a7CvW36/bfv/0um/1a/+/9ketOZAjK96WwBmd70F1KAGqU=
+  </data>
+ </layer>
+ <layer name="barrage" width="36" height="20">
+  <data encoding="base64" compression="zlib">
+   eJztkTEKACAMA/UzdtXZ//9LBAfp0qTgIjnIljahLUUIIYQQv9EqJqvvc3ZGBzXIfpmc4WYi+dmoj11eZL+5/ZHY+9jlRfaz92mne+ZfaB/mPsy/vHeCWhToHXs=
+  </data>
+ </layer>
+ <objectgroup name="braindots">
+  <object id="2" name="ballA" type="ball" x="396" y="508.329">
+   <properties>
+    <property name="autocreate" value="false"/>
+   </properties>
+  </object>
+  <object id="3" name="ballB" type="ball" x="1009.33" y="510.999">
+   <properties>
+    <property name="autocreate" value="false"/>
+   </properties>
+  </object>
+  <object id="24" name="ground1" x="2.66667" y="536" width="412" height="222.667">
+   <properties>
+    <property name="autocreate" value="true"/>
+   </properties>
+  </object>
+  <object id="26" name="ground2" x="990.667" y="534.667" width="377.333" height="225.333">
+   <properties>
+    <property name="autocreate" value="true"/>
+   </properties>
+  </object>
+  <object id="27" name="ground3" x="418.667" y="573.333" width="149.333" height="185.333">
+   <properties>
+    <property name="autocreate" value=""/>
+   </properties>
+  </object>
+  <object id="28" name="ground4" x="838.667" y="574.667" width="148" height="184">
+   <properties>
+    <property name="autocreate" value="true"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

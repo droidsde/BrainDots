@@ -2,6 +2,8 @@
 #include <sstream>
 
 USING_NS_CC;
+using namespace cocos2d::ui;
+
 #define PTM_RATIO 32.0 // 32px = 1m in Box2D
 const float BALL_RADIUS = 25.0f;
 const float OUTSIDE = 500;
@@ -180,9 +182,47 @@ void HelloWorld::initMapLevel(int level)
     CCLOG("%f %f",xB,yB);
     
     // hex grid
+    std::vector<Rect> listRectGrid;
     auto gridGroup = map->getObjectGroup("hexgridobjects");
     if (gridGroup==nullptr) {
         CCLOG("hexgridobjects group not found");
+    } else {
+        listGirdLayer.clear();
+        listRectGrid = TiledBodyCreator::getRectListObjects(map, "hexgridobjects");
+        if (listRectGrid.size() > 0) {
+            for (int i = 0; i < listRectGrid.size(); i++) {
+                Rect rect = listRectGrid[i];
+                auto layer = LayerColor::create();
+                layer->setContentSize(Size(rect.size));
+                layer->setPosition(Vec2(rect.origin));
+                CCLOG("layer %f %f %f %f", layer->getPositionX(), layer->getPositionY(), layer->getContentSize().width, layer->getContentSize().height);
+                addChild(layer, 100);
+                listGirdLayer.push_back(layer);
+                
+                // add touch
+                auto listener = EventListenerTouchOneByOne::create();
+                listener->setSwallowTouches(true);
+                listener->onTouchBegan = [&](Touch* touch, Event* event)
+                {
+                    auto bounds = event->getCurrentTarget()->getBoundingBox();
+                    if (bounds.containsPoint(touch->getLocation())) {
+                        CCLOG("layer touch begin");
+                        return true;
+                    }
+                    else return false;
+                };
+                
+                listener->onTouchMoved = [=](Touch* touch, Event* event){
+                };
+                
+                listener->onTouchEnded = [=](Touch* touch, Event* event){
+                    
+                };
+                
+                // Add listener
+                _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, layer);
+            }
+        }
     }
 }
 
@@ -255,7 +295,9 @@ void HelloWorld::initBalls()
     // fixturedef
     b2FixtureDef ballFixtureDef;
     ballFixtureDef.shape = &circleShape;
-    ballFixtureDef.density = 1.0f;
+    ballFixtureDef.density = 10.0f;
+    ballFixtureDef.friction = 0;
+    ballFixtureDef.restitution = 0;
     ballFixtureDef.filter.categoryBits = CATEGORY_BALL;
     ballFixtureDef.filter.maskBits = MASK_BALL;
     
@@ -271,12 +313,10 @@ void HelloWorld::initBalls()
     ballA = world->CreateBody(&mBallDefA);
     _ballAFixture = ballA->CreateFixture(&ballFixtureDef);
     ballA->SetUserData(ballASprite);
-//    ballA->SetGravityScale(10);
     
     ballB = world->CreateBody(&mBallDefB);
     _ballBFixture = ballB->CreateFixture(&ballFixtureDef);
     ballB->SetUserData(ballBSprite);
-//    ballB->SetGravityScale(10);
 
 }
 
@@ -417,6 +457,14 @@ void HelloWorld::update(float dt) {
 
 bool HelloWorld::onTouchBegan(Touch* touch, Event* event) {
     drawnode->clear();
+    
+    if (listGirdLayer.size() > 0) {
+        for (int i = 0; i<listGirdLayer.size(); i++) {
+            if (listGirdLayer[i]->getBoundingBox().containsPoint(touch->getLocation())) {
+                return false;
+            }
+        }
+    }
 	int r = rand() % 128 + 128;
 	int b = rand() % 128 + 128;
 	int g = rand() % 128 + 128;
@@ -438,7 +486,15 @@ void HelloWorld::onTouchMoved(Touch* touch, Event* event) {
 
     Vec2 start = touch->getLocation();
     Vec2 end = touch->getPreviousLocation();
-
+    
+    if (listGirdLayer.size() > 0) {
+        for (int i = 0; i<listGirdLayer.size(); i++) {
+            if (listGirdLayer[i]->getBoundingBox().containsPoint(start)) {
+                return;
+            }
+        }
+    }
+    
 	target->begin();
 
 	float distance = start.getDistance(end);

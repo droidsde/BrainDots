@@ -172,3 +172,17 @@ FixtureDef* TiledBodyCreator::createRect(ValueMap object)
     
     return fix;
 }
+
+std::vector<Rect> TiledBodyCreator::getRectListObjects(cocos2d::TMXTiledMap *map, std::string layerName)
+{
+    std::vector<Rect> listRect;
+    auto layerGroup = map->getObjectGroup(layerName);
+    cocos2d::ValueVector collisionObjects = layerGroup->getObjects();
+    
+    for (cocos2d::Value objectValue : collisionObjects) {
+        auto object = objectValue.asValueMap();
+        Rect pos = Rect(object["x"].asFloat(), object["y"].asFloat(), object["width"].asFloat(), object["height"].asFloat());
+        listRect.push_back(pos);
+    }
+    return listRect;
+}

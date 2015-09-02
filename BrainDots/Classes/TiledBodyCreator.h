@@ -56,6 +56,7 @@ public:
     static FixtureDef* createCircle(ValueMap object);
     static FixtureDef* createRect(ValueMap object);
     
+    static std::vector<Rect> getRectListObjects(TMXTiledMap* map, std::string layerName);
 };
 
 #endif /* defined(__BrainDots__TiledBodyCreator__) */

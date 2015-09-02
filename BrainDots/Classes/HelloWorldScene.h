@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "Box2D/Box2D.h"
+#include <ui/CocosGUI.h>
 #include "GLESDebugDraw.h"
 #include "BallContactListener.h"
 #include "TiledBodyCreator.h"
@@ -75,6 +76,9 @@ private:
     
     // test draw node
     DrawNode* drawnode;
+    
+    // list rect hex grid
+    std::vector<Layer*> listGirdLayer;
 };
 
 #endif // __HELLOWORLD_SCENE_H__

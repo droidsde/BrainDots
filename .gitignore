@@ -8,6 +8,12 @@ BrainDots/proj.android/obj/*
 BrainDots/proj.android/libs/*
 BrainDots/proj.ios_mac/BrainDots.xcodeproj/project.pbxproj
 BrainDots/proj.ios_mac/BrainDots.xcodeproj/project.xcworkspace/xcuserdata/Hoang.xcuserdatad/UserInterfaceState.xcuserstate
+BrainDotsDebug/proj.android/bin/*
+BrainDotsDebug/proj.android/gen/*
+BrainDotsDebug/proj.android/obj/*
+BrainDotsDebug/proj.android/libs/*
+BrainDotsDebug/proj.ios_mac/BrainDots.xcodeproj/project.pbxproj
+BrainDotsDebug/proj.ios_mac/BrainDots.xcodeproj/project.xcworkspace/xcuserdata/Hoang.xcuserdatad/UserInterfaceState.xcuserstate
 # Xcode
 #
 # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore

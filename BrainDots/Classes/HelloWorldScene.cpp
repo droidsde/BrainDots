@@ -1,5 +1,4 @@
 #include "HelloWorldScene.h"
-#include <sstream>
 
 USING_NS_CC;
 using namespace cocos2d::ui;
@@ -136,7 +135,6 @@ void HelloWorld::initPhysics()
     world = new b2World(gravity);
     world->SetAllowSleeping(true);
     world->SetContinuousPhysics(true);
-//    world->SetAutoClearForces(true);
     
     // add debug draw
     this->debugDraw = new GLESDebugDraw( PTM_RATIO );

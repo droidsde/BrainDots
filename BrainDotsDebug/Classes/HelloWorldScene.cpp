@@ -55,7 +55,7 @@ bool HelloWorld::init()
 {
     //////////////////////////////
     // 1. super init first
-    if ( !Layer::init() )
+    if ( !LayerColor::initWithColor(Color4B(255, 255, 255, 255)) )
     {
         return false;
     }
@@ -89,7 +89,7 @@ bool HelloWorld::init()
     this->initPhysics();
     
     // init map level
-    this->initMapLevel(3);
+    this->initMapLevel(24);
     
     // init physics object
     this->initPhysicObjects();
@@ -157,6 +157,7 @@ void HelloWorld::initMapLevel(int level)
         CCLOG("file not found");
         
     } else {
+        CCLOG("size of map level %f %f", map->getContentSize().width, map->getContentSize().height);
         addChild(map, 0, 1);
         
         // auto create physics objects

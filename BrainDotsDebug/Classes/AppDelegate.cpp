@@ -1,5 +1,6 @@
 #include "AppDelegate.h"
 #include "HelloWorldScene.h"
+#include "GLViewUtil.h"
 
 USING_NS_CC;
 
@@ -54,7 +55,10 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
     // set FPS. the default value is 1.0/60 if you don't call this
     director->setAnimationInterval(1.0 / 60);
-
+    
+    auto fitSize = GLViewUtil::calcFitDesignResolutionSize(1334, 750, GLViewUtil::FitType::WIDTH);
+    glview->setDesignResolutionSize(fitSize.width, fitSize.height, ResolutionPolicy::SHOW_ALL);
+    
     register_all_packages();
 
     // create a scene. it's an autorelease object
@@ -70,6 +74,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
 void AppDelegate::applicationDidEnterBackground() {
     Director::getInstance()->stopAnimation();
 
+    NotificationCenter::getInstance()->postNotification(PAUSE_GAME);
+    
     // if you use SimpleAudioEngine, it must be pause
     // SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
 }

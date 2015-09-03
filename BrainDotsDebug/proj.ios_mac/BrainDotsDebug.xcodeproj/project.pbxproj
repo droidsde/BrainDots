@@ -18,10 +18,9 @@
 		20A8B3C01B96D40300665D34 /* BallContactListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20A8B3BE1B96D40300665D34 /* BallContactListener.cpp */; };
 		20A8B3C31B96D63400665D34 /* TiledBodyCreator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20A8B3C11B96D63400665D34 /* TiledBodyCreator.cpp */; };
 		20A8B3C81B96E71400665D34 /* GLESDebugDraw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20A8B3C61B96E71400665D34 /* GLESDebugDraw.cpp */; };
-		20CAD3981B97E23000EABF4D /* level0.tmx in Resources */ = {isa = PBXBuildFile; fileRef = 20CAD3971B97E23000EABF4D /* level0.tmx */; };
-		20CAD39A1B97EF4500EABF4D /* level1.tmx in Resources */ = {isa = PBXBuildFile; fileRef = 20CAD3991B97EF4500EABF4D /* level1.tmx */; };
-		20CAD39D1B97F6EB00EABF4D /* level2.tmx in Resources */ = {isa = PBXBuildFile; fileRef = 20CAD39B1B97F6EB00EABF4D /* level2.tmx */; };
-		20CAD39E1B97F6EB00EABF4D /* level3.tmx in Resources */ = {isa = PBXBuildFile; fileRef = 20CAD39C1B97F6EB00EABF4D /* level3.tmx */; };
+		20CAD3A21B98141D00EABF4D /* level in Resources */ = {isa = PBXBuildFile; fileRef = 20CAD3A11B98141D00EABF4D /* level */; };
+		20CAD3A61B983B5800EABF4D /* SceneManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20CAD3A41B983B5800EABF4D /* SceneManager.cpp */; };
+		20CAD3A91B983F6100EABF4D /* LogoScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20CAD3A71B983F6100EABF4D /* LogoScene.cpp */; };
 		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
 		3EACC98F19EE6D4300EB3C5E /* res in Resources */ = {isa = PBXBuildFile; fileRef = 3EACC98E19EE6D4300EB3C5E /* res */; };
 		3EACC99019EE6D4300EB3C5E /* res in Resources */ = {isa = PBXBuildFile; fileRef = 3EACC98E19EE6D4300EB3C5E /* res */; };
@@ -127,10 +126,13 @@
 		20A8B3C21B96D63400665D34 /* TiledBodyCreator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TiledBodyCreator.h; sourceTree = "<group>"; };
 		20A8B3C61B96E71400665D34 /* GLESDebugDraw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLESDebugDraw.cpp; sourceTree = "<group>"; };
 		20A8B3C71B96E71400665D34 /* GLESDebugDraw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLESDebugDraw.h; sourceTree = "<group>"; };
-		20CAD3971B97E23000EABF4D /* level0.tmx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = level0.tmx; sourceTree = "<group>"; };
-		20CAD3991B97EF4500EABF4D /* level1.tmx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = level1.tmx; sourceTree = "<group>"; };
-		20CAD39B1B97F6EB00EABF4D /* level2.tmx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = level2.tmx; sourceTree = "<group>"; };
-		20CAD39C1B97F6EB00EABF4D /* level3.tmx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = level3.tmx; sourceTree = "<group>"; };
+		20CAD39F1B9813B500EABF4D /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
+		20CAD3A11B98141D00EABF4D /* level */ = {isa = PBXFileReference; lastKnownFileType = folder; path = level; sourceTree = "<group>"; };
+		20CAD3A31B9834EB00EABF4D /* GLViewUtil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GLViewUtil.h; sourceTree = "<group>"; };
+		20CAD3A41B983B5800EABF4D /* SceneManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SceneManager.cpp; sourceTree = "<group>"; };
+		20CAD3A51B983B5800EABF4D /* SceneManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SceneManager.h; sourceTree = "<group>"; };
+		20CAD3A71B983F6100EABF4D /* LogoScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LogoScene.cpp; sourceTree = "<group>"; };
+		20CAD3A81B983F6100EABF4D /* LogoScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogoScene.h; sourceTree = "<group>"; };
 		288765A40DF7441C002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		3EACC98E19EE6D4300EB3C5E /* res */ = {isa = PBXFileReference; lastKnownFileType = folder; path = res; sourceTree = "<group>"; };
 		46880B7619C43A67006E1F66 /* CloseNormal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CloseNormal.png; sourceTree = "<group>"; };
@@ -301,10 +303,7 @@
 		46880B7519C43A67006E1F66 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				20CAD39B1B97F6EB00EABF4D /* level2.tmx */,
-				20CAD39C1B97F6EB00EABF4D /* level3.tmx */,
-				20CAD3991B97EF4500EABF4D /* level1.tmx */,
-				20CAD3971B97E23000EABF4D /* level0.tmx */,
+				20CAD3A11B98141D00EABF4D /* level */,
 				521A8EA819F11F5000D177D7 /* fonts */,
 				3EACC98E19EE6D4300EB3C5E /* res */,
 				46880B7619C43A67006E1F66 /* CloseNormal.png */,
@@ -332,6 +331,12 @@
 				20A8B3C21B96D63400665D34 /* TiledBodyCreator.h */,
 				20A8B3C61B96E71400665D34 /* GLESDebugDraw.cpp */,
 				20A8B3C71B96E71400665D34 /* GLESDebugDraw.h */,
+				20CAD39F1B9813B500EABF4D /* Constants.h */,
+				20CAD3A31B9834EB00EABF4D /* GLViewUtil.h */,
+				20CAD3A41B983B5800EABF4D /* SceneManager.cpp */,
+				20CAD3A51B983B5800EABF4D /* SceneManager.h */,
+				20CAD3A71B983F6100EABF4D /* LogoScene.cpp */,
+				20CAD3A81B983F6100EABF4D /* LogoScene.h */,
 			);
 			name = Classes;
 			path = ../Classes;
@@ -489,7 +494,6 @@
 				20A8B3BC1B96CD9800665D34 /* sounds in Resources */,
 				5087E77F17EB970100C73F5D /* Default@2x.png in Resources */,
 				50EF629917ECD46A001EB2F8 /* Icon-100.png in Resources */,
-				20CAD39D1B97F6EB00EABF4D /* level2.tmx in Resources */,
 				5087E78317EB970100C73F5D /* Icon-152.png in Resources */,
 				46880B8119C43A67006E1F66 /* HelloWorld.png in Resources */,
 				46880B7D19C43A67006E1F66 /* CloseSelected.png in Resources */,
@@ -499,7 +503,6 @@
 				521A8EA919F11F5000D177D7 /* fonts in Resources */,
 				20A8B3BA1B96CD9800665D34 /* particle in Resources */,
 				50EF62A317ECD613001EB2F8 /* Icon-50.png in Resources */,
-				20CAD39E1B97F6EB00EABF4D /* level3.tmx in Resources */,
 				20A8B3B81B96CD9800665D34 /* images in Resources */,
 				5087E78017EB970100C73F5D /* Icon-114.png in Resources */,
 				50EF62A217ECD613001EB2F8 /* Icon-29.png in Resources */,
@@ -507,12 +510,11 @@
 				20A8B3BB1B96CD9800665D34 /* res in Resources */,
 				5087E78217EB970100C73F5D /* Icon-144.png in Resources */,
 				3EACC98F19EE6D4300EB3C5E /* res in Resources */,
-				20CAD39A1B97EF4500EABF4D /* level1.tmx in Resources */,
 				50EF629817ECD46A001EB2F8 /* Icon-80.png in Resources */,
 				5087E78417EB970100C73F5D /* Icon-57.png in Resources */,
 				5087E77E17EB970100C73F5D /* Default.png in Resources */,
 				521A8E6419F0C34300D177D7 /* Default-667h@2x.png in Resources */,
-				20CAD3981B97E23000EABF4D /* level0.tmx in Resources */,
+				20CAD3A21B98141D00EABF4D /* level in Resources */,
 				46880B7B19C43A67006E1F66 /* CloseNormal.png in Resources */,
 				50EF629717ECD46A001EB2F8 /* Icon-58.png in Resources */,
 			);
@@ -543,6 +545,8 @@
 				20A8B3C81B96E71400665D34 /* GLESDebugDraw.cpp in Sources */,
 				46880B8A19C43A87006E1F66 /* HelloWorldScene.cpp in Sources */,
 				503AE10017EB989F00D1A890 /* AppController.mm in Sources */,
+				20CAD3A91B983F6100EABF4D /* LogoScene.cpp in Sources */,
+				20CAD3A61B983B5800EABF4D /* SceneManager.cpp in Sources */,
 				20A8B3C31B96D63400665D34 /* TiledBodyCreator.cpp in Sources */,
 				503AE10217EB989F00D1A890 /* RootViewController.mm in Sources */,
 				503AE10117EB989F00D1A890 /* main.m in Sources */,

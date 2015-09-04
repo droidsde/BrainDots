@@ -75,7 +75,7 @@ void SceneManager::nextScene(cocos2d::Scene * scene)
 
 void SceneManager::moveLogoScene()
 {
-    Scene* scene = LogoScene::createScene();
+    auto scene = LogoScene::createScene();
     this->nextScene(scene);
 }
 
@@ -86,7 +86,8 @@ void SceneManager::moveSplashScreen()
 
 void SceneManager::moveMenuScene()
 {
-    
+    auto scene = MenuScene::createScene();
+    this->nextScene(scene);
 }
 
 void SceneManager::moveSettingLayer()
@@ -96,7 +97,8 @@ void SceneManager::moveSettingLayer()
 
 void SceneManager::moveGameScene()
 {
-    
+    auto scene = GameScene::createScene();
+    this->nextScene(scene);
 }
 
 void SceneManager::moveGameOverScene()

@@ -1,6 +1,6 @@
 #include "AppDelegate.h"
-#include "HelloWorldScene.h"
 #include "GLViewUtil.h"
+#include "SceneManager.h"
 
 USING_NS_CC;
 
@@ -60,13 +60,10 @@ bool AppDelegate::applicationDidFinishLaunching() {
     glview->setDesignResolutionSize(fitSize.width, fitSize.height, ResolutionPolicy::SHOW_ALL);
     
     register_all_packages();
-
-    // create a scene. it's an autorelease object
-    auto scene = HelloWorld::createScene();
-
-    // run
-    director->runWithScene(scene);
-
+    
+    auto manageScene = SceneManager::getInstance();
+    manageScene->changeState(GAME_STATE::LOGO);
+    
     return true;
 }
 

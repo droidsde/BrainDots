@@ -12,6 +12,10 @@
 #include <cocos2d.h>
 #include "Constants.h"
 #include "LogoScene.h"
+#include "MenuScene.h"
+#include "GameScene.h"
+
+#include "SoundManager.h"
 
 USING_NS_CC;
 

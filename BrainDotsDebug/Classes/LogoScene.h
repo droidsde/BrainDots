@@ -10,6 +10,7 @@
 #define __BrainDotsDebug__LogoScene__
 
 #include <cocos2d.h>
+#include "SceneManager.h"
 
 USING_NS_CC;
 
@@ -28,7 +29,13 @@ private:
     
     void loadResources();
     
+    void loadImage(Texture2D* texture);
+    
     void loadSounds();
+    
+    void loadMapLevels();
+    
+    void startSplashScreen();
     
     void nextScene();
     

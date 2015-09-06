@@ -12,10 +12,10 @@
 #include <cocos2d.h>
 #include "Constants.h"
 #include "LogoScene.h"
-#include "MenuScene.h"
+#include "MenuScene/MenuScene.h"
 #include "GameScene.h"
 
-#include "SoundManager.h"
+#include "SoundManager/SoundManager.h"
 
 USING_NS_CC;
 
@@ -30,6 +30,7 @@ public:
     
     CC_SYNTHESIZE(cocos2d::Scene*, curScene, CurScene);
     CC_SYNTHESIZE(GAME_STATE, curState, CurState);
+    CC_SYNTHESIZE(int, gameLevel, LevelGame);
     
     void changeState(GAME_STATE = GAME_STATE::LOGO);
     

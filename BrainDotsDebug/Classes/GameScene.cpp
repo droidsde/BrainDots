@@ -27,14 +27,6 @@ enum TAG
     ballB,
 };
 
-template <typename T>
-std::string to_string(T value)
-{
-    std::ostringstream os ;
-    os << value ;
-    return os.str() ;
-}
-
 Scene* GameScene::createScene()
 {
     // 'scene' is an autorelease object
@@ -89,7 +81,7 @@ bool GameScene::init()
     this->initPhysics();
     
     // init map level
-    this->initMapLevel(24);
+    this->initMapLevel(SceneManager::getInstance()->getLevelGame());
     
     // init physics object
     this->initPhysicObjects();
@@ -677,9 +669,7 @@ void GameScene::clearScreen(cocos2d::Ref *pSender) {
             }
         }
     }
-    auto scene = GameScene::createScene();
-    auto changeScene = TransitionFade::create(1.0f, scene);
-    Director::getInstance()->replaceScene(changeScene);
+    SceneManager::getInstance()->changeState(GAME_STATE::MENU);
 }
 
 void GameScene::menuCloseCallback(Ref* pSender)

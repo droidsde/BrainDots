@@ -22,6 +22,16 @@
 
 #define PAUSE_GAME                      "pauseGame"
 
+#define LEVEL_MAX						10
+
+template <typename T>
+std::string to_string(T value)
+{
+    std::ostringstream os ;
+    os << value ;
+    return os.str() ;
+}
+
 typedef enum class game_state
 {
     LOGO = 0,
@@ -33,6 +43,10 @@ typedef enum class game_state
     HIGHSCORE,
 }GAME_STATE;
 
+typedef enum class tag
+{
+	TAG_MENU_LEVEL_CHOOSE = 0,
+}TAG_MENU;
 struct UserData
 {
     int level;

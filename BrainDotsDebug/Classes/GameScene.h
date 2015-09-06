@@ -7,6 +7,7 @@
 #include "BallContactListener.h"
 #include "TiledBodyCreator.h"
 #include "GLESDebugDraw.h"
+#include "SceneManager.h"
 
 USING_NS_CC;
 

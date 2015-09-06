@@ -39,7 +39,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     paths.push_back("res");
     paths.push_back("level");
     paths.push_back("particle");
-//    paths.push_back(cocos2d::FileUtils::getInstance()->getWritablePath());
+    paths.push_back(cocos2d::FileUtils::getInstance()->getWritablePath());
     FileUtils::getInstance()->setSearchPaths(paths);
     
     // initialize director

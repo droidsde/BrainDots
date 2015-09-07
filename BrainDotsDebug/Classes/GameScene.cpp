@@ -57,7 +57,7 @@ bool GameScene::init()
     backButton->setTouchEnabled(true);
     backButton->addTouchEventListener(CC_CALLBACK_2(GameScene::touchButtonEvent, this));
     backButton->setTag(TAG_GAME::TAG_BUTTON_BACK);
-    addChild(backButton);
+    addChild(backButton, ZORDER_GAME::ZORDER_BUTTON_BACK);
     
     // button replay
     auto replayButton = Button::create("replay.png");
@@ -66,7 +66,7 @@ bool GameScene::init()
     replayButton->setTouchEnabled(true);
     replayButton->setTag(TAG_GAME::TAG_BUTTON_REPLAY);
     replayButton->addTouchEventListener(CC_CALLBACK_2(GameScene::touchButtonEvent, this));
-    addChild(replayButton);
+    addChild(replayButton, ZORDER_GAME::ZORDER_BUTTON_REPLAY);
     
     // draw node
     drawnode = DrawNode::create();
@@ -145,7 +145,7 @@ void GameScene::initMapLevel(int level)
         
     } else {
         CCLOG("size of map level %f %f", map->getContentSize().width, map->getContentSize().height);
-        addChild(map, 0, 1);
+        addChild(map, ZORDER_GAME::ZORDER_MAPLEVEL, 1);
         
         // auto create physics objects
         TiledBodyCreator::initMapLevel(map, world, "braindots", CATEGORY_BARRAGE, MASK_BARRAGE);

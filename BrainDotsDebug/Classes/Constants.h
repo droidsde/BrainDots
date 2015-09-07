@@ -57,6 +57,13 @@ enum TAG_GAME
     TAG_BUTTON_BACK = 10,
     TAG_BUTTON_REPLAY,
 };
+
+enum ZORDER_GAME
+{
+	ZORDER_MAPLEVEL = 0,
+	ZORDER_BUTTON_BACK = 10,
+	ZORDER_BUTTON_REPLAY = 11,
+};
     
 struct UserData
 {

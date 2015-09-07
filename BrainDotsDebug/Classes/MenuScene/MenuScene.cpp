@@ -59,7 +59,7 @@ void MenuScene::reloadData() {
 	listview->removeAllChildren();
 	for (int i = 0; i < LEVEL_MAX; ++i) {
 		Layout* layout = Layout::create();
-        auto stage = Button::create("sticker.png");
+        Button* stage = Button::create("sticker.png");
         
         if (i == 0 || i == LEVEL_MAX-1) {
             layout->setContentSize(Size(stickerSize.width/2+visibleSize.width/2, listview->getContentSize().height));
@@ -84,6 +84,12 @@ void MenuScene::reloadData() {
 		stage->setTag(i);
 		stage->addTouchEventListener(
 				CC_CALLBACK_2(MenuScene::touchButtonEvent, this));
+		// add tick icon
+		ImageView* tick = ImageView::create("tick.png");
+		tick->setAnchorPoint(Vec2::ANCHOR_TOP_RIGHT);
+		tick->setPosition(Vec2(stage->getContentSize().width - 10, stage->getContentSize().height - 10));
+		stage->addChild(tick);
+
 		layout->addChild(stage);
 		listview->insertCustomItem(layout, i);
 	}

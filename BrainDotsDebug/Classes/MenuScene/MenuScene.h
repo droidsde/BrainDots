@@ -12,7 +12,7 @@
 #include <cocos2d.h>
 #include "SceneManager.h"
 #include "ui/CocosGUI.h"
-#include "SoundManager/SoundManager.h"
+#include "ManageSoundDelegate.h"
 
 USING_NS_CC;
 using namespace ui;
@@ -35,7 +35,10 @@ private:
     Vec2 origin;
     Size visibleSize;
     ListView* listview;
-    Size stickerSize;
+    PageView* pageview;
+    Size stickerSize, miniStickerSize;
+    int curPage = 1; // 1->10
+    int curLevel; // 0 -> (6 * PAGE)-1
     
     void addMenu();
     
@@ -50,6 +53,15 @@ private:
     void reloadData();
 
     void touchButtonEvent(Ref* sender, Widget::TouchEventType type);
+    
+    void pageViewEvent(Ref* pSender, PageView::EventType type);
+    
+    void selectedItemEvent(Ref *pSender, ListView::EventType type);
+    
+    void openStage(int i);
+    
+    void showLevelsInStage(int stage);
+    void showStages(int stage);
 };
 
 #endif /* defined(__BrainDotsDebug__MenuScene__) */

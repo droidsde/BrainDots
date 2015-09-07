@@ -21,12 +21,6 @@ const short MASK_BARRAGE = -1;
 const short MASK_WALL1 = CATEGORY_BALL | CATEGORY_BARRAGE;
 const short MASK_WALL2 = CATEGORY_BALL | CATEGORY_BARRAGE | CATEGORY_PLATFORM;
 
-enum TAG
-{
-    ballA = 1,
-    ballB,
-};
-
 Scene* GameScene::createScene()
 {
     // 'scene' is an autorelease object
@@ -55,23 +49,24 @@ bool GameScene::init()
     visibleSize = Director::getInstance()->getVisibleSize();
     origin = Director::getInstance()->getVisibleOrigin();
     CCLOG("size screen %f %f", visibleSize.width, visibleSize.height);
-    /////////////////////////////
-    // 2. add a menu item with "X" image, which is clicked to quit the program
-    //    you may modify it.
-
-    // add a "close" icon to exit the progress. it's an autorelease object
-    auto closeItem = MenuItemImage::create(
-                                           "CloseNormal.png",
-                                           "CloseSelected.png",
-                                           CC_CALLBACK_1(GameScene::clearScreen, this));
     
-	closeItem->setPosition(Vec2(origin.x + visibleSize.width - closeItem->getContentSize().width/2 ,
-                                origin.y + closeItem->getContentSize().height/2));
-
-    // create menu, it's an autorelease object
-    auto menu = Menu::create(closeItem, NULL);
-    menu->setPosition(Vec2::ZERO);
-    this->addChild(menu, 1);
+    // button back
+    auto backButton = Button::create("back.png");
+    backButton->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
+    backButton->setPosition(Vec2(PADDING, visibleSize.height - PADDING));
+    backButton->setTouchEnabled(true);
+    backButton->addTouchEventListener(CC_CALLBACK_2(GameScene::touchButtonEvent, this));
+    backButton->setTag(TAG_GAME::TAG_BUTTON_BACK);
+    addChild(backButton);
+    
+    // button replay
+    auto replayButton = Button::create("replay.png");
+    replayButton->setAnchorPoint(Vec2::ANCHOR_TOP_RIGHT);
+    replayButton->setPosition(Vec2(visibleSize.width - PADDING, visibleSize.height - PADDING));
+    replayButton->setTouchEnabled(true);
+    replayButton->setTag(TAG_GAME::TAG_BUTTON_REPLAY);
+    replayButton->addTouchEventListener(CC_CALLBACK_2(GameScene::touchButtonEvent, this));
+    addChild(replayButton);
     
     // draw node
     drawnode = DrawNode::create();
@@ -275,14 +270,11 @@ void GameScene::initBalls()
     addChild(ballASprite);
 //        ballASprite->setPosition(Vec2(visibleSize.width/4, visibleSize.height/2));
     ballASprite->setPosition(posballA);
-    ballASprite->setTag(TAG::ballA);
     
     auto ballBSprite = Sprite::create("ball_blue.png");
     addChild(ballBSprite);
 //        ballBSprite->setPosition(Vec2(visibleSize.width*3/4, visibleSize.height/2));
     ballBSprite->setPosition(posballB);
-    ballBSprite->setTag(TAG::ballB);
-    
     
     // shape of body
     b2CircleShape circleShape;
@@ -655,7 +647,7 @@ bool GameScene::checkBodyWeighOnSomebody(cocos2d::Vec2 start, cocos2d::Vec2 end,
     return false;
 }
 
-void GameScene::clearScreen(cocos2d::Ref *pSender) {
+void GameScene::backMenu() {
     this->m_bClearBox = true;
     if (m_bClearBox) {
         this->removeChild(target, true);
@@ -670,6 +662,22 @@ void GameScene::clearScreen(cocos2d::Ref *pSender) {
         }
     }
     SceneManager::getInstance()->changeState(GAME_STATE::MENU);
+}
+
+void GameScene::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEventType type)
+{
+    auto receiver = (Node*) sender;
+    if (type == ui::Widget::TouchEventType::ENDED)
+    {
+        switch (receiver->getTag()) {
+            case TAG_GAME::TAG_BUTTON_BACK :
+                backMenu();
+                break;
+            case TAG_GAME::TAG_BUTTON_REPLAY:
+                SceneManager::getInstance()->changeState(GAME_STATE::GAME);
+                break;
+        }
+    }
 }
 
 void GameScene::menuCloseCallback(Ref* pSender)

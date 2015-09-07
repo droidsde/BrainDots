@@ -23,6 +23,8 @@
 #define PAUSE_GAME                      "pauseGame"
 
 #define LEVEL_MAX						10
+#define ITEMS_IN_PAGE                   6
+#define PADDING                         10
 
 template <typename T>
 std::string to_string(T value)
@@ -43,10 +45,19 @@ typedef enum class game_state
     HIGHSCORE,
 }GAME_STATE;
 
-typedef enum class tag
+enum TAG_MENU
 {
-	TAG_MENU_LEVEL_CHOOSE = 0,
-}TAG_MENU;
+    TAG_MENU_BUTTON_TITLE = 3000,
+    TAG_MENU_STAGE_CHOOSE = 0,
+	TAG_MENU_LEVEL_CHOOSE = 100,
+};
+
+enum TAG_GAME
+{
+    TAG_BUTTON_BACK = 10,
+    TAG_BUTTON_REPLAY,
+};
+    
 struct UserData
 {
     int level;

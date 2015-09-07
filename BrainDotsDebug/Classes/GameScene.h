@@ -10,6 +10,7 @@
 #include "SceneManager.h"
 
 USING_NS_CC;
+using namespace cocos2d::ui;
 
 class GameScene : public cocos2d::LayerColor
 {
@@ -41,8 +42,9 @@ public:
     void addRectangleBetweenPointsToBody(b2Body* body, Vec2 start, Vec2 end);
     Rect getBodyRectangle(b2Body* body);
     bool checkBodyWeighOnSomebody(Vec2 start, Vec2 end, float distance);
-    void clearScreen(Ref* pSender);
-
+    void backMenu();
+    void touchButtonEvent(Ref* sender, Widget::TouchEventType type);
+    
 private:
     
     Size visibleSize;

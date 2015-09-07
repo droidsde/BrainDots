@@ -12,7 +12,7 @@ SceneManager* SceneManager::_sceneManager = nullptr;
 
 SceneManager::SceneManager()
 {
-    
+    gameLevel = 0;
 }
 
 SceneManager::~SceneManager()

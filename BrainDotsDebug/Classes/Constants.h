@@ -25,6 +25,9 @@
 #define LEVEL_MAX						10
 #define ITEMS_IN_PAGE                   6
 #define PADDING                         10
+#define LIST_ITEM_MARGIN                50
+#define SCROLL_THRESHOLD                50
+#define DELTA_TRANSLATE                 20
 
 template <typename T>
 std::string to_string(T value)
@@ -33,6 +36,23 @@ std::string to_string(T value)
     os << value ;
     return os.str() ;
 }
+
+enum ZORDER_MENU
+{
+    HEADER_LAYER = 0,
+    HEADER_TITLE,
+    HEADER_PENCIL,
+    HEADER_SHARE,
+    HEADER_SETTING,
+    HEADER_POPUP_LAYER,
+    
+    BODY_LAYER = 0,
+    BODY_LISTVIEW,
+    BODY_STICKER,
+    BODY_STICKER_TICK,
+    BODY_STICKER_MINI_TICK,
+    BODY_STICKER_TEXT,
+};
 
 typedef enum class game_state
 {

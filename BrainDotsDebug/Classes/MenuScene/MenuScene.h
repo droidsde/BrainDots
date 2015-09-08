@@ -12,7 +12,7 @@
 #include <cocos2d.h>
 #include "SceneManager.h"
 #include "ui/CocosGUI.h"
-#include "SoundManager/ManageSoundDelegate.h"
+#include "ManageSoundDelegate.h"
 
 USING_NS_CC;
 using namespace ui;
@@ -30,17 +30,25 @@ public:
     
     CC_SYNTHESIZE(ManageSoundDelegate*, msDelegator, SoundMusic);
     
+    void onTouchesBegan(const std::vector<Touch *> &touches, cocos2d::Event *unused_event);
+    void onTouchesMoved(const std::vector<Touch *> &touches, cocos2d::Event *unused_event);
+    void onTouchesEnded(const std::vector<Touch *> &touches, cocos2d::Event *unused_event);
+    
 private:
     
     Vec2 origin;
     Size visibleSize;
+    Size bodySize, headerSize;
+    Layer *headerLayer, *bodyLayer;
     ListView* listview;
     PageView* pageview;
-    Size stickerSize, miniStickerSize;
+    Size stickerSize, miniStickerSize, miniTickSize;
     int curPage = 1; // 1->10
     int curLevel; // 0 -> (6 * PAGE)-1
     
-    void addMenu();
+    void addHeaderLayer();
+    
+    void addBodyLayer();
     
     void addListHorizontal();
     

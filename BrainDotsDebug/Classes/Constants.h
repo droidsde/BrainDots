@@ -28,6 +28,7 @@
 #define LIST_ITEM_MARGIN                50
 #define SCROLL_THRESHOLD                50
 #define DELTA_TRANSLATE                 20
+#define PADDING_MENU_HEADER_ITEM        40
 
 template <typename T>
 std::string to_string(T value)
@@ -67,9 +68,13 @@ typedef enum class game_state
 
 enum TAG_MENU
 {
-    TAG_MENU_BUTTON_TITLE = 3000,
-    TAG_MENU_STAGE_CHOOSE = 0,
-	TAG_MENU_LEVEL_CHOOSE = 100,
+    TAG_STAGE_CHOOSE = 0,
+	TAG_LEVEL_CHOOSE = 100,
+    TAG_BUTTON_TITLE = 3000,
+    TAG_BUTTON_PENCIL,
+    TAG_BUTTON_RECORD_VIDEO,
+    TAG_BUTTON_SHARE,
+    TAG_BUTTON_MENU,
 };
 
 enum TAG_GAME
@@ -84,7 +89,7 @@ enum ZORDER_GAME
 	ZORDER_BUTTON_BACK = 10,
 	ZORDER_BUTTON_REPLAY = 11,
 };
-    
+
 struct UserData
 {
     int level;

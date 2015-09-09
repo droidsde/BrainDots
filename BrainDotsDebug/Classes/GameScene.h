@@ -44,6 +44,7 @@ public:
     bool checkBodyWeighOnSomebody(Vec2 start, Vec2 end, float distance);
     void backMenu();
     void touchButtonEvent(Ref* sender, Widget::TouchEventType type);
+    void endGame();
     
 private:
     
@@ -69,7 +70,7 @@ private:
     Vec2 previousLocation;
     std::vector<Vec2> platformPoints;
     
-    RenderTexture *target;
+    RenderTexture *target, *captureScreen;
     Sprite *brush;
     std::vector<Sprite*> _brushs;
     

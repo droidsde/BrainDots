@@ -13,10 +13,15 @@
 #include "SceneManager.h"
 #include "ui/CocosGUI.h"
 #include "ManageSoundDelegate.h"
+#include "PencilPopupLayer.h"
+#include "RecordPopupLayer.h"
+#include "SharePopupLayer.h"
+#include "MenuPopupLayer.h"
 
 USING_NS_CC;
 using namespace ui;
 
+class BasePopupLayer;
 class MenuScene : public LayerColor
 {
 public:

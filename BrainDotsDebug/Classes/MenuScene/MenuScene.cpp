@@ -71,8 +71,8 @@ void MenuScene::addHeaderLayer()
     title->setTitleFontName("arial.ttf");
     title->setTitleColor(Color3B::ORANGE);
     title->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    title->setPosition(Vec2(PADDING, headerSize.height/2));
-    title->setTag(TAG_MENU::TAG_MENU_BUTTON_TITLE);
+    title->setPosition(Vec2(PADDING_MENU_HEADER_ITEM, headerSize.height/2));
+    title->setTag(TAG_MENU::TAG_BUTTON_TITLE);
     title->addTouchEventListener(CC_CALLBACK_2(MenuScene::touchButtonEvent, this));
     headerLayer->addChild(title, ZORDER_MENU::HEADER_TITLE);
     
@@ -80,32 +80,36 @@ void MenuScene::addHeaderLayer()
     Button* menu = Button::create("menu_icon.png");
     menu->setTouchEnabled(true);
     menu->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-    menu->setPosition(Vec2(headerSize.width - PADDING, headerSize.height/2));
+    menu->setPosition(Vec2(headerSize.width - PADDING_MENU_HEADER_ITEM, headerSize.height/2));
     menu->addTouchEventListener(CC_CALLBACK_2(MenuScene::touchButtonEvent, this));
+    menu->setTag(TAG_MENU::TAG_BUTTON_MENU);
     headerLayer->addChild(menu);
     
     // button share
     Button* share = Button::create("share_icon.png");
     share->setTouchEnabled(true);
     share->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-    share->setPosition(Vec2(menu->getPositionX() - menu->getContentSize().width - PADDING, headerSize.height/2));
+    share->setPosition(Vec2(menu->getPositionX() - menu->getContentSize().width - PADDING_MENU_HEADER_ITEM, headerSize.height/2));
     share->addTouchEventListener(CC_CALLBACK_2(MenuScene::touchButtonEvent, this));
+    share->setTag(TAG_MENU::TAG_BUTTON_SHARE);
     headerLayer->addChild(share);
     
     // record video
     Button* record = Button::create("recordvideo_icon.png");
     record->setTouchEnabled(true);
     record->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-    record->setPosition(Vec2(share->getPositionX() - share->getContentSize().width - PADDING, headerSize.height/2));
+    record->setPosition(Vec2(share->getPositionX() - share->getContentSize().width - PADDING_MENU_HEADER_ITEM, headerSize.height/2));
     record->addTouchEventListener(CC_CALLBACK_2(MenuScene::touchButtonEvent, this));
+    record->setTag(TAG_MENU::TAG_BUTTON_RECORD_VIDEO);
     headerLayer->addChild(record);
     
     // button pencil
     Button* pencil = Button::create("pencil_icon.png");
     pencil->setTouchEnabled(true);
     pencil->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-    pencil->setPosition(Vec2(record->getPositionX() - record->getContentSize().width - PADDING, headerSize.height/2));
+    pencil->setPosition(Vec2(record->getPositionX() - record->getContentSize().width - PADDING_MENU_HEADER_ITEM, headerSize.height/2));
     pencil->addTouchEventListener(CC_CALLBACK_2(MenuScene::touchButtonEvent, this));
+    pencil->setTag(TAG_MENU::TAG_BUTTON_PENCIL);
     headerLayer->addChild(pencil);
 }
 
@@ -225,7 +229,7 @@ void MenuScene::addPageView()
                 level->setTitleFontSize(60);
                 level->setTitleFontName("arial.ttf");
                 level->setTouchEnabled(true);
-                level->setTag(TAG_MENU::TAG_MENU_LEVEL_CHOOSE + ITEMS_IN_PAGE * i + 3 * j + k);
+                level->setTag(TAG_MENU::TAG_LEVEL_CHOOSE + ITEMS_IN_PAGE * i + 3 * j + k);
                 level->addTouchEventListener(
                                              CC_CALLBACK_2(MenuScene::touchButtonEvent, this));
                 level->setPosition(Vec2( (k+1) * spaceX, (2-j) * spaceY));
@@ -251,21 +255,45 @@ void MenuScene::touchButtonEvent(Ref* sender, Widget::TouchEventType type) {
 	auto receiver = (Node*) sender;
 	if (type == ui::Widget::TouchEventType::ENDED) {
         
-        for (int i = TAG_MENU::TAG_MENU_LEVEL_CHOOSE; i < TAG_MENU::TAG_MENU_LEVEL_CHOOSE + LEVEL_MAX*ITEMS_IN_PAGE; i++) {
+        for (int i = TAG_MENU::TAG_LEVEL_CHOOSE; i < TAG_MENU::TAG_LEVEL_CHOOSE + LEVEL_MAX*ITEMS_IN_PAGE; i++) {
             if (receiver->getTag() == i) {
                 CCLOG("level %d", i);
                 // open game level
-                SceneManager::getInstance()->setLevelGame(i-TAG_MENU::TAG_MENU_LEVEL_CHOOSE);
+                SceneManager::getInstance()->setLevelGame(i-TAG_MENU::TAG_LEVEL_CHOOSE);
                 SceneManager::getInstance()->changeState(GAME_STATE::GAME);
             }
         }
         
 		switch (receiver->getTag()) {
-            case TAG_MENU::TAG_MENU_BUTTON_TITLE :
+            case TAG_MENU::TAG_BUTTON_TITLE :
                 if (!listview->isVisible()) {
                     showStages(curPage-1);
                 }
                 break;
+            case TAG_MENU::TAG_BUTTON_PENCIL :
+            {
+                auto baseLayer = PencilPopupLayer::create();
+                this->addChild(baseLayer);
+                break;
+            }
+            case TAG_MENU::TAG_BUTTON_RECORD_VIDEO :
+            {
+                auto baseLayer = RecordPopupLayer::create();
+                this->addChild(baseLayer);
+                break;
+            }
+            case TAG_MENU::TAG_BUTTON_SHARE :
+            {
+                auto baseLayer = SharePopupLayer::create();
+                this->addChild(baseLayer);
+                break;
+            }
+            case TAG_MENU::TAG_BUTTON_MENU :
+            {
+                auto baseLayer = MenuPopupLayer::create();
+                this->addChild(baseLayer);
+                break;
+            }
 		}
 	}
 }

@@ -89,6 +89,12 @@ bool GameScene::init()
     target->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
     this->addChild(target);
     
+    // init rendertexture capture screen
+    captureScreen = RenderTexture::create(visibleSize.width, visibleSize.height, Texture2D::PixelFormat::RGBA8888);
+    captureScreen->retain();
+    captureScreen->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
+    this->addChild(captureScreen);
+    
     brush = Sprite::create("brush.png");
     brush->retain();
     this->schedule(schedule_selector(GameScene::update));
@@ -335,7 +341,7 @@ void GameScene::update(float dt) {
                                           this->addChild(starParticle);
                                       });
         
-        this->runAction(Sequence::create(call1, DelayTime::create(1.0f), call2,  NULL));
+        this->runAction(Sequence::create(call1, DelayTime::create(1.0f), call2, DelayTime::create(2.0f), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)),  NULL));
         
         
         this->unschedule(schedule_selector(GameScene::update));
@@ -650,16 +656,14 @@ bool GameScene::checkBodyWeighOnSomebody(cocos2d::Vec2 start, cocos2d::Vec2 end,
 void GameScene::backMenu() {
     this->m_bClearBox = true;
     if (m_bClearBox) {
+        for (b2Body* b = world->GetBodyList(); b; b = b->GetNext()) {
+            world->DestroyBody(b);
+        }
+        
         this->removeChild(target, true);
         _brushs.clear();
         this->removeAllChildren();
         m_bClearBox = false;
-        
-        for (b2Body* b = world->GetBodyList(); b; b = b->GetNext()) {
-            if (b->GetUserData() != NULL) {
-                world->DestroyBody(b);
-            }
-        }
     }
     SceneManager::getInstance()->changeState(GAME_STATE::MENU);
 }
@@ -678,6 +682,26 @@ void GameScene::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEventType ty
                 break;
         }
     }
+}
+
+void GameScene::endGame()
+{
+    captureScreen->begin();
+    Director::getInstance()->getRunningScene()->visit();
+    captureScreen->end();
+    
+    Director::getInstance()->getRenderer()->render();
+    auto _image = captureScreen->newImage();
+    auto _key = to_string((int) time(NULL));
+    auto _texture2D = Director::getInstance()->getTextureCache()->addImage(
+                                                                           _image, _key);
+    CC_SAFE_DELETE(_image);
+    auto texture2D = Sprite::createWithTexture(_texture2D);
+    texture2D->setScale(0.5);
+    texture2D->setPosition(visibleSize/2);
+    texture2D->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    addChild(texture2D);
+    removeChild(captureScreen, true);
 }
 
 void GameScene::menuCloseCallback(Ref* pSender)

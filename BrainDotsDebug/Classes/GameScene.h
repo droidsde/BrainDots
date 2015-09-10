@@ -41,7 +41,8 @@ public:
     void update(float dt);
     void addRectangleBetweenPointsToBody(b2Body* body, Vec2 start, Vec2 end);
     Rect getBodyRectangle(b2Body* body);
-    bool checkBodyWeighOnSomebody(Vec2 start, Vec2 end, float distance);
+    Vec2 checkBodyWeighOnSomebody(Vec2 start, Vec2 end);
+    std::vector<Vec2> getListPointsIn2Point(Vec2 start, Vec2 end);
     void backMenu();
     void touchButtonEvent(Ref* sender, Widget::TouchEventType type);
     void endGame();
@@ -68,6 +69,8 @@ private:
     int vindex = 0;
     
     Vec2 previousLocation;
+    Vec2 posErrorDraw;
+    bool isErrorDraw = false;
     std::vector<Vec2> platformPoints;
     
     RenderTexture *target, *captureScreen;
@@ -83,6 +86,8 @@ private:
     
     // list rect hex grid
     std::vector<Layer*> listGirdLayer;
+    
+    TMXTiledMap* map;
 
 };
 

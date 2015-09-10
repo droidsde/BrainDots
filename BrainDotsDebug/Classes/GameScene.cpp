@@ -145,7 +145,7 @@ void GameScene::initMapLevel(int level)
 {
     //reading in a tiled map
     std::string nameLevel = "level" + to_string(level) + ".tmx";
-    auto map = TMXTiledMap::create(nameLevel);
+    map = TMXTiledMap::create(nameLevel);
     if (map==nullptr) {
         CCLOG("file not found");
         
@@ -183,7 +183,7 @@ void GameScene::initMapLevel(int level)
             CCLOG("hexgridobjects group not found");
         } else {
             listGirdLayer.clear();
-            listRectGrid = TiledBodyCreator::getRectListObjects(map, "hexgridobjects");
+            listRectGrid = TiledBodyCreator::getRectListObjects(map, "hexgridobjects", "hexgridlayer");
             if (listRectGrid.size() > 0) {
                 for (int i = 0; i < listRectGrid.size(); i++) {
                     Rect rect = listRectGrid[i];
@@ -273,12 +273,12 @@ void GameScene::initWall(b2Body *body, b2Fixture* _wallFixture[], float outside,
 void GameScene::initBalls()
 {
     auto ballASprite = Sprite::create("ball_red.png");
-    addChild(ballASprite);
+    map->addChild(ballASprite);
 //        ballASprite->setPosition(Vec2(visibleSize.width/4, visibleSize.height/2));
     ballASprite->setPosition(posballA);
     
     auto ballBSprite = Sprite::create("ball_blue.png");
-    addChild(ballBSprite);
+    map->addChild(ballBSprite);
 //        ballBSprite->setPosition(Vec2(visibleSize.width*3/4, visibleSize.height/2));
     ballBSprite->setPosition(posballB);
     
@@ -432,7 +432,10 @@ void GameScene::update(float dt) {
 
 bool GameScene::onTouchBegan(Touch* touch, Event* event) {
     drawnode->clear();
-    
+    if (gameOver) {
+        return false;
+    }
+    // touch in grid layer
     if (listGirdLayer.size() > 0) {
         for (int i = 0; i<listGirdLayer.size(); i++) {
             if (listGirdLayer[i]->getBoundingBox().containsPoint(touch->getLocation())) {
@@ -440,9 +443,17 @@ bool GameScene::onTouchBegan(Touch* touch, Event* event) {
             }
         }
     }
-    int r = rand() % 128 + 128;
-    int b = rand() % 128 + 128;
-    int g = rand() % 128 + 128;
+    
+    // touch in any physic body
+    if (checkBodyWeighOnSomebody(touch->getLocation(), touch->getLocation()) != Vec2::ZERO)
+    {
+        return false;
+    }
+    
+    srand((int)time(NULL));
+    int r = rand() % 255;
+    int b = rand() % 255;
+    int g = rand() % 255;
     brush->setColor(Color3B(r, b, g));
     
     platformPoints.clear();
@@ -461,6 +472,7 @@ void GameScene::onTouchMoved(Touch* touch, Event* event) {
     
     Vec2 start = touch->getLocation();
     Vec2 end = touch->getPreviousLocation();
+    Vec2 collision = checkBodyWeighOnSomebody(start, end);
     
     if (listGirdLayer.size() > 0) {
         for (int i = 0; i<listGirdLayer.size(); i++) {
@@ -469,26 +481,41 @@ void GameScene::onTouchMoved(Touch* touch, Event* event) {
             }
         }
     }
-    target->begin();
-    
-    float distance = start.getDistance(end);
-    
-    for (int i = 0; i < distance; i++) {
-        float difX = end.x - start.x;
-        float difY = end.y - start.y;
-        float delta = (float) i / distance;
-        Sprite * sprite = Sprite::createWithTexture(brush->getTexture());
-        sprite->setPosition(Vec2(start.x + (difX * delta), start.y + (difY * delta)));
-        sprite->setColor(brush->getColor());
-        sprite->visit();
-    }
-    target->end();
-    //    addRectangleBetweenPointsToBody(currentPlatformBody, start, end);
-    if (!checkBodyWeighOnSomebody(start, end, distance)) {
+    if (collision == Vec2::ZERO) {
         platformPoints.push_back(start);
+        if (isErrorDraw) {
+            isErrorDraw = false;
+        }
     }
-    previousLocation = start;
+    else {
+        if (!isErrorDraw) {
+            if (posErrorDraw != collision) {
+                posErrorDraw = collision;
+            }
+        }
+        isErrorDraw = true;
+        start = collision;
+    }
     
+    // if draw no problem
+    if (!isErrorDraw)
+    {
+        target->begin();
+        float distance = start.getDistance(end);
+        
+        for (int i = 0; i < distance; i++) {
+            float difX = end.x - start.x;
+            float difY = end.y - start.y;
+            float delta = (float) i / distance;
+            Sprite * sprite = Sprite::createWithTexture(brush->getTexture());
+            sprite->setPosition(Vec2(start.x + (difX * delta), start.y + (difY * delta)));
+            sprite->setColor(brush->getColor());
+            sprite->visit();
+        }
+        target->end();
+    }
+    
+    previousLocation = start;
 }
 
 void GameScene::onTouchEnded(Touch* touch, Event* event) {
@@ -533,7 +560,7 @@ void GameScene::onTouchEnded(Touch* touch, Event* event) {
         CC_SAFE_DELETE(_image);
         auto texture2D = Sprite::createWithTexture(_texture2D, bodyRectangle);
         texture2D->setAnchorPoint(anchorPoint);
-        addChild(texture2D);
+        map->addChild(texture2D);
         newBody->SetUserData(texture2D);
     }
     removeChild(target, true);
@@ -633,24 +660,64 @@ Rect GameScene::getBodyRectangle(b2Body* body) {
     return Rect(minX2, remY2, width2, height2);
 }
 
-bool GameScene::checkBodyWeighOnSomebody(cocos2d::Vec2 start, cocos2d::Vec2 end, float distance)
+std::vector<Vec2> GameScene::getListPointsIn2Point(cocos2d::Vec2 start, cocos2d::Vec2 end)
 {
-    for (b2Body *body = world->GetBodyList(); body != NULL; body =
-         body->GetNext()) {
-        b2Vec2 v1 = b2Vec2(start.x/PTM_RATIO, start.y / PTM_RATIO);
-        b2Vec2 v2 = b2Vec2(end.x /PTM_RATIO, end.y / PTM_RATIO);
+    std::vector<Vec2> list;
+    float startX, endX;
+    float A, B;
+    
+    float x1 = start.x;
+    float y1 = start.y;
+    float x2 = end.x;
+    float y2 = end.y;
+    
+    if (x1 - x2 == 0) {
+        A = 0;
+    } else
+    {
+        A = (y1 - y2) / (x1 - x2);
+    }
+    B = y1 - x1 * A;
+    
+    if (x1 > x2) {
+        startX = x2;
+        endX = x1;
+    } else {
+        startX = x1;
+        endX = x2;
+    }
+    for (float i=startX; i<=endX; i++) {
+        Vec2 acceptPoint = Vec2(i, A * i + B);
+        list.push_back(acceptPoint);
+    }
+    return list;
+}
+
+Vec2 GameScene::checkBodyWeighOnSomebody(cocos2d::Vec2 start, cocos2d::Vec2 end)
+{
+    Vec2 result = Vec2::ZERO;
+    for (b2Body *body = world->GetBodyList(); body != NULL; body = body->GetNext()) {
+        
         b2Fixture *f = body->GetFixtureList();
+        std::vector<Vec2> listPoints;
+        listPoints.clear();
+        listPoints = getListPointsIn2Point(start, end);
+        
         while(f)
         {
-            if(f -> TestPoint(v1) || f->TestPoint(v2))
-            {
-                CCLOG("You touched a body");
-                return true;
+            for (int i=0; i<listPoints.size(); i++) {
+                b2Vec2 checkPoint = b2Vec2(listPoints[i].x / PTM_RATIO, listPoints[i].y / PTM_RATIO);
+                if(f -> TestPoint(checkPoint))
+                {
+                    result = listPoints[i];
+                    CCLOG("You touched a body");
+                    return result;
+                }
             }
             f = f->GetNext();            
         }
     }
-    return false;
+    return result;
 }
 
 void GameScene::backMenu() {
@@ -659,7 +726,6 @@ void GameScene::backMenu() {
         for (b2Body* b = world->GetBodyList(); b; b = b->GetNext()) {
             world->DestroyBody(b);
         }
-        
         this->removeChild(target, true);
         _brushs.clear();
         this->removeAllChildren();
@@ -697,11 +763,20 @@ void GameScene::endGame()
                                                                            _image, _key);
     CC_SAFE_DELETE(_image);
     auto texture2D = Sprite::createWithTexture(_texture2D);
-    texture2D->setScale(0.5);
     texture2D->setPosition(visibleSize/2);
     texture2D->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     addChild(texture2D);
     removeChild(captureScreen, true);
+    
+    // create tick
+    auto tick = Sprite::create("mini_tick.png");
+    tick->setAnchorPoint(Vec2::ANCHOR_TOP_RIGHT);
+    tick->setPosition(Vec2(texture2D->getContentSize().width - PADDING, texture2D->getContentSize().height - PADDING));
+    tick->retain();
+    auto addtick = CallFunc::create([texture2D, tick] {
+        texture2D->addChild(tick);
+    });
+    texture2D->runAction(Sequence::create(ScaleTo::create(0.5, 0.5f), DelayTime::create(0.5), addtick, nullptr));
 }
 
 void GameScene::menuCloseCallback(Ref* pSender)

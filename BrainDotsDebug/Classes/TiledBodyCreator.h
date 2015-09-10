@@ -56,7 +56,7 @@ public:
     static FixtureDef* createCircle(ValueMap object);
     static FixtureDef* createRect(ValueMap object);
     
-    static std::vector<Rect> getRectListObjects(TMXTiledMap* map, std::string layerName);
+    static std::vector<Rect> getRectListObjects(TMXTiledMap* map,std::string objectsName, std::string layerName);
 };
 
 

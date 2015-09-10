@@ -173,10 +173,16 @@ FixtureDef* TiledBodyCreator::createRect(ValueMap object)
     return fix;
 }
 
-std::vector<Rect> TiledBodyCreator::getRectListObjects(cocos2d::TMXTiledMap *map, std::string layerName)
+std::vector<Rect> TiledBodyCreator::getRectListObjects(cocos2d::TMXTiledMap *map, std::string objectsName,std::string layerName)
 {
     std::vector<Rect> listRect;
-    auto layerGroup = map->getObjectGroup(layerName);
+    auto layerGrid = map->getLayer(layerName);
+    if (layerGrid) {
+        CCLOG("found layer grid");
+        int zorder = layerGrid->getProperty("zorder").asInt();
+        map->reorderChild(layerGrid, zorder>0?zorder:100);
+    }
+    auto layerGroup = map->getObjectGroup(objectsName);
     cocos2d::ValueVector collisionObjects = layerGroup->getObjects();
     
     for (cocos2d::Value objectValue : collisionObjects) {

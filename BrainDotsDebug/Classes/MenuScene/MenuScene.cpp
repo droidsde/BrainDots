@@ -133,7 +133,7 @@ void MenuScene::addListHorizontal()
     
     // add listview in body layer
     listview = ListView::create();
-    listview->setDirection(ScrollView::Direction::HORIZONTAL);
+    listview->setDirection(cocos2d::ui::ScrollView::Direction::HORIZONTAL);
     listview->setGravity(ListView::Gravity::CENTER_VERTICAL);
     listview->setTouchEnabled(true);
     listview->setBounceEnabled(true);

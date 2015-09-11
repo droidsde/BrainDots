@@ -30,6 +30,25 @@
 #define DELTA_TRANSLATE                 20
 #define PADDING_MENU_HEADER_ITEM        40
 
+#define PTM_RATIO 32.0 // 32px = 1m in Box2D
+
+const float BALL_RADIUS = 25.0f;
+const float OUTSIDE = 500;
+
+// category definiti
+const short CATEGORY_BALL = 0x0001;
+const short CATEGORY_PLATFORM = 0x0002;
+const short CATEGORY_BARRAGE = 0x0004;
+const short CATEGORY_WALL1 = 0x0008;
+const short CATEGORY_WALL2 = 0x0016;
+
+// maskbit definiti
+const short MASK_BALL = -1;
+const short MASK_PLATFORM = CATEGORY_BALL | CATEGORY_BARRAGE | CATEGORY_PLATFORM | CATEGORY_WALL2;
+const short MASK_BARRAGE = -1;
+const short MASK_WALL1 = CATEGORY_BALL | CATEGORY_BARRAGE;
+const short MASK_WALL2 = CATEGORY_BALL | CATEGORY_BARRAGE | CATEGORY_PLATFORM;
+
 template <typename T>
 std::string to_string(T value)
 {

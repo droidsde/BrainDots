@@ -15,16 +15,14 @@ using namespace cocos2d::ui;
 class GameScene : public cocos2d::LayerColor
 {
 public:
-    // there's no 'id' in cpp, so we recommend returning the class instance pointer
+    
+    GameScene();
+    ~GameScene();
+    
     static cocos2d::Scene* createScene();
-
-    // Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
     virtual bool init();
     virtual void draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t flags) override;
-    // a selector callback
-    void menuCloseCallback(cocos2d::Ref* pSender);
     
-    // implement the "static create()" method manually
     CREATE_FUNC(GameScene);
     
     virtual bool onTouchBegan(Touch* touch, Event* event);
@@ -48,12 +46,24 @@ public:
     void endGame();
     
 private:
-    
+    // size and pos screen
     Size visibleSize;
     Vec2 origin;
     
+    // map variable
+    TMXTiledMap* map;
+    
+    // test draw node
+    DrawNode* drawnode;
+    
+    // list rect hex grid
+    std::vector<Layer*> listGirdLayer;
+    
+    // control game
     bool gameOver = false;
     bool m_bClearBox;
+    
+    // physics variable
     b2World* world;
     GLESDebugDraw* debugDraw;
     b2Body* currentPlatformBody;
@@ -63,32 +73,19 @@ private:
     b2Fixture* _ballBFixture;
     b2Fixture* _wallFixture1[4];
     b2Fixture* _wallFixture2[4];
-    
-    Vec2 posballA, posballB;
     b2Vec2 vertices[b2_maxPolygonVertices];
-    int vindex = 0;
     
-    Vec2 previousLocation;
+    // contacts physics
+    BallContactListener* _ballContactListener;
+    Vec2 collisionPoint = Vec2::ZERO;
+    Vec2 posballA, posballB;
+    
+    // touch variable
     Vec2 posErrorDraw;
     bool isErrorDraw = false;
     std::vector<Vec2> platformPoints;
-    
     RenderTexture *target, *captureScreen;
     Sprite *brush;
-    std::vector<Sprite*> _brushs;
-    
-    // contacts
-    BallContactListener* _ballContactListener;
-    Vec2 collisionPoint = Vec2::ZERO;
-    
-    // test draw node
-    DrawNode* drawnode;
-    
-    // list rect hex grid
-    std::vector<Layer*> listGirdLayer;
-    
-    TMXTiledMap* map;
-
 };
 
 #endif // __HELLOWORLD_SCENE_H__

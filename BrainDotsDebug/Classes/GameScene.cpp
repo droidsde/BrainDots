@@ -1,38 +1,36 @@
 #include "GameScene.h"
 
-USING_NS_CC;
-using namespace cocos2d::ui;
+GameScene::GameScene()
+{
+    map = nullptr;
+    drawnode = nullptr;
+    world = nullptr;
+    currentPlatformBody = nullptr;
+    target = nullptr;
+    brush = nullptr;
+    _ballContactListener = nullptr;
+}
 
-#define PTM_RATIO 32.0 // 32px = 1m in Box2D
-const float BALL_RADIUS = 25.0f;
-const float OUTSIDE = 500;
-
-// category definiti
-const short CATEGORY_BALL = 0x0001;
-const short CATEGORY_PLATFORM = 0x0002;
-const short CATEGORY_BARRAGE = 0x0004;
-const short CATEGORY_WALL1 = 0x0008;
-const short CATEGORY_WALL2 = 0x0016;
-
-// maskbit definiti
-const short MASK_BALL = -1;
-const short MASK_PLATFORM = CATEGORY_BALL | CATEGORY_BARRAGE | CATEGORY_PLATFORM | CATEGORY_WALL2;
-const short MASK_BARRAGE = -1;
-const short MASK_WALL1 = CATEGORY_BALL | CATEGORY_BARRAGE;
-const short MASK_WALL2 = CATEGORY_BALL | CATEGORY_BARRAGE | CATEGORY_PLATFORM;
+GameScene::~GameScene()
+{
+    map = nullptr;
+    drawnode = nullptr;
+    brush = nullptr;
+    delete world;
+    world = nullptr;
+    
+    delete _ballContactListener;
+    CC_SAFE_RELEASE(target);
+    std::vector<Vec2>().swap(platformPoints);
+    delete this->debugDraw;
+    this->debugDraw = nullptr;
+}
 
 Scene* GameScene::createScene()
 {
-    // 'scene' is an autorelease object
     auto scene = Scene::create();
-    
-    // 'layer' is an autorelease object
     auto layer = GameScene::create();
-
-    // add layer as a child to scene
     scene->addChild(layer);
-
-    // return the scene
     return scene;
 }
 
@@ -48,7 +46,6 @@ bool GameScene::init()
     
     visibleSize = Director::getInstance()->getVisibleSize();
     origin = Director::getInstance()->getVisibleOrigin();
-    CCLOG("size screen %f %f", visibleSize.width, visibleSize.height);
     
     // button back
     auto backButton = Button::create("back.png");
@@ -68,10 +65,6 @@ bool GameScene::init()
     replayButton->addTouchEventListener(CC_CALLBACK_2(GameScene::touchButtonEvent, this));
     addChild(replayButton, ZORDER_GAME::ZORDER_BUTTON_REPLAY);
     
-    // draw node
-    drawnode = DrawNode::create();
-    addChild(drawnode);
-    
     // init physics
     this->initPhysics();
     
@@ -89,12 +82,7 @@ bool GameScene::init()
     target->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
     this->addChild(target);
     
-    // init rendertexture capture screen
-    captureScreen = RenderTexture::create(visibleSize.width, visibleSize.height, Texture2D::PixelFormat::RGBA8888);
-    captureScreen->retain();
-    captureScreen->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
-    this->addChild(captureScreen);
-    
+    // brush
     brush = Sprite::create("brush.png");
     brush->retain();
     this->schedule(schedule_selector(GameScene::update));
@@ -219,6 +207,10 @@ void GameScene::initMapLevel(int level)
                 }
             }
         }
+        
+        // draw node
+        drawnode = DrawNode::create();
+        map->addChild(drawnode);
     }
 }
 
@@ -274,12 +266,10 @@ void GameScene::initBalls()
 {
     auto ballASprite = Sprite::create("ball_red.png");
     map->addChild(ballASprite);
-//        ballASprite->setPosition(Vec2(visibleSize.width/4, visibleSize.height/2));
     ballASprite->setPosition(posballA);
     
     auto ballBSprite = Sprite::create("ball_blue.png");
     map->addChild(ballBSprite);
-//        ballBSprite->setPosition(Vec2(visibleSize.width*3/4, visibleSize.height/2));
     ballBSprite->setPosition(posballB);
     
     // shape of body
@@ -432,6 +422,8 @@ void GameScene::update(float dt) {
 
 bool GameScene::onTouchBegan(Touch* touch, Event* event) {
     drawnode->clear();
+    isErrorDraw = false;
+    posErrorDraw = Vec2::ZERO;
     if (gameOver) {
         return false;
     }
@@ -459,7 +451,6 @@ bool GameScene::onTouchBegan(Touch* touch, Event* event) {
     platformPoints.clear();
     Vec2 location = touch->getLocation();
     platformPoints.push_back(location);
-    previousLocation = location;
     
     b2BodyDef myBodyDef;
     myBodyDef.type = b2_staticBody;
@@ -469,25 +460,35 @@ bool GameScene::onTouchBegan(Touch* touch, Event* event) {
 }
 
 void GameScene::onTouchMoved(Touch* touch, Event* event) {
+    drawnode->clear();
     
     Vec2 start = touch->getLocation();
     Vec2 end = touch->getPreviousLocation();
     Vec2 collision = checkBodyWeighOnSomebody(start, end);
     
-    if (listGirdLayer.size() > 0) {
-        for (int i = 0; i<listGirdLayer.size(); i++) {
-            if (listGirdLayer[i]->getBoundingBox().containsPoint(start)) {
-                return;
-            }
+    // if before error draw
+    if (isErrorDraw) {
+        Vec2 _collision = checkBodyWeighOnSomebody(start, posErrorDraw);
+        // if error draw
+        if (_collision != Vec2::ZERO) {
+            Color4F color = Color4F(brush->getColor().r, brush->getColor().g, brush->getColor().b, 100);
+            drawnode->drawSegment(start, posErrorDraw, brush->getContentSize().width/2 , Color4F(color));
+        }
+        else {
+            // draw from pos error -> poos now
+            isErrorDraw = false;
+            end = posErrorDraw;
         }
     }
+    
+    // if draw ok
     if (collision == Vec2::ZERO) {
-        platformPoints.push_back(start);
-        if (isErrorDraw) {
-            isErrorDraw = false;
+        if (!isErrorDraw) {
+            platformPoints.push_back(start);
         }
     }
     else {
+        // draw error
         if (!isErrorDraw) {
             if (posErrorDraw != collision) {
                 posErrorDraw = collision;
@@ -514,11 +515,10 @@ void GameScene::onTouchMoved(Touch* touch, Event* event) {
         }
         target->end();
     }
-    
-    previousLocation = start;
 }
 
 void GameScene::onTouchEnded(Touch* touch, Event* event) {
+    drawnode->clear();
     
     if (ballA && ballB) {
         if (ballA->GetType() == b2_staticBody) {
@@ -574,8 +574,6 @@ void GameScene::onTouchEnded(Touch* touch, Event* event) {
 
 void GameScene::addRectangleBetweenPointsToBody(b2Body* body, Vec2 start,
                                                  Vec2 end) {
-    drawnode->drawDot(start, 1, Color4F::RED);
-    drawnode->drawDot(end, 1, Color4F::GREEN);
     
     float minW = brush->boundingBox().size.width / PTM_RATIO ;
     float minH = brush->boundingBox().size.height / PTM_RATIO;
@@ -696,13 +694,25 @@ std::vector<Vec2> GameScene::getListPointsIn2Point(cocos2d::Vec2 start, cocos2d:
 Vec2 GameScene::checkBodyWeighOnSomebody(cocos2d::Vec2 start, cocos2d::Vec2 end)
 {
     Vec2 result = Vec2::ZERO;
+    std::vector<Vec2> listPoints = getListPointsIn2Point(start, end);
+    
+    // collision with hex grid layer
+    if (listGirdLayer.size() > 0) {
+        for (int i = 0; i<listGirdLayer.size(); i++) {
+            for (int j = 0; j < listPoints.size(); j++) {
+                if (listGirdLayer[i]->getBoundingBox().containsPoint(listPoints[j])) {
+                    result = listPoints[j];
+                    CCLOG("You touched a hex grid layer");
+                    return result;
+                }
+            }
+        }
+    }
+    
+    // collision with body physics
     for (b2Body *body = world->GetBodyList(); body != NULL; body = body->GetNext()) {
         
         b2Fixture *f = body->GetFixtureList();
-        std::vector<Vec2> listPoints;
-        listPoints.clear();
-        listPoints = getListPointsIn2Point(start, end);
-        
         while(f)
         {
             for (int i=0; i<listPoints.size(); i++) {
@@ -727,7 +737,6 @@ void GameScene::backMenu() {
             world->DestroyBody(b);
         }
         this->removeChild(target, true);
-        _brushs.clear();
         this->removeAllChildren();
         m_bClearBox = false;
     }
@@ -752,6 +761,13 @@ void GameScene::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEventType ty
 
 void GameScene::endGame()
 {
+    // init rendertexture capture screen
+    captureScreen = RenderTexture::create(visibleSize.width, visibleSize.height, Texture2D::PixelFormat::RGBA8888);
+    captureScreen->retain();
+    captureScreen->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
+    this->addChild(captureScreen);
+
+    // capture screen
     captureScreen->begin();
     Director::getInstance()->getRunningScene()->visit();
     captureScreen->end();
@@ -779,11 +795,3 @@ void GameScene::endGame()
     texture2D->runAction(Sequence::create(ScaleTo::create(0.5, 0.5f), DelayTime::create(0.5), addtick, nullptr));
 }
 
-void GameScene::menuCloseCallback(Ref* pSender)
-{
-    Director::getInstance()->end();
-
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-    exit(0);
-#endif
-}

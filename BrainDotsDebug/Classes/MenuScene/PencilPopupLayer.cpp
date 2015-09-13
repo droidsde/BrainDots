@@ -142,7 +142,7 @@ void PencilPopupLayer::adjustItemScale(Vec2 adjustPoint)
 
 void PencilPopupLayer::adjustScrollView(Vec2 adjustPoint)
 {
-    Vec2 endPoint = ccpAdd(scrollView->getContentOffset(),Vec2(adjustPoint.x,0));
+    Vec2 endPoint = scrollView->getContentOffset().add(Vec2(adjustPoint.x,0));
     scrollView->unscheduleAllSelectors();
     scrollView->setContentOffset(endPoint,false);
 }
@@ -152,12 +152,12 @@ void PencilPopupLayer::adjustEndScrollView()
     Ref* obj = NULL;
     float minX = sizeLayout.height;
     float midX = swSize.width/2;
-    //获取距离中间最小值的card
+    //èŽ·å�–è·�ç¦»ä¸­é—´æœ€å°�å€¼çš„card
     CCARRAY_FOREACH(itemArray,obj)
     {
         Node* card = (Node*) obj;
         float offset = scrollView->getContentOffset().x;
-        //转化父类坐标
+        //è½¬åŒ–çˆ¶ç±»å��æ ‡
         float posX = card->getPositionX() + offset;
         float disMid = midX-posX;
         if(abs(disMid) < abs(minX)) minX = disMid;
@@ -166,12 +166,12 @@ void PencilPopupLayer::adjustEndScrollView()
     CCARRAY_FOREACH(itemArray,obj)
     {
         Node* item = (Node*) obj;
-        //转化父类坐标
+        //è½¬åŒ–çˆ¶ç±»å��æ ‡
         float offset = scrollView->getContentOffset().x;
         float posX = item->getPositionX() + offset ;
-        //距离中间长度
+        //è·�ç¦»ä¸­é—´é•¿åº¦
         float disMid = abs(midX - posX - minX);
-        //目标scale
+        //ç›®æ ‡scale
         float scale = 1- disMid/disDistance*disScale;
         ScaleTo* scaleBy = ScaleTo::create(0.2f,scale);
         item->runAction(scaleBy);
@@ -230,7 +230,7 @@ int PencilPopupLayer::getCurItemIndex()
 {
     float distance1 = - scrollLayer->getPositionX();
     float distance2 = swSize.width/2 - offsetPosition.x;
-    //+5 浮点数误差
+    //+5 æµ®ç‚¹æ•°è¯¯å·®
     int index = (distance1 + distance2 + 5) / (disDistance);
     //CCLog("card index:%d  distance1:%f",index,distance1);
     return index;

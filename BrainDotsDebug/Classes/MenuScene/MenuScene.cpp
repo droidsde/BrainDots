@@ -44,13 +44,6 @@ bool MenuScene::init() {
     // add body layer
     addBodyLayer();
     
-    auto listener = EventListenerTouchAllAtOnce::create();
-    listener->setEnabled(true);
-    listener->onTouchesBegan = CC_CALLBACK_2(MenuScene::onTouchesBegan, this);
-    listener->onTouchesMoved = CC_CALLBACK_2(MenuScene::onTouchesMoved, this);
-    listener->onTouchesEnded = CC_CALLBACK_2(MenuScene::onTouchesEnded, this);
-    this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
-    
 	return true;
 }
 
@@ -161,7 +154,7 @@ void MenuScene::reloadData() {
                 stage->setPosition(Vec2(layout->getContentSize().width-stickerSize.width/2, bodySize.height - stickerSize.height/2 - miniTickSize.height/2));
             } else if (i == LEVEL_MAX-1)
             {
-                stage->setPosition(Vec2(stickerSize.width/2, bodySize.height/2));
+                stage->setPosition(Vec2(stickerSize.width/2, bodySize.height - stickerSize.height/2 - miniTickSize.height/2));
             }
         }
         else {
@@ -367,20 +360,6 @@ void MenuScene::showStages(int i)
     }
 }
 
-void MenuScene::onTouchesBegan(const std::vector<Touch *> &touches, cocos2d::Event *unused_event)
-{
-    
-}
-
-void MenuScene::onTouchesMoved(const std::vector<Touch *> &touches, cocos2d::Event *unused_event)
-{
-
-}
-
-void MenuScene::onTouchesEnded(const std::vector<Touch *> &touches, cocos2d::Event *unused_event)
-{
-
-}
 
 void MenuScene::onEnter() {
 	LayerColor::onEnter();

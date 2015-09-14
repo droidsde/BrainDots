@@ -11,6 +11,7 @@
 
 #include <cocos2d.h>
 #include "BasePopupLayer.h"
+#include "BaseCoverFlow.h"
 #include <extensions/cocos-ext.h>
 
 USING_NS_CC;

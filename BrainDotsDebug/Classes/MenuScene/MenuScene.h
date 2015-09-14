@@ -12,7 +12,7 @@
 #include <cocos2d.h>
 #include "SceneManager.h"
 #include "ui/CocosGUI.h"
-#include "SoundManager/ManageSoundDelegate.h"
+#include "ManageSoundDelegate.h"
 #include "PencilPopupLayer.h"
 #include "RecordPopupLayer.h"
 #include "SharePopupLayer.h"
@@ -34,10 +34,6 @@ public:
     virtual void onExit();
     
     CC_SYNTHESIZE(ManageSoundDelegate*, msDelegator, SoundMusic);
-    
-    void onTouchesBegan(const std::vector<Touch *> &touches, cocos2d::Event *unused_event);
-    void onTouchesMoved(const std::vector<Touch *> &touches, cocos2d::Event *unused_event);
-    void onTouchesEnded(const std::vector<Touch *> &touches, cocos2d::Event *unused_event);
     
 private:
     

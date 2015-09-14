@@ -18,7 +18,7 @@ PencilPopupLayer::PencilPopupLayer()
 
 PencilPopupLayer::~PencilPopupLayer()
 {
-    CC_SAFE_RELEASE_NULL(itemArray);
+//    CC_SAFE_RELEASE_NULL(itemArray);
 }
 
 PencilPopupLayer* PencilPopupLayer::create()
@@ -53,43 +53,51 @@ bool PencilPopupLayer::init()
     initData();
     
     // add item
-    for (int i = 0; i < 10; i++) {
-        auto item = Sprite::create("pencil1.png");
-        addItem(item);
-    }
-
-    // touch screen
-    auto listener = EventListenerTouchAllAtOnce::create();
-    listener->setEnabled(true);
-    listener->onTouchesBegan = CC_CALLBACK_2(PencilPopupLayer::onTouchesBegan, this);
-    listener->onTouchesMoved = CC_CALLBACK_2(PencilPopupLayer::onTouchesMoved, this);
-    listener->onTouchesEnded = CC_CALLBACK_2(PencilPopupLayer::onTouchesEnded, this);
-    this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
+//    for (int i = 0; i < 100; i++) {
+//        auto item = Sprite::create("pencil1.png");
+//        addItem(item);
+//    }
     
+    BaseCoverFlow* cover = BaseCoverFlow::create(sizeLayout, 20);
+    cover->setContentSize(sizeLayout);
+    cover->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    cover->setPosition(Vec2::ZERO);
+    layoutTable->addChild(cover);
+    
+    // touch screen
+//    auto listener = EventListenerTouchOneByOne::create();
+//    listener->setEnabled(true);
+//    listener->onTouchBegan = CC_CALLBACK_2(PencilPopupLayer::onTouchBegan, this);
+//    listener->onTouchMoved = CC_CALLBACK_2(PencilPopupLayer::onTouchMoved, this);
+//    listener->onTouchEnded = CC_CALLBACK_2(PencilPopupLayer::onTouchEnded, this);
+//    this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, scrollLayer);
+
     return true;
 }
 
 void PencilPopupLayer::initData()
 {
+    // init array
     itemArray = Array::create();
     itemArray->retain();
     
     itemNum = 0;
+    // set offset to center
     offsetPosition = Vec2(swSize.width/2, swSize.height/2);
     
     scrollLayer = Layer::create();
-    scrollLayer->setAnchorPoint(Vec2::ZERO);
-    scrollLayer->setPosition(Vec2::ZERO);
+    scrollLayer->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    scrollLayer->setPosition(offsetPosition);
     scrollLayer->setContentSize(slSize);
     
     scrollView = cocos2d::extension::ScrollView::create(swSize, scrollLayer);
     scrollView->setContentSize(swSize);
-    scrollView->setAnchorPoint(Vec2::ZERO);
-    scrollView->setTouchEnabled(true);
+    scrollView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    scrollView->setTouchEnabled(false);
     scrollView->setDirection(cocos2d::extension::ScrollView::Direction::HORIZONTAL);
     scrollView->setContentOffset(Vec2::ZERO);
     scrollView->setDelegate(this);
-    addChild(scrollView,1);
+    layoutTable->addChild(scrollView,1);
 }
 
 void PencilPopupLayer::onExit()
@@ -109,9 +117,9 @@ void PencilPopupLayer::onTouchMoved(cocos2d::Touch *touch, cocos2d::Event *pEven
     Vec2 scroll_movepoint = touch->getLocation();
     if(swBox.containsPoint(scroll_movepoint))
     {
-        Vec2 adjustPoint = scroll_movepoint-scroll_prepoint;
-        adjustScrollView(adjustPoint);
-        adjustItemScale(adjustPoint);
+//        Vec2 adjustPoint = scroll_movepoint-scroll_prepoint;
+//        adjustScrollView(adjustPoint);
+//        adjustItemScale(adjustPoint);
     }
 }
 
@@ -120,7 +128,7 @@ void PencilPopupLayer::onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *pEven
     Vec2 scroll_prepoint = touch->getPreviousLocation();
     Vec2 scroll_endpoint = touch->getLocation();
 //    float disX = scroll_endpoint.x - scroll_endpoint.x;
-    adjustEndScrollView();
+//    adjustEndScrollView();
 }
 
 void PencilPopupLayer::adjustItemScale(Vec2 adjustPoint)
@@ -142,7 +150,8 @@ void PencilPopupLayer::adjustItemScale(Vec2 adjustPoint)
 
 void PencilPopupLayer::adjustScrollView(Vec2 adjustPoint)
 {
-    Vec2 endPoint = scrollView->getContentOffset().add(Vec2(adjustPoint.x,0));
+    Vec2 endPoint;
+    Vec2::add(scrollView->getContentOffset(), Vec2(adjustPoint.x, 0), &endPoint);
     scrollView->unscheduleAllSelectors();
     scrollView->setContentOffset(endPoint,false);
 }
@@ -193,15 +202,13 @@ void PencilPopupLayer::itemViewEnd_callback(Ref* pSender)
 
 void PencilPopupLayer::scrollViewDidScroll(cocos2d::extension::ScrollView* view)
 {
-    
+    CCLOG("scrolling %f %f", view->getContentOffset().x, view->getContentOffset().y);
 }
 
 void PencilPopupLayer::scrollViewDidZoom(cocos2d::extension::ScrollView* view)
 {
     
 }
-
-
 
 void PencilPopupLayer::addItem(Node * item)
 {

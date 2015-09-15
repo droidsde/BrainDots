@@ -75,7 +75,7 @@ bool GameScene::init()
     this->initPhysicObjects();
     this->initBalls();
     
-//    this->revoluteJoint();
+    this->revoluteJoint();
     
     // init rendertexture and sprite draw
     target = RenderTexture::create(visibleSize.width, visibleSize.height,

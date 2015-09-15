@@ -738,12 +738,12 @@
     <property name="autocreate" value="false"/>
    </properties>
   </object>
-  <object id="6" name="ground1" x="229.333" y="230.667" width="414.667" height="416">
+  <object id="6" name="ground1" type="object" x="229.333" y="230.667" width="414.667" height="416">
    <properties>
     <property name="autocreate" value="true"/>
    </properties>
   </object>
-  <object id="8" name="ground2" x="228" y="649.333" width="910.667" height="109.333">
+  <object id="8" name="ground2" type="object" x="228" y="649.333" width="910.667" height="109.333">
    <properties>
     <property name="autocreate" value="true"/>
    </properties>

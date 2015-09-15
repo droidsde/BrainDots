@@ -133,8 +133,8 @@ void TiledBodyCreator::executeJointList(b2World *world, ValueVector jointList)
                 CCLOG("bodyA: %s bodyB: %s joint", joint->nameBodyA.c_str(), joint->nameBodyB.c_str());
                 joint->bodyA = (b2Body*)itr1->second;
                 joint->bodyB = (b2Body*)itr2->second;
-                CCLOG("bodyA posX,posY: %f %f", joint->bodyA->GetPosition().x, joint->bodyA->GetPosition().y);
-                CCLOG("bodyB posX,posY: %f %f", joint->bodyB->GetPosition().x, joint->bodyB->GetPosition().y);
+                CCLOG("bodyA posX,posY: %f %f", joint->bodyA->GetWorldCenter().x, joint->bodyA->GetWorldCenter().y);
+                CCLOG("bodyB posX,posY: %f %f", joint->bodyB->GetWorldCenter().x, joint->bodyB->GetWorldCenter().y);
                 // remove itr
                 mapBodyList.erase(itr1);
                 mapBodyList.erase(itr2);
@@ -154,8 +154,9 @@ void TiledBodyCreator::createJoint(b2World *world, Joint2Body *joint)
             revoluteJointDef.bodyA = joint->bodyA;
             revoluteJointDef.bodyB = joint->bodyB;
             revoluteJointDef.collideConnected = joint->collideConnected;
-            revoluteJointDef.localAnchorA.Set(joint->localAnchorA.x, joint->localAnchorA.y);
-            revoluteJointDef.localAnchorB.Set(joint->localAnchorB.x, joint->localAnchorB.y);
+            revoluteJointDef.localAnchorA = joint->localAnchorA;
+            revoluteJointDef.localAnchorB = joint->localAnchorB;
+            revoluteJointDef.referenceAngle = 0;
             
             revoluteJointDef.enableLimit = joint->enableLimit;
             if (joint->enableLimit) {
@@ -183,23 +184,33 @@ void TiledBodyCreator::createStaticBodies(b2World *world,  ValueVector staticBod
         return;
     }
     
-    
-    for(cocos2d::Value objectValue : staticBodyList)
-    {
-        b2BodyDef bd;
-        auto fixtureShape = createFixture(objectValue.asValueMap(), bd);
-        b2Body* staticBody = world->CreateBody(&bd);
-        if(fixtureShape != NULL) {
-            fixtureShape->fixture.filter.categoryBits = categorybits;
-            fixtureShape->fixture.filter.maskBits = maskbits;
-            staticBody->CreateFixture(&fixtureShape->fixture);
+    b2BodyDef bd;
+    bd.type = b2_staticBody;
+    bd.position.Set(20, 12);
+    b2FixtureDef fixtureDef;
+    fixtureDef.density = 10;
+    b2CircleShape circleShape;
+    circleShape.m_radius = 1;
 
-            // insert to map
-            mapBodyList.insert(std::pair<std::string, b2Body*>(objectValue.asValueMap()["name"].asString(), staticBody));
-        } else {
-            CCLOG("Error when get objects");
-        }
-    }
+    fixtureDef.shape = &circleShape;
+    b2Body* m_bodyB = world->CreateBody(&bd);
+    m_bodyB->CreateFixture(&fixtureDef);
+    mapBodyList.insert(std::pair<std::string, b2Body*>("anchorpoint1", m_bodyB));
+//    for(cocos2d::Value objectValue : staticBodyList)
+//    {
+//        auto fixtureShape = createFixture(objectValue.asValueMap(), bd);
+//        b2Body* staticBody = world->CreateBody(&bd);
+//        if(fixtureShape != NULL) {
+//            fixtureShape->fixture.filter.categoryBits = categorybits;
+//            fixtureShape->fixture.filter.maskBits = maskbits;
+//            staticBody->CreateFixture(&fixtureShape->fixture);
+//            CCLOG("position static body %f %f", staticBody->GetWorldCenter().x, staticBody->GetWorldCenter().y);
+//            // insert to map
+//            mapBodyList.insert(std::pair<std::string, b2Body*>(objectValue.asValueMap()["name"].asString(), staticBody));
+//        } else {
+//            CCLOG("Error when get objects");
+//        }
+//    }
 }
 
 void TiledBodyCreator::createDynamicBodies(cocos2d::TMXTiledMap *map, b2World *world,  ValueVector dynamicBodyList, uint16 categorybits, uint16 maskbits)
@@ -207,40 +218,52 @@ void TiledBodyCreator::createDynamicBodies(cocos2d::TMXTiledMap *map, b2World *w
     if (dynamicBodyList.size() <= 0) {
         return;
     }
-    
-    for (cocos2d::Value objectValue : dynamicBodyList) {
-        b2BodyDef bd;
-        bd.type = b2_dynamicBody;
-        auto fixtureShape = createFixture(objectValue.asValueMap(), bd);
-        float density = objectValue.asValueMap()["density"].asFloat();
-        std::string spriteName = objectValue.asValueMap()["spriteName"].asString();
-        
-        if (fixtureShape != NULL) {
+    // create body def
+    b2BodyDef bd;
+    bd.type = b2_dynamicBody;
+    bd.position.Set(20, 12);
 
-            b2Body* dynamicBody = world->CreateBody(&bd);
-            // fixturedef
-            fixtureShape->fixture.filter.categoryBits = categorybits;
-            fixtureShape->fixture.filter.maskBits = maskbits;
-            fixtureShape->fixture.density = density;
-            dynamicBody->CreateFixture(&fixtureShape->fixture);
-            
-            // create sprite for polygon
-            Rect bodyRectangle = ExecuteShapePhysic::getBodyRectangle(map->getMapSize(), dynamicBody);
-            CCLOG("posx posy %f %f size %f %f", bodyRectangle.origin.x, bodyRectangle.origin.y, bodyRectangle.size.width, bodyRectangle.size.height);
-            float anchorX = dynamicBody->GetPosition().x * PTM_RATIO - bodyRectangle.origin.x;
-            float anchorY = bodyRectangle.size.height - (map->getMapSize().height - bodyRectangle.origin.y - dynamicBody->GetPosition().y * PTM_RATIO);
-            Vec2 anchorPoint = Vec2(anchorX / bodyRectangle.size.width, anchorY / bodyRectangle.size.height);
-            auto dynamicSprite = Sprite::create(spriteName , bodyRectangle);
-            dynamicSprite->setAnchorPoint(anchorPoint);
-            dynamicBody->SetUserData(dynamicSprite);
-            map->addChild(dynamicSprite);
-            
-            // insert to map
-            mapBodyList.insert(std::pair<std::string, b2Body*>(objectValue.asValueMap()["name"].asString(), dynamicBody));
-        } else {
-            CCLOG("Error when get objects");
-        }
-    }
+    b2FixtureDef fixtureDef;
+    fixtureDef.density = 10;
+    b2PolygonShape boxShape;
+    boxShape.SetAsBox(9, 1);
+
+    fixtureDef.shape = &boxShape;
+    b2Body* m_bodyA = world->CreateBody(&bd);
+    m_bodyA->CreateFixture(&fixtureDef);
+
+    mapBodyList.insert(std::pair<std::string, b2Body*>("ground3", m_bodyA));
+//    for (cocos2d::Value objectValue : dynamicBodyList) {
+//
+//        auto fixtureShape = createFixture(objectValue.asValueMap(), bd);
+//        float density = objectValue.asValueMap()["density"].asFloat();
+//        std::string spriteName = objectValue.asValueMap()["spriteName"].asString();
+//
+//        if (fixtureShape != NULL) {
+//
+//            b2Body* dynamicBody = world->CreateBody(&bd);
+//            // fixturedef
+//            fixtureShape->fixture.filter.categoryBits = categorybits;
+//            fixtureShape->fixture.filter.maskBits = maskbits;
+//            fixtureShape->fixture.density = density;
+//            dynamicBody->CreateFixture(&fixtureShape->fixture);
+//            CCLOG("position dynamic body %f %f", dynamicBody->GetWorldCenter().x, dynamicBody->GetWorldCenter().y);
+//            // create sprite for polygon
+//            Rect bodyRectangle = ExecuteShapePhysic::getBodyRectangle(map->getMapSize(), dynamicBody);
+//            float anchorX = dynamicBody->GetPosition().x * PTM_RATIO - bodyRectangle.origin.x;
+//            float anchorY = bodyRectangle.size.height - (map->getMapSize().height - bodyRectangle.origin.y - dynamicBody->GetPosition().y * PTM_RATIO);
+//            Vec2 anchorPoint = Vec2(anchorX / bodyRectangle.size.width, anchorY / bodyRectangle.size.height);
+//            auto dynamicSprite = Sprite::create(spriteName , bodyRectangle);
+//            dynamicSprite->setAnchorPoint(anchorPoint);
+//            dynamicBody->SetUserData(dynamicSprite);
+//            map->addChild(dynamicSprite);
+//
+//            // insert to map
+//            mapBodyList.insert(std::pair<std::string, b2Body*>(objectValue.asValueMap()["name"].asString(), dynamicBody));
+//        } else {
+//            CCLOG("Error when get objects");
+//        }
+//    }
 }
 
 FixtureDef* TiledBodyCreator::createFixture(ValueMap object, b2BodyDef bd)
@@ -331,15 +354,14 @@ FixtureDef* TiledBodyCreator::createCircle(ValueMap object, b2BodyDef bd)
 {
     auto position = Point(object["x"].asFloat() / PTM_RATIO, object["y"].asFloat() / PTM_RATIO);
     float radius = object["width"].asFloat()/2 / PTM_RATIO;
-    
+    CCLOG("");
     b2CircleShape *circleshape = new b2CircleShape();
     circleshape->m_radius = radius;
     circleshape->m_p.Set(position.x + radius, position.y + radius);
     
     auto fix = new FixtureDef();
     fix->fixture.shape = circleshape;
-    
-    bd.position.Set(position.x + radius, position.y + radius);
+
     return fix;
 }
 

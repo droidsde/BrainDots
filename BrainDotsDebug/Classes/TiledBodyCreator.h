@@ -11,6 +11,7 @@
 
 #include <cocos2d.h>
 #include <Box2D/Box2D.h>
+#include "SceneManager.h"
 
 USING_NS_CC;
 
@@ -45,18 +46,50 @@ public:
     Point anchorPoint;
 };
 
+class Joint2Body
+{
+public:
+    std::string nameBodyA, nameBodyB;
+    b2Body* bodyA, *bodyB;
+    bool collideConnected;
+    bool enableLimit;
+    bool enableMotor;
+    b2JointType jointType;
+    b2Vec2 localAnchorA;
+    b2Vec2 localAnchorB;
+    float lowerAngle;
+    float maxMotorTorque;
+    float motorSpeed;
+    float upperAngle;
+};
+
 class TiledBodyCreator
 {
 public:
+    // init map
     static void initMapLevel(TMXTiledMap* map, b2World* world, std::string layerName, uint16 categorybits, uint16 maskbits);
-    static FixtureDef* createFixture(ValueMap object);
     
-    static FixtureDef* createPolygon(ValueMap object);
-    static FixtureDef* createPolyline(ValueMap object);
-    static FixtureDef* createCircle(ValueMap object);
-    static FixtureDef* createRect(ValueMap object);
+    static void executeObjectList(cocos2d::TMXTiledMap *map, b2World *world, ValueVector objectList, uint16 categorybits, uint16 maskbits);
+    static void executeJointList(b2World *world, ValueVector jointList);
+    
+    static FixtureDef* createFixture(ValueMap object, b2BodyDef bd);
+    
+    static FixtureDef* createPolygon(ValueMap object, b2BodyDef bd);
+    static FixtureDef* createPolyline(ValueMap object, b2BodyDef bd);
+    static FixtureDef* createCircle(ValueMap object, b2BodyDef bd);
+    static FixtureDef* createRect(ValueMap object, b2BodyDef bd);
     
     static std::vector<Rect> getRectListObjects(TMXTiledMap* map,std::string objectsName, std::string layerName);
+    
+    // static body
+    static void createStaticBodies(b2World *world, ValueVector staticBodyList, uint16 categorybits, uint16 maskbits);
+    
+    // dynamic body
+    static void createDynamicBodies(cocos2d::TMXTiledMap *map, b2World *world, ValueVector dynamicBodyList, uint16 categorybits, uint16 maskbits);
+    
+    // create joints
+    static void createJoint(b2World* world, Joint2Body* joint);
+    
 };
 
 

@@ -75,6 +75,8 @@ bool GameScene::init()
     this->initPhysicObjects();
     this->initBalls();
     
+//    this->revoluteJoint();
+    
     // init rendertexture and sprite draw
     target = RenderTexture::create(visibleSize.width, visibleSize.height,
                                    Texture2D::PixelFormat::RGBA8888);
@@ -96,6 +98,48 @@ bool GameScene::init()
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
     
     return true;
+}
+
+void GameScene::revoluteJoint()
+{
+    b2BodyDef bodyDef;
+    bodyDef.type = b2_dynamicBody;
+    b2FixtureDef fixtureDef;
+    fixtureDef.density = 10;
+    
+    b2PolygonShape boxShape;
+    boxShape.SetAsBox(5, 1);
+    b2CircleShape circleShape;
+    circleShape.m_radius = 1;
+    
+    bodyDef.position.Set(600 / PTM_RATIO, 600 / PTM_RATIO);
+    fixtureDef.shape = &boxShape;
+    b2Body* m_bodyA = world->CreateBody(&bodyDef);
+    m_bodyA->CreateFixture(&fixtureDef);
+    
+    bodyDef.position.Set(600 / PTM_RATIO, 600 / PTM_RATIO);
+    bodyDef.type = b2_staticBody;
+    fixtureDef.shape = &circleShape;
+    b2Body* m_bodyB = world->CreateBody(&bodyDef);
+    m_bodyB->CreateFixture(&fixtureDef);
+    
+    b2RevoluteJointDef revoluteJointDef;
+    revoluteJointDef.bodyA = m_bodyA;
+    revoluteJointDef.bodyB = m_bodyB;
+    revoluteJointDef.collideConnected = false;
+    revoluteJointDef.localAnchorA.Set(0,0);
+    revoluteJointDef.localAnchorB.Set(0,0);
+    
+    //revoluteJointDef.enableLimit = true;
+    //revoluteJointDef.lowerAngle = -90 * PI / 180;
+    //revoluteJointDef.upperAngle =  90 * PI / 180;
+    
+    revoluteJointDef.enableMotor = true;
+//    revoluteJointDef.maxMotorTorque = 200;
+//    revoluteJointDef.motorSpeed = 100;
+    
+    world->CreateJoint(&revoluteJointDef );
+
 }
 
 void GameScene::draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformUpdated) {
@@ -138,7 +182,6 @@ void GameScene::initMapLevel(int level)
         CCLOG("file not found");
         
     } else {
-        CCLOG("size of map level %f %f", map->getContentSize().width, map->getContentSize().height);
         addChild(map, ZORDER_GAME::ZORDER_MAPLEVEL, 1);
         
         // auto create physics objects
@@ -154,7 +197,7 @@ void GameScene::initMapLevel(int level)
         float xA = ballA_map["x"].asFloat();
         float yA = ballA_map["y"].asFloat();
         posballA = Vec2(xA, yA);
-        CCLOG("%f %f",xA,yA);
+//        CCLOG("%f %f",xA,yA);
         
         // ball B
         auto ballB_map = group->getObject("ballB");
@@ -162,7 +205,7 @@ void GameScene::initMapLevel(int level)
         float xB = ballB_map["x"].asFloat();
         float yB = ballB_map["y"].asFloat();
         posballB = Vec2(xB, yB);
-        CCLOG("%f %f",xB,yB);
+//        CCLOG("%f %f",xB,yB);
         
         // hex grid
         std::vector<Rect> listRectGrid;
@@ -541,7 +584,7 @@ void GameScene::onTouchEnded(Touch* touch, Event* event) {
             Vec2 end = platformPoints[i + 1];
             this->addRectangleBetweenPointsToBody(newBody, start, end);
         }
-        Rect bodyRectangle = getBodyRectangle(newBody);
+        Rect bodyRectangle = ExecuteShapePhysic::getBodyRectangle(visibleSize, newBody);
         float anchorX = newBody->GetPosition().x * PTM_RATIO
         - bodyRectangle.origin.x;
         float anchorY = bodyRectangle.size.height
@@ -609,53 +652,6 @@ void GameScene::addRectangleBetweenPointsToBody(b2Body* body, Vec2 start,
     boxFixtureDef.filter.maskBits = MASK_PLATFORM;
     
     body->CreateFixture(&boxFixtureDef);
-}
-
-Rect GameScene::getBodyRectangle(b2Body* body) {
-    float minX2 = visibleSize.width;
-    float maxX2 = 0;
-    float minY2 = visibleSize.height;
-    float maxY2 = 0;
-    
-    const b2Transform& xf = body->GetTransform();
-    for (b2Fixture* f = body->GetFixtureList(); f; f = f->GetNext()) {
-        
-        b2PolygonShape* poly = (b2PolygonShape*) f->GetShape();
-        int32 vertexCount = poly->m_count;
-        b2Assert(vertexCount <= b2_maxPolygonVertices);
-        
-        for (int32 i = 0; i < vertexCount; ++i) {
-            b2Vec2 vertex = b2Mul(xf, poly->m_vertices[i]);
-            
-            if (vertex.x < minX2) {
-                minX2 = vertex.x;
-            }
-            
-            if (vertex.x > maxX2) {
-                maxX2 = vertex.x;
-            }
-            
-            if (vertex.y < minY2) {
-                minY2 = vertex.y;
-            }
-            
-            if (vertex.y > maxY2) {
-                maxY2 = vertex.y;
-            }
-        }
-    }
-    
-    maxX2 *= PTM_RATIO;
-    minX2 *= PTM_RATIO;
-    maxY2 *= PTM_RATIO;
-    minY2 *= PTM_RATIO;
-    
-    float width2 = maxX2 - minX2;
-    float height2 = maxY2 - minY2;
-    
-    float remY2 = visibleSize.height - maxY2;
-    
-    return Rect(minX2, remY2, width2, height2);
 }
 
 std::vector<Vec2> GameScene::getListPointsIn2Point(cocos2d::Vec2 start, cocos2d::Vec2 end)

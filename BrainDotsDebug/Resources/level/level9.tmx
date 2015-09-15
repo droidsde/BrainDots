@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="36" height="20" tilewidth="38" tileheight="38" nextobjectid="5">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="36" height="20" tilewidth="38" tileheight="38" nextobjectid="7">
  <tileset firstgid="1" name="background" tilewidth="38" tileheight="38">
   <image source="triangle1.png" width="380" height="190"/>
  </tileset>
@@ -334,6 +334,13 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
+   <tile gid="24"/>
+   <tile gid="25"/>
+   <tile gid="26"/>
+   <tile gid="24"/>
+   <tile gid="24"/>
+   <tile gid="25"/>
+   <tile gid="26"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -346,20 +353,13 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
+   <tile gid="24"/>
+   <tile gid="25"/>
+   <tile gid="26"/>
+   <tile gid="26"/>
+   <tile gid="24"/>
+   <tile gid="25"/>
+   <tile gid="26"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -728,17 +728,27 @@
   </data>
  </layer>
  <objectgroup name="braindots">
-  <object id="2" name="ballA" type="ball" x="358.667" y="324">
+  <object id="2" name="ballA" type="ball" x="322.667" y="318">
    <properties>
     <property name="autocreate" value="false"/>
    </properties>
   </object>
-  <object id="3" name="ballB" type="ball" x="1010.67" y="661.666">
+  <object id="3" name="ballB" type="ball" x="1044" y="315">
    <properties>
     <property name="autocreate" value="false"/>
    </properties>
   </object>
   <object id="4" name="ground" type="object" x="2.66667" y="686.667" width="1364" height="72">
+   <properties>
+    <property name="autocreate" value="true"/>
+   </properties>
+  </object>
+  <object id="5" name="ground1" type="object" x="192" y="345.333" width="264" height="36">
+   <properties>
+    <property name="autocreate" value="true"/>
+   </properties>
+  </object>
+  <object id="6" name="ground2" type="object" x="912" y="344" width="266.667" height="36">
    <properties>
     <property name="autocreate" value="true"/>
    </properties>

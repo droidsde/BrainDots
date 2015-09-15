@@ -38,13 +38,13 @@ public:
     // adds a new sprite at a given coordinate
     void update(float dt);
     void addRectangleBetweenPointsToBody(b2Body* body, Vec2 start, Vec2 end);
-    Rect getBodyRectangle(b2Body* body);
     Vec2 checkBodyWeighOnSomebody(Vec2 start, Vec2 end);
     std::vector<Vec2> getListPointsIn2Point(Vec2 start, Vec2 end);
     void backMenu();
     void touchButtonEvent(Ref* sender, Widget::TouchEventType type);
     void endGame();
     
+    void revoluteJoint();
 private:
     // size and pos screen
     Size visibleSize;

@@ -16,6 +16,7 @@
 #include "GameScene.h"
 
 #include "SoundManager/SoundManager.h"
+#include "ExecuteShapePhysic.h"
 
 USING_NS_CC;
 

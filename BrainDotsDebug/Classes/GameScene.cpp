@@ -13,6 +13,7 @@ GameScene::GameScene()
 
 GameScene::~GameScene()
 {
+    CCLOG("remove all objects");
     map = nullptr;
     drawnode = nullptr;
     brush = nullptr;
@@ -75,7 +76,8 @@ bool GameScene::init()
     this->initPhysicObjects();
     this->initBalls();
     
-    this->revoluteJoint();
+//    this->revoluteJoint();
+//    this->weldJoint();
     
     // init rendertexture and sprite draw
     target = RenderTexture::create(visibleSize.width, visibleSize.height,
@@ -130,16 +132,102 @@ void GameScene::revoluteJoint()
     revoluteJointDef.localAnchorA.Set(0,0);
     revoluteJointDef.localAnchorB.Set(0,0);
     
-    //revoluteJointDef.enableLimit = true;
+//    revoluteJointDef.enableLimit = true;
     //revoluteJointDef.lowerAngle = -90 * PI / 180;
     //revoluteJointDef.upperAngle =  90 * PI / 180;
     
     revoluteJointDef.enableMotor = true;
-//    revoluteJointDef.maxMotorTorque = 200;
-//    revoluteJointDef.motorSpeed = 100;
+    revoluteJointDef.maxMotorTorque = 150;
+    revoluteJointDef.motorSpeed = 100;
     
     world->CreateJoint(&revoluteJointDef );
+    
+}
 
+void GameScene::weldJoint()
+{
+    b2Body* mBodyA, *mBodyB;
+    
+    float posX = visibleSize.width/2;
+    
+    // box A
+    {
+        b2BodyDef bodyDef;
+        bodyDef.type = b2_dynamicBody;
+        bodyDef.position.Set(posX / PTM_RATIO, 600 / PTM_RATIO);
+        bodyDef.angle = 0;
+        
+        b2PolygonShape boxShape;
+        boxShape.SetAsBox(5, 1);
+        
+        b2FixtureDef fixtureDef;
+        fixtureDef.density = 10;
+        fixtureDef.shape = &boxShape;
+        
+        mBodyA = world->CreateBody(&bodyDef);
+        mBodyA->CreateFixture(&fixtureDef);
+    }
+    
+    // box B
+    {
+        b2BodyDef bodyDef;
+        bodyDef.type = b2_dynamicBody;
+        bodyDef.position.Set(posX / PTM_RATIO, 600 / PTM_RATIO);
+        bodyDef.angle = -90 * b2_pi / 180;
+        
+        b2PolygonShape boxShape;
+        boxShape.SetAsBox(5, 1);
+        
+        b2FixtureDef fixtureDef;
+        fixtureDef.density = 10;
+        fixtureDef.shape = &boxShape;
+        
+        mBodyB = world->CreateBody(&bodyDef);
+        mBodyB->CreateFixture(&fixtureDef);
+    }
+    
+    b2WeldJointDef weldJointDef;
+    weldJointDef.referenceAngle = -90 * b2_pi / 180;
+    weldJointDef.bodyA = mBodyA;
+    weldJointDef.bodyB = mBodyB;
+    weldJointDef.localAnchorA.Set(0, 0);
+    weldJointDef.localAnchorB.Set(0, 0);
+    weldJointDef.collideConnected = false;
+    
+    world->CreateJoint(&weldJointDef);
+}
+
+void GameScene::conveyorBelts()
+{
+    // Platform
+    {
+        b2BodyDef bd;
+        bd.position.Set(visibleSize.width/2 / PTM_RATIO, 5.0f);
+        b2Body* body = world->CreateBody(&bd);
+        
+        b2PolygonShape shape;
+        shape.SetAsBox(10.0f, 0.5f);
+        
+        b2FixtureDef fd;
+        fd.shape = &shape;
+        fd.friction = 1.0f;
+        mPlatform = body->CreateFixture(&fd);
+    }
+    
+    // Boxes
+    for (int32 i = 0; i < 5; ++i)
+    {
+        b2BodyDef bd;
+        bd.type = b2_dynamicBody;
+        bd.position.Set(visibleSize.width/2 / PTM_RATIO + 2.0f * i, 7.0f);
+        b2Body* body = world->CreateBody(&bd);
+        
+//        b2PolygonShape shape;
+//        shape.SetAsBox(0.5f, 0.5f);
+        b2CircleShape shape;
+        shape.m_radius = 0.5f;
+        body->CreateFixture(&shape, 20.0f);
+    }
 }
 
 void GameScene::draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformUpdated) {
@@ -160,12 +248,15 @@ void GameScene::initPhysics()
     world->SetAllowSleeping(true);
     world->SetContinuousPhysics(true);
     
+    // test conveyor belts
+//    this->conveyorBelts();
+    
     // add debug draw
     this->debugDraw = new GLESDebugDraw( PTM_RATIO );
     this->world->SetDebugDraw(debugDraw);
     
     // add contact
-    _ballContactListener = new BallContactListener();
+    _ballContactListener = new BallContactListener(mPlatform);
     world->SetContactListener(_ballContactListener);
     
     uint32 flags = 0;
@@ -185,7 +276,7 @@ void GameScene::initMapLevel(int level)
         addChild(map, ZORDER_GAME::ZORDER_MAPLEVEL, 1);
         
         // auto create physics objects
-        TiledBodyCreator::initMapLevel(map, world, "braindots", CATEGORY_BARRAGE, MASK_BARRAGE);
+        TiledBodyCreator::initMapLevel(map, world, "braindots", CATEGORY_BARRAGE, MASK_BARRAGE, mPlatform);
         
         // get ball group
         auto group = map->getObjectGroup("braindots");
@@ -197,7 +288,6 @@ void GameScene::initMapLevel(int level)
         float xA = ballA_map["x"].asFloat();
         float yA = ballA_map["y"].asFloat();
         posballA = Vec2(xA, yA);
-//        CCLOG("%f %f",xA,yA);
         
         // ball B
         auto ballB_map = group->getObject("ballB");
@@ -205,7 +295,6 @@ void GameScene::initMapLevel(int level)
         float xB = ballB_map["x"].asFloat();
         float yB = ballB_map["y"].asFloat();
         posballB = Vec2(xB, yB);
-//        CCLOG("%f %f",xB,yB);
         
         // hex grid
         std::vector<Rect> listRectGrid;
@@ -323,17 +412,19 @@ void GameScene::initBalls()
     b2FixtureDef ballFixtureDef;
     ballFixtureDef.shape = &circleShape;
     ballFixtureDef.density = 10.0f;
-    ballFixtureDef.friction = 0;
+    ballFixtureDef.friction = 0.02f;
     ballFixtureDef.restitution = 0;
     ballFixtureDef.filter.categoryBits = CATEGORY_BALL;
     ballFixtureDef.filter.maskBits = MASK_BALL;
     
     // body definition
     b2BodyDef mBallDefA;
+    mBallDefA.fixedRotation = true;
     mBallDefA.position.Set(ballASprite->getPositionX() / PTM_RATIO, ballASprite->getPositionY()/ PTM_RATIO);
     mBallDefA.type = b2_staticBody;
     
     b2BodyDef mBallDefB;
+    mBallDefB.fixedRotation = true;
     mBallDefB.position.Set(ballBSprite->getPositionX() / PTM_RATIO, ballBSprite->getPositionY()/ PTM_RATIO);
     mBallDefB.type = b2_staticBody;
     
@@ -344,7 +435,8 @@ void GameScene::initBalls()
     ballB = world->CreateBody(&mBallDefB);
     _ballBFixture = ballB->CreateFixture(&ballFixtureDef);
     ballB->SetUserData(ballBSprite);
-    
+
+    _ballContactListener->setFixtureForBall(_ballAFixture, _ballBFixture);
 }
 
 void GameScene::update(float dt) {
@@ -729,6 +821,7 @@ Vec2 GameScene::checkBodyWeighOnSomebody(cocos2d::Vec2 start, cocos2d::Vec2 end)
 void GameScene::backMenu() {
     this->m_bClearBox = true;
     if (m_bClearBox) {
+        
         for (b2Body* b = world->GetBodyList(); b; b = b->GetNext()) {
             world->DestroyBody(b);
         }
@@ -749,6 +842,9 @@ void GameScene::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEventType ty
                 backMenu();
                 break;
             case TAG_GAME::TAG_BUTTON_REPLAY:
+                for (b2Body* b = world->GetBodyList(); b; b = b->GetNext()) {
+                    world->DestroyBody(b);
+                }
                 SceneManager::getInstance()->changeState(GAME_STATE::GAME);
                 break;
         }

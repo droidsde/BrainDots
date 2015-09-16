@@ -27,7 +27,7 @@
   </object>
  </objectgroup>
  <objectgroup name="hexgridobjects">
-  <object id="6" name="hexgrid1" x="418.667" y="306.667" width="568" height="452">
+  <object id="6" name="hexgrid1" type="object" x="418.667" y="306.667" width="568" height="452">
    <properties>
     <property name="autocreate" value="false"/>
    </properties>

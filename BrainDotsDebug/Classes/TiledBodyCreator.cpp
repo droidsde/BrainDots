@@ -20,7 +20,7 @@ typedef enum {
 } fixtureTypes;
 
 void TiledBodyCreator::initMapLevel(cocos2d::TMXTiledMap *map, b2World *world, std::string layerName,
-                                    uint16 categorybits, uint16 maskbits)
+                                    uint16 categorybits, uint16 maskbits, b2Fixture* mPlatform)
 {
     auto layerGroup = map->getObjectGroup(layerName);
     cocos2d::ValueVector physicObjects = layerGroup->getObjects();
@@ -39,7 +39,7 @@ void TiledBodyCreator::initMapLevel(cocos2d::TMXTiledMap *map, b2World *world, s
     }
     
     // execute object list
-    executeObjectList(map, world, objectsList, categorybits, maskbits);
+    executeObjectList(map, world, objectsList, categorybits, maskbits, mPlatform);
     
     // execute joint list
     executeJointList(world, jointList);
@@ -49,7 +49,7 @@ void TiledBodyCreator::initMapLevel(cocos2d::TMXTiledMap *map, b2World *world, s
     jointList.clear();
 }
 
-void TiledBodyCreator::executeObjectList(cocos2d::TMXTiledMap *map, b2World *world, ValueVector objectList, uint16 categorybits, uint16 maskbits)
+void TiledBodyCreator::executeObjectList(cocos2d::TMXTiledMap *map, b2World *world, ValueVector objectList, uint16 categorybits, uint16 maskbits, b2Fixture* mPlatform)
 {
     if (objectList.size() <= 0) {
         return;
@@ -73,7 +73,14 @@ void TiledBodyCreator::executeObjectList(cocos2d::TMXTiledMap *map, b2World *wor
     }
     
     // create auto staticbodies
-    createStaticBodies(world, staticBodyList, categorybits, maskbits);
+    createStaticBodies(world, staticBodyList, categorybits, maskbits, mPlatform);
+    
+    // remove all joint list
+    for (b2Joint* joint = world->GetJointList(); joint != nullptr; joint->GetNext()) {
+        if (joint != nullptr) {
+            world->DestroyJoint(joint);
+        }
+    }
     
     // create auto dynamic bodies
     createDynamicBodies(map, world, dynamicBodyList, categorybits, maskbits);
@@ -96,9 +103,12 @@ void TiledBodyCreator::executeJointList(b2World *world, ValueVector jointList)
         joint->nameBodyA = object["bodyA"].asString();
         joint->nameBodyB = object["bodyB"].asString();
         joint->collideConnected = object["collideConnected"].asBool();
+        joint->referenceAngle = object["referenceAngle"].asFloat();
         
         if (object["jointType"].asString() == "RevoluteJoint") {
             joint->jointType = e_revoluteJoint;
+        } else if (object["jointType"].asString() == "WeldJoint") {
+            joint->jointType = e_weldJoint;
         }
         
         // local anchor A,B
@@ -115,8 +125,8 @@ void TiledBodyCreator::executeJointList(b2World *world, ValueVector jointList)
         }
         
         if (enableMotor) {
-            joint->maxMotorTorque = object["maxMotorTorque"].asFloat();
             joint->motorSpeed = object["motorSpeed"].asFloat();
+            joint->maxMotorTorque = object["maxMotorTorque"].asFloat();
         }
         listJoint2body.push_back(joint);
     }
@@ -130,14 +140,9 @@ void TiledBodyCreator::executeJointList(b2World *world, ValueVector jointList)
         if (itr1 != mapBodyList.end()) {
             itr2 = mapBodyList.find(joint->nameBodyB);
             if (itr2 != mapBodyList.end()) {
-                CCLOG("bodyA: %s bodyB: %s joint", joint->nameBodyA.c_str(), joint->nameBodyB.c_str());
+                CCLOG("Joint bodyA: %s vs bodyB: %s", joint->nameBodyA.c_str(), joint->nameBodyB.c_str());
                 joint->bodyA = (b2Body*)itr1->second;
                 joint->bodyB = (b2Body*)itr2->second;
-                CCLOG("bodyA posX,posY: %f %f", joint->bodyA->GetWorldCenter().x, joint->bodyA->GetWorldCenter().y);
-                CCLOG("bodyB posX,posY: %f %f", joint->bodyB->GetWorldCenter().x, joint->bodyB->GetWorldCenter().y);
-                // remove itr
-                mapBodyList.erase(itr1);
-                mapBodyList.erase(itr2);
                 // find out 2 body to joint
                 createJoint(world, joint);
             }
@@ -156,7 +161,7 @@ void TiledBodyCreator::createJoint(b2World *world, Joint2Body *joint)
             revoluteJointDef.collideConnected = joint->collideConnected;
             revoluteJointDef.localAnchorA = joint->localAnchorA;
             revoluteJointDef.localAnchorB = joint->localAnchorB;
-            revoluteJointDef.referenceAngle = 0;
+            revoluteJointDef.referenceAngle = joint->referenceAngle;
             
             revoluteJointDef.enableLimit = joint->enableLimit;
             if (joint->enableLimit) {
@@ -173,44 +178,61 @@ void TiledBodyCreator::createJoint(b2World *world, Joint2Body *joint)
             
             break;
         }
+            
+        case e_weldJoint :
+        {
+            b2WeldJointDef weldJointDef;
+            weldJointDef.referenceAngle = CC_DEGREES_TO_RADIANS(joint->referenceAngle);
+            weldJointDef.bodyA = joint->bodyA;
+            weldJointDef.bodyB = joint->bodyB;
+            weldJointDef.localAnchorA = joint->localAnchorA;
+            weldJointDef.localAnchorB = joint->localAnchorB;
+            weldJointDef.collideConnected = joint->collideConnected;
+            
+            world->CreateJoint(&weldJointDef);
+            break;
+        }
         default:
             break;
     }
 }
 
-void TiledBodyCreator::createStaticBodies(b2World *world,  ValueVector staticBodyList, uint16 categorybits, uint16 maskbits)
+void TiledBodyCreator::createStaticBodies(b2World *world,  ValueVector staticBodyList, uint16 categorybits, uint16 maskbits, b2Fixture* mPlatform)
 {
     if (staticBodyList.size() <= 0) {
         return;
     }
     
-    b2BodyDef bd;
-    bd.type = b2_staticBody;
-    bd.position.Set(20, 12);
-    b2FixtureDef fixtureDef;
-    fixtureDef.density = 10;
-    b2CircleShape circleShape;
-    circleShape.m_radius = 1;
-
-    fixtureDef.shape = &circleShape;
-    b2Body* m_bodyB = world->CreateBody(&bd);
-    m_bodyB->CreateFixture(&fixtureDef);
-    mapBodyList.insert(std::pair<std::string, b2Body*>("anchorpoint1", m_bodyB));
-//    for(cocos2d::Value objectValue : staticBodyList)
-//    {
-//        auto fixtureShape = createFixture(objectValue.asValueMap(), bd);
-//        b2Body* staticBody = world->CreateBody(&bd);
-//        if(fixtureShape != NULL) {
-//            fixtureShape->fixture.filter.categoryBits = categorybits;
-//            fixtureShape->fixture.filter.maskBits = maskbits;
-//            staticBody->CreateFixture(&fixtureShape->fixture);
-//            CCLOG("position static body %f %f", staticBody->GetWorldCenter().x, staticBody->GetWorldCenter().y);
-//            // insert to map
-//            mapBodyList.insert(std::pair<std::string, b2Body*>(objectValue.asValueMap()["name"].asString(), staticBody));
-//        } else {
-//            CCLOG("Error when get objects");
-//        }
-//    }
+    for(cocos2d::Value objectValue : staticBodyList)
+    {
+        b2Fixture* platform;
+        float conveyorBelts = objectValue.asValueMap()["conveyorBelts"].asBool();
+        
+        // create fixture shape
+        auto fixtureShape = createFixture(objectValue.asValueMap());
+        if(fixtureShape != NULL) {
+            // create bodedef
+            b2BodyDef bd;
+            bd.type = b2_staticBody;
+            b2Vec2 pos = getPositionBody(objectValue.asValueMap());
+            if (pos.x != 0 && pos.y != 0) {
+                bd.position.Set(pos.x, pos.y);
+            }
+            // create body
+            b2Body* staticBody = world->CreateBody(&bd);
+            fixtureShape->fixture.filter.categoryBits = categorybits;
+            fixtureShape->fixture.filter.maskBits = maskbits;
+            platform = staticBody->CreateFixture(&fixtureShape->fixture);
+            if (conveyorBelts) {
+                mPlatform = platform;
+            }
+            
+            // insert to map
+            mapBodyList.insert(std::pair<std::string, b2Body*>(objectValue.asValueMap()["name"].asString(), staticBody));
+        } else {
+            CCLOG("Error when get objects");
+        }
+    }
 }
 
 void TiledBodyCreator::createDynamicBodies(cocos2d::TMXTiledMap *map, b2World *world,  ValueVector dynamicBodyList, uint16 categorybits, uint16 maskbits)
@@ -218,55 +240,87 @@ void TiledBodyCreator::createDynamicBodies(cocos2d::TMXTiledMap *map, b2World *w
     if (dynamicBodyList.size() <= 0) {
         return;
     }
-    // create body def
-    b2BodyDef bd;
-    bd.type = b2_dynamicBody;
-    bd.position.Set(20, 12);
+    
+    for (cocos2d::Value objectValue : dynamicBodyList) {
+        
+        // create fixture shape
+        auto fixtureShape = createFixture(objectValue.asValueMap());
+        float density = objectValue.asValueMap()["density"].asFloat();
+        float angle = objectValue.asValueMap()["angle"].asFloat();
+        float angularVelocity = objectValue.asValueMap()["angularVelocity"].asFloat();
+        std::string spriteName = objectValue.asValueMap()["spriteName"].asString();
 
-    b2FixtureDef fixtureDef;
-    fixtureDef.density = 10;
-    b2PolygonShape boxShape;
-    boxShape.SetAsBox(9, 1);
+        if (fixtureShape != NULL) {
+            
+            // create body def
+            b2BodyDef bd;
+            bd.type = b2_dynamicBody;
+            b2Vec2 pos = getPositionBody(objectValue.asValueMap());
+            if (pos.x != 0 && pos.y != 0) {
+                bd.position.Set(pos.x, pos.y);
+            }
+            bd.angle = CC_DEGREES_TO_RADIANS( angle );
+            b2Body* dynamicBody = world->CreateBody(&bd);
+            
+            // fixturedef
+            fixtureShape->fixture.filter.categoryBits = categorybits;
+            fixtureShape->fixture.filter.maskBits = maskbits;
+            fixtureShape->fixture.density = density;
+            dynamicBody->CreateFixture(&fixtureShape->fixture);
+            dynamicBody->SetAngularVelocity(angularVelocity);
 
-    fixtureDef.shape = &boxShape;
-    b2Body* m_bodyA = world->CreateBody(&bd);
-    m_bodyA->CreateFixture(&fixtureDef);
+            // create sprite for polygon
+            Rect bodyRectangle = ExecuteShapePhysic::getBodyRectangle(map->getMapSize(), dynamicBody);
+            float anchorX = dynamicBody->GetPosition().x * PTM_RATIO - bodyRectangle.origin.x;
+            float anchorY = bodyRectangle.size.height - (map->getMapSize().height - bodyRectangle.origin.y - dynamicBody->GetPosition().y * PTM_RATIO);
+            Vec2 anchorPoint = Vec2(anchorX / bodyRectangle.size.width, anchorY / bodyRectangle.size.height);
+            auto dynamicSprite = Sprite::create(spriteName , bodyRectangle);
+            dynamicSprite->setAnchorPoint(anchorPoint);
+            dynamicBody->SetUserData(dynamicSprite);
+            map->addChild(dynamicSprite);
 
-    mapBodyList.insert(std::pair<std::string, b2Body*>("ground3", m_bodyA));
-//    for (cocos2d::Value objectValue : dynamicBodyList) {
-//
-//        auto fixtureShape = createFixture(objectValue.asValueMap(), bd);
-//        float density = objectValue.asValueMap()["density"].asFloat();
-//        std::string spriteName = objectValue.asValueMap()["spriteName"].asString();
-//
-//        if (fixtureShape != NULL) {
-//
-//            b2Body* dynamicBody = world->CreateBody(&bd);
-//            // fixturedef
-//            fixtureShape->fixture.filter.categoryBits = categorybits;
-//            fixtureShape->fixture.filter.maskBits = maskbits;
-//            fixtureShape->fixture.density = density;
-//            dynamicBody->CreateFixture(&fixtureShape->fixture);
-//            CCLOG("position dynamic body %f %f", dynamicBody->GetWorldCenter().x, dynamicBody->GetWorldCenter().y);
-//            // create sprite for polygon
-//            Rect bodyRectangle = ExecuteShapePhysic::getBodyRectangle(map->getMapSize(), dynamicBody);
-//            float anchorX = dynamicBody->GetPosition().x * PTM_RATIO - bodyRectangle.origin.x;
-//            float anchorY = bodyRectangle.size.height - (map->getMapSize().height - bodyRectangle.origin.y - dynamicBody->GetPosition().y * PTM_RATIO);
-//            Vec2 anchorPoint = Vec2(anchorX / bodyRectangle.size.width, anchorY / bodyRectangle.size.height);
-//            auto dynamicSprite = Sprite::create(spriteName , bodyRectangle);
-//            dynamicSprite->setAnchorPoint(anchorPoint);
-//            dynamicBody->SetUserData(dynamicSprite);
-//            map->addChild(dynamicSprite);
-//
-//            // insert to map
-//            mapBodyList.insert(std::pair<std::string, b2Body*>(objectValue.asValueMap()["name"].asString(), dynamicBody));
-//        } else {
-//            CCLOG("Error when get objects");
-//        }
-//    }
+            // insert to map
+            mapBodyList.insert(std::pair<std::string, b2Body*>(objectValue.asValueMap()["name"].asString(), dynamicBody));
+        } else {
+            CCLOG("Error when get objects");
+        }
+    }
 }
 
-FixtureDef* TiledBodyCreator::createFixture(ValueMap object, b2BodyDef bd)
+b2Vec2 TiledBodyCreator::getPositionBody(ValueMap object)
+{
+    auto position = Vec2(object["x"].asFloat() / PTM_RATIO, object["y"].asFloat() / PTM_RATIO);
+    float width = object["width"].asFloat() / PTM_RATIO;
+    
+    int fixtureType = RECT_FIXTURE;
+    for(auto propObj : object)
+    {
+        if(propObj.first == "points") {
+            fixtureType = POLYGON_FIXTURE;
+        } else if(propObj.first == "polylinePoints") {
+            fixtureType = POLYLINE_FIXTURE;
+        }
+    }
+    if(object["shape"].asString() == "circle") {
+        fixtureType = CIRCLE_FIXTURE;
+    }
+    
+    if(fixtureType == CIRCLE_FIXTURE) {
+        return b2Vec2(position.x + width/2, position.y + width/2);
+    } else if(fixtureType == RECT_FIXTURE) {
+        float height = object["height"].asFloat() / PTM_RATIO;
+        return b2Vec2(position.x + width/2, position.y + height/2);
+    } else if (fixtureType == POLYGON_FIXTURE) {
+        ValueVector pointsVector = object["points"].asValueVector();
+        return b2Vec2(object["x"].asFloat() / PTM_RATIO, object["y"].asFloat() / PTM_RATIO);
+    } else if (fixtureType == POLYLINE_FIXTURE) {
+        ValueVector pointsVector = object["polylinePoints"].asValueVector();
+        return b2Vec2(object["x"].asFloat() / PTM_RATIO, object["y"].asFloat() / PTM_RATIO);
+    }
+    else return b2Vec2(0, 0);
+}
+
+FixtureDef* TiledBodyCreator::createFixture(ValueMap object)
 {
     if (object["autocreate"].asBool() == false) {
         return nullptr;
@@ -286,21 +340,21 @@ FixtureDef* TiledBodyCreator::createFixture(ValueMap object, b2BodyDef bd)
     }
     
     if(fixtureType == POLYGON_FIXTURE) {
-        return createPolygon(object, bd);
+        return createPolygon(object);
     } else if(fixtureType == POLYLINE_FIXTURE) {
-        return createPolyline(object, bd);
+        return createPolyline(object);
     } else if(fixtureType == CIRCLE_FIXTURE) {
-        return createCircle(object, bd);
+        return createCircle(object);
     } else if(fixtureType == RECT_FIXTURE) {
-        return createRect(object, bd);
+        return createRect(object);
     }
     else return nullptr;
 }
 
-FixtureDef* TiledBodyCreator::createPolygon(ValueMap object, b2BodyDef bd)
+FixtureDef* TiledBodyCreator::createPolygon(ValueMap object)
 {
     ValueVector pointsVector = object["points"].asValueVector();
-    auto position = Point(object["x"].asFloat() / PTM_RATIO, object["y"].asFloat() / PTM_RATIO);
+    auto position = Vec2(object["x"].asFloat() / PTM_RATIO, object["y"].asFloat() / PTM_RATIO);
     
     b2PolygonShape *polyshape = new b2PolygonShape();
     b2Vec2 vertices[b2_maxPolygonVertices];
@@ -314,8 +368,8 @@ FixtureDef* TiledBodyCreator::createPolygon(ValueMap object, b2BodyDef bd)
     auto fix = new FixtureDef();
     
     for(Value point : pointsVector) {
-        vertices[vindex].x = (point.asValueMap()["x"].asFloat() / PTM_RATIO + position.x);
-        vertices[vindex].y = (-point.asValueMap()["y"].asFloat() / PTM_RATIO + position.y);
+        vertices[vindex].x = (point.asValueMap()["x"].asFloat() / PTM_RATIO );
+        vertices[vindex].y = (-point.asValueMap()["y"].asFloat() / PTM_RATIO );
         vindex++;
     }
     
@@ -326,10 +380,10 @@ FixtureDef* TiledBodyCreator::createPolygon(ValueMap object, b2BodyDef bd)
 }
 
 
-FixtureDef* TiledBodyCreator::createPolyline(ValueMap object, b2BodyDef bd)
+FixtureDef* TiledBodyCreator::createPolyline(ValueMap object)
 {
     ValueVector pointsVector = object["polylinePoints"].asValueVector();
-    auto position = Point(object["x"].asFloat() / PTM_RATIO, object["y"].asFloat() / PTM_RATIO);
+    auto position = Vec2(object["x"].asFloat() / PTM_RATIO, object["y"].asFloat() / PTM_RATIO);
     
     b2ChainShape *polylineshape = new b2ChainShape();
 //    float verticesSize = pointsVector.size()+ 1;
@@ -339,8 +393,8 @@ FixtureDef* TiledBodyCreator::createPolyline(ValueMap object, b2BodyDef bd)
     auto fix = new FixtureDef();
     
     for(Value point : pointsVector) {
-        vertices[vindex].x = (point.asValueMap()["x"].asFloat() / PTM_RATIO + position.x);
-        vertices[vindex].y = (-point.asValueMap()["y"].asFloat() / PTM_RATIO + position.y);
+        vertices[vindex].x = (point.asValueMap()["x"].asFloat() / PTM_RATIO );
+        vertices[vindex].y = (-point.asValueMap()["y"].asFloat() / PTM_RATIO );
         vindex++;
     }
     
@@ -350,11 +404,11 @@ FixtureDef* TiledBodyCreator::createPolyline(ValueMap object, b2BodyDef bd)
     return fix;
 }
 
-FixtureDef* TiledBodyCreator::createCircle(ValueMap object, b2BodyDef bd)
+FixtureDef* TiledBodyCreator::createCircle(ValueMap object)
 {
-    auto position = Point(object["x"].asFloat() / PTM_RATIO, object["y"].asFloat() / PTM_RATIO);
+    auto position = Vec2(object["x"].asFloat() / PTM_RATIO, object["y"].asFloat() / PTM_RATIO);
     float radius = object["width"].asFloat()/2 / PTM_RATIO;
-    CCLOG("");
+
     b2CircleShape *circleshape = new b2CircleShape();
     circleshape->m_radius = radius;
     circleshape->m_p.Set(position.x + radius, position.y + radius);
@@ -365,30 +419,15 @@ FixtureDef* TiledBodyCreator::createCircle(ValueMap object, b2BodyDef bd)
     return fix;
 }
 
-FixtureDef* TiledBodyCreator::createRect(ValueMap object, b2BodyDef bd)
+FixtureDef* TiledBodyCreator::createRect(ValueMap object)
 {
-    auto position = Point(object["x"].asFloat() / PTM_RATIO, object["y"].asFloat() / PTM_RATIO);
+    auto position = Vec2(object["x"].asFloat() / PTM_RATIO, object["y"].asFloat() / PTM_RATIO);
     float width = object["width"].asFloat() / PTM_RATIO;
     float height = object["height"].asFloat() / PTM_RATIO;
     
     b2PolygonShape *rectshape = new b2PolygonShape();
-    b2Vec2 vertices[4];
-    int vindex = 4;
-    
-    vertices[0].x = position.x + 0.0f;
-    vertices[0].y = position.y + 0.0f;
-    
-    vertices[1].x = position.x + 0.0f;
-    vertices[1].y = position.y + height;
-    
-    vertices[2].x = position.x + width;
-    vertices[2].y = position.y + height;
-    
-    vertices[3].x = position.x + width;
-    vertices[3].y = position.y + 0.0f;
-    
     auto fix = new FixtureDef();
-    rectshape->Set(vertices, vindex);
+    rectshape->SetAsBox(width/2, height/2);
     fix->fixture.shape = rectshape;
     
     return fix;
@@ -399,7 +438,6 @@ std::vector<Rect> TiledBodyCreator::getRectListObjects(cocos2d::TMXTiledMap *map
     std::vector<Rect> listRect;
     auto layerGrid = map->getLayer(layerName);
     if (layerGrid) {
-        CCLOG("found layer grid");
         int zorder = layerGrid->getProperty("zorder").asInt();
         map->reorderChild(layerGrid, zorder>0?zorder:100);
     }

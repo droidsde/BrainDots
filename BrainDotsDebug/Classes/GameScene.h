@@ -45,6 +45,9 @@ public:
     void endGame();
     
     void revoluteJoint();
+    void weldJoint();
+    void conveyorBelts();
+    
 private:
     // size and pos screen
     Size visibleSize;
@@ -74,6 +77,8 @@ private:
     b2Fixture* _wallFixture1[4];
     b2Fixture* _wallFixture2[4];
     b2Vec2 vertices[b2_maxPolygonVertices];
+    //test
+    b2Fixture* mPlatform;
     
     // contacts physics
     BallContactListener* _ballContactListener;

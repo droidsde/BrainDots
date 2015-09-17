@@ -11,7 +11,10 @@
 
 #include <Box2D/Box2D.h>
 #include <vector>
+#include "SceneManager.h"
+#include "GameScene.h"
 
+class GameScene;
 struct BallContact {
     b2Fixture* fixtureA;
     b2Fixture* fixtureB;
@@ -27,18 +30,19 @@ class BallContactListener: public b2ContactListener
 public:
     std::vector<BallContact> _contacts;
     
-    BallContactListener(b2Fixture* platform);
+    BallContactListener();
     ~BallContactListener();
     
     void setFixtureForBall(b2Fixture* fixBallA, b2Fixture* fixBallB);
+    void setListConveyorBelt(std::vector<ConveyorBelt> list);
     
     virtual void BeginContact(b2Contact* contact);
     virtual void EndContact(b2Contact* contact);
     virtual void PreSolve(b2Contact* contact, const b2Manifold* oldManifold);
     virtual void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse);
 private:
-    b2Fixture* mPlatform;
     b2Fixture* mFixBallA, *mFixBallB;
+    std::vector<ConveyorBelt> mListConveyorBelt;
 };
 
 

@@ -67,11 +67,12 @@ public:
 class TiledBodyCreator
 {
 public:
+
     // init map
-    static void initMapLevel(TMXTiledMap* map, b2World* world, std::string layerName, uint16 categorybits, uint16 maskbits, b2Fixture* mPlatform);
+    static void initMapLevel(TMXTiledMap* map, b2World* world, std::string layerName, uint16 categorybits, uint16 maskbits);
     
     // execute 2 lists
-    static void executeObjectList(cocos2d::TMXTiledMap *map, b2World *world, ValueVector objectList, uint16 categorybits, uint16 maskbits, b2Fixture* mPlatform);
+    static void executeObjectList(cocos2d::TMXTiledMap *map, b2World *world, ValueVector objectList, uint16 categorybits, uint16 maskbits);
     static void executeJointList(b2World *world, ValueVector jointList);
     
     // create fixture from tmx file
@@ -85,7 +86,7 @@ public:
     static b2Vec2 getPositionBody(ValueMap object);
     
     // static body
-    static void createStaticBodies(b2World *world, ValueVector staticBodyList, uint16 categorybits, uint16 maskbits, b2Fixture* mPlatform);
+    static void createStaticBodies(b2World *world, ValueVector staticBodyList, uint16 categorybits, uint16 maskbits);
     
     // dynamic body
     static void createDynamicBodies(cocos2d::TMXTiledMap *map, b2World *world, ValueVector dynamicBodyList, uint16 categorybits, uint16 maskbits);
@@ -95,6 +96,16 @@ public:
     
     // get list hex objects
     static std::vector<Rect> getRectListObjects(TMXTiledMap* map,std::string objectsName, std::string layerName);
+    
+    // get list objects
+    static ValueVector getListObjects(TMXTiledMap* map, std::string layerName);
+    // get list object by type
+    static ValueVector getListObjectByType(TMXTiledMap* map, std::string layerName, std::string type);
+    // get list physics by bodyType
+    static ValueVector getListPhysicsByBodytype(TMXTiledMap* map, std::string layerName, std::string type, std::string bodytype);
+    
+    // get list conveyor belts
+    static std::vector<ConveyorBelt> getListConveyorBelt();
 };
 
 

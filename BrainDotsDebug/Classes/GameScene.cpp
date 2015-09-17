@@ -2,6 +2,7 @@
 
 GameScene::GameScene()
 {
+    CCLOG("GameScene::GameScene()");
     map = nullptr;
     drawnode = nullptr;
     world = nullptr;
@@ -13,7 +14,7 @@ GameScene::GameScene()
 
 GameScene::~GameScene()
 {
-    CCLOG("remove all objects");
+    CCLOG("GameScene::~GameScene()");
     map = nullptr;
     drawnode = nullptr;
     brush = nullptr;
@@ -22,13 +23,13 @@ GameScene::~GameScene()
     
     delete _ballContactListener;
     CC_SAFE_RELEASE(target);
-    std::vector<Vec2>().swap(platformPoints);
     delete this->debugDraw;
     this->debugDraw = nullptr;
 }
 
 Scene* GameScene::createScene()
 {
+    CCLOG("GameScene::createScene()");
     auto scene = Scene::create();
     auto layer = GameScene::create();
     scene->addChild(layer);
@@ -38,6 +39,7 @@ Scene* GameScene::createScene()
 // on "init" you need to initialize your instance
 bool GameScene::init()
 {
+    CCLOG("GameScene::init()");
     //////////////////////////////
     // 1. super init first
     if ( !LayerColor::initWithColor(Color4B(255, 255, 255, 255)) )
@@ -210,8 +212,14 @@ void GameScene::conveyorBelts()
         
         b2FixtureDef fd;
         fd.shape = &shape;
-        fd.friction = 1.0f;
+        fd.friction = 10.0f;
         mPlatform = body->CreateFixture(&fd);
+        
+        ConveyorBelt cb;
+        cb.fixture = mPlatform;
+        cb.friction = fd.friction;
+        cb.tangentSpeed = 500;
+        listConveyorBelt.push_back(cb);
     }
     
     // Boxes
@@ -222,8 +230,6 @@ void GameScene::conveyorBelts()
         bd.position.Set(visibleSize.width/2 / PTM_RATIO + 2.0f * i, 7.0f);
         b2Body* body = world->CreateBody(&bd);
         
-//        b2PolygonShape shape;
-//        shape.SetAsBox(0.5f, 0.5f);
         b2CircleShape shape;
         shape.m_radius = 0.5f;
         body->CreateFixture(&shape, 20.0f);
@@ -242,21 +248,19 @@ void GameScene::draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform
 
 void GameScene::initPhysics()
 {
+    CCLOG("GameScene::initPhysics()");
     // create physics world box2d
     b2Vec2 gravity = b2Vec2(0.0f, -10.0f);
     world = new b2World(gravity);
     world->SetAllowSleeping(true);
     world->SetContinuousPhysics(true);
     
-    // test conveyor belts
-//    this->conveyorBelts();
-    
     // add debug draw
     this->debugDraw = new GLESDebugDraw( PTM_RATIO );
     this->world->SetDebugDraw(debugDraw);
     
     // add contact
-    _ballContactListener = new BallContactListener(mPlatform);
+    _ballContactListener = new BallContactListener();
     world->SetContactListener(_ballContactListener);
     
     uint32 flags = 0;
@@ -266,17 +270,23 @@ void GameScene::initPhysics()
 
 void GameScene::initMapLevel(int level)
 {
+    CCLOG("GameScene::initMapLevel()");
     //reading in a tiled map
     std::string nameLevel = "level" + to_string(level) + ".tmx";
     map = TMXTiledMap::create(nameLevel);
     if (map==nullptr) {
+        
         CCLOG("file not found");
         
     } else {
         addChild(map, ZORDER_GAME::ZORDER_MAPLEVEL, 1);
         
         // auto create physics objects
-        TiledBodyCreator::initMapLevel(map, world, "braindots", CATEGORY_BARRAGE, MASK_BARRAGE, mPlatform);
+        TiledBodyCreator::initMapLevel(map, world, "braindots", CATEGORY_BARRAGE, MASK_BARRAGE);
+        listConveyorBelt = TiledBodyCreator::getListConveyorBelt();
+//        this->conveyorBelts();
+        CCLOG("listConveyorBelt %zd", listConveyorBelt.size());
+        _ballContactListener->setListConveyorBelt(listConveyorBelt);
         
         // get ball group
         auto group = map->getObjectGroup("braindots");
@@ -306,13 +316,13 @@ void GameScene::initMapLevel(int level)
             listRectGrid = TiledBodyCreator::getRectListObjects(map, "hexgridobjects", "hexgridlayer");
             if (listRectGrid.size() > 0) {
                 for (int i = 0; i < listRectGrid.size(); i++) {
-                    Rect rect = listRectGrid[i];
+                    Rect rect = listRectGrid.at(i);
                     auto layer = LayerColor::create();
                     layer->setContentSize(Size(rect.size));
                     layer->setPosition(Vec2(rect.origin));
                     CCLOG("layer %f %f %f %f", layer->getPositionX(), layer->getPositionY(), layer->getContentSize().width, layer->getContentSize().height);
                     addChild(layer, 100);
-                    listGirdLayer.push_back(layer);
+                    listGirdLayer.pushBack(layer);
                     
                     // add touch
                     auto listener = EventListenerTouchOneByOne::create();
@@ -348,6 +358,7 @@ void GameScene::initMapLevel(int level)
 
 void GameScene::initPhysicObjects()
 {
+    CCLOG("GameScene::initPhysicObjects()");
     //Define the ground body
     b2BodyDef groundBodyDef;
     groundBodyDef.position.Set(0, 0); // bottom-left corner
@@ -396,6 +407,7 @@ void GameScene::initWall(b2Body *body, b2Fixture* _wallFixture[], float outside,
 
 void GameScene::initBalls()
 {
+    CCLOG("GameScene::initBalls()");
     auto ballASprite = Sprite::create("ball_red.png");
     map->addChild(ballASprite);
     ballASprite->setPosition(posballA);
@@ -412,7 +424,7 @@ void GameScene::initBalls()
     b2FixtureDef ballFixtureDef;
     ballFixtureDef.shape = &circleShape;
     ballFixtureDef.density = 10.0f;
-    ballFixtureDef.friction = 0.02f;
+    ballFixtureDef.friction = 0;
     ballFixtureDef.restitution = 0;
     ballFixtureDef.filter.categoryBits = CATEGORY_BALL;
     ballFixtureDef.filter.maskBits = MASK_BALL;
@@ -565,7 +577,7 @@ bool GameScene::onTouchBegan(Touch* touch, Event* event) {
     // touch in grid layer
     if (listGirdLayer.size() > 0) {
         for (int i = 0; i<listGirdLayer.size(); i++) {
-            if (listGirdLayer[i]->getBoundingBox().containsPoint(touch->getLocation())) {
+            if (listGirdLayer.at(i)->getBoundingBox().containsPoint(touch->getLocation())) {
                 return false;
             }
         }
@@ -672,8 +684,8 @@ void GameScene::onTouchEnded(Touch* touch, Event* event) {
         world->DestroyBody(currentPlatformBody);
         b2Body* newBody = world->CreateBody(&myBodyDef);
         for (int i = 0; i < platformPoints.size() - 1; i++) {
-            Vec2 start = platformPoints[i];
-            Vec2 end = platformPoints[i + 1];
+            Vec2 start = platformPoints.at(i);
+            Vec2 end = platformPoints.at(i+1);
             this->addRectangleBetweenPointsToBody(newBody, start, end);
         }
         Rect bodyRectangle = ExecuteShapePhysic::getBodyRectangle(visibleSize, newBody);
@@ -788,8 +800,8 @@ Vec2 GameScene::checkBodyWeighOnSomebody(cocos2d::Vec2 start, cocos2d::Vec2 end)
     if (listGirdLayer.size() > 0) {
         for (int i = 0; i<listGirdLayer.size(); i++) {
             for (int j = 0; j < listPoints.size(); j++) {
-                if (listGirdLayer[i]->getBoundingBox().containsPoint(listPoints[j])) {
-                    result = listPoints[j];
+                if (listGirdLayer.at(i)->getBoundingBox().containsPoint(listPoints.at(j))) {
+                    result = listPoints.at(j);
                     CCLOG("You touched a hex grid layer");
                     return result;
                 }
@@ -804,10 +816,10 @@ Vec2 GameScene::checkBodyWeighOnSomebody(cocos2d::Vec2 start, cocos2d::Vec2 end)
         while(f)
         {
             for (int i=0; i<listPoints.size(); i++) {
-                b2Vec2 checkPoint = b2Vec2(listPoints[i].x / PTM_RATIO, listPoints[i].y / PTM_RATIO);
+                b2Vec2 checkPoint = b2Vec2(listPoints.at(i).x / PTM_RATIO, listPoints.at(i).y / PTM_RATIO);
                 if(f -> TestPoint(checkPoint))
                 {
-                    result = listPoints[i];
+                    result = listPoints.at(i);
                     CCLOG("You touched a body");
                     return result;
                 }

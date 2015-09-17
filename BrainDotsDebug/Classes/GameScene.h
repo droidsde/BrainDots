@@ -11,7 +11,7 @@
 
 USING_NS_CC;
 using namespace cocos2d::ui;
-
+class BallContactListener;
 class GameScene : public cocos2d::LayerColor
 {
 public:
@@ -60,7 +60,7 @@ private:
     DrawNode* drawnode;
     
     // list rect hex grid
-    std::vector<Layer*> listGirdLayer;
+    Vector<Layer*> listGirdLayer;
     
     // control game
     bool gameOver = false;
@@ -91,6 +91,8 @@ private:
     std::vector<Vec2> platformPoints;
     RenderTexture *target, *captureScreen;
     Sprite *brush;
+    
+    std::vector<ConveyorBelt> listConveyorBelt;
 };
 
 #endif // __HELLOWORLD_SCENE_H__

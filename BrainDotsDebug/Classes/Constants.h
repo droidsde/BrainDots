@@ -10,6 +10,7 @@
 #define BrainDotsDebug_Constants_h
 
 #pragma once
+#include "Box2D/Box2D.h"
 
 #define VERSION                         "version 1.0.0"
 
@@ -133,4 +134,12 @@ struct compare_level
         return (struct1.level > struct2.level);
     }
 };
+
+    class ConveyorBelt
+    {
+    public:
+        b2Fixture* fixture;
+        float friction;
+        float tangentSpeed;
+    };
 #endif

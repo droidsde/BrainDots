@@ -11,6 +11,8 @@
 USING_NS_CC;
 
 std::map<std::string , b2Body*> mapBodyList;
+std::vector<ConveyorBelt> listConveyorBelt;
+
 typedef enum {
     POLYGON_FIXTURE,
     POLYLINE_FIXTURE,
@@ -20,7 +22,7 @@ typedef enum {
 } fixtureTypes;
 
 void TiledBodyCreator::initMapLevel(cocos2d::TMXTiledMap *map, b2World *world, std::string layerName,
-                                    uint16 categorybits, uint16 maskbits, b2Fixture* mPlatform)
+                                    uint16 categorybits, uint16 maskbits)
 {
     auto layerGroup = map->getObjectGroup(layerName);
     cocos2d::ValueVector physicObjects = layerGroup->getObjects();
@@ -39,7 +41,7 @@ void TiledBodyCreator::initMapLevel(cocos2d::TMXTiledMap *map, b2World *world, s
     }
     
     // execute object list
-    executeObjectList(map, world, objectsList, categorybits, maskbits, mPlatform);
+    executeObjectList(map, world, objectsList, categorybits, maskbits);
     
     // execute joint list
     executeJointList(world, jointList);
@@ -49,13 +51,12 @@ void TiledBodyCreator::initMapLevel(cocos2d::TMXTiledMap *map, b2World *world, s
     jointList.clear();
 }
 
-void TiledBodyCreator::executeObjectList(cocos2d::TMXTiledMap *map, b2World *world, ValueVector objectList, uint16 categorybits, uint16 maskbits, b2Fixture* mPlatform)
+void TiledBodyCreator::executeObjectList(cocos2d::TMXTiledMap *map, b2World *world, ValueVector objectList, uint16 categorybits, uint16 maskbits)
 {
     if (objectList.size() <= 0) {
         return;
     }
     
-    // static bodies
     ValueVector staticBodyList;
     ValueVector dynamicBodyList;
     
@@ -73,14 +74,7 @@ void TiledBodyCreator::executeObjectList(cocos2d::TMXTiledMap *map, b2World *wor
     }
     
     // create auto staticbodies
-    createStaticBodies(world, staticBodyList, categorybits, maskbits, mPlatform);
-    
-    // remove all joint list
-    for (b2Joint* joint = world->GetJointList(); joint != nullptr; joint->GetNext()) {
-        if (joint != nullptr) {
-            world->DestroyJoint(joint);
-        }
-    }
+    createStaticBodies(world, staticBodyList, categorybits, maskbits);
     
     // create auto dynamic bodies
     createDynamicBodies(map, world, dynamicBodyList, categorybits, maskbits);
@@ -148,6 +142,9 @@ void TiledBodyCreator::executeJointList(b2World *world, ValueVector jointList)
             }
         }
     }
+    
+    listJoint2body.clear();
+    mapBodyList.clear();
 }
 
 void TiledBodyCreator::createJoint(b2World *world, Joint2Body *joint)
@@ -197,8 +194,14 @@ void TiledBodyCreator::createJoint(b2World *world, Joint2Body *joint)
     }
 }
 
-void TiledBodyCreator::createStaticBodies(b2World *world,  ValueVector staticBodyList, uint16 categorybits, uint16 maskbits, b2Fixture* mPlatform)
+std::vector<ConveyorBelt> TiledBodyCreator::getListConveyorBelt()
 {
+    return listConveyorBelt;
+}
+
+void TiledBodyCreator::createStaticBodies(b2World *world,  ValueVector staticBodyList, uint16 categorybits, uint16 maskbits)
+{
+    listConveyorBelt.clear();
     if (staticBodyList.size() <= 0) {
         return;
     }
@@ -206,8 +209,9 @@ void TiledBodyCreator::createStaticBodies(b2World *world,  ValueVector staticBod
     for(cocos2d::Value objectValue : staticBodyList)
     {
         b2Fixture* platform;
-        float conveyorBelts = objectValue.asValueMap()["conveyorBelts"].asBool();
-        
+        bool isConveyorBelts = objectValue.asValueMap()["isConveyorBelt"].asBool();
+        float conveyorSpeed = objectValue.asValueMap()["conveyorBeltSpeed"].asFloat();
+        float friction = objectValue.asValueMap()["friction"].asFloat();
         // create fixture shape
         auto fixtureShape = createFixture(objectValue.asValueMap());
         if(fixtureShape != NULL) {
@@ -223,8 +227,13 @@ void TiledBodyCreator::createStaticBodies(b2World *world,  ValueVector staticBod
             fixtureShape->fixture.filter.categoryBits = categorybits;
             fixtureShape->fixture.filter.maskBits = maskbits;
             platform = staticBody->CreateFixture(&fixtureShape->fixture);
-            if (conveyorBelts) {
-                mPlatform = platform;
+            if (isConveyorBelts) {
+                ConveyorBelt cb;
+                cb.fixture = platform;
+                cb.tangentSpeed = conveyorSpeed;
+                cb.friction = friction;
+                CCLOG("friction %f", friction);
+                listConveyorBelt.push_back(cb);
             }
             
             // insert to map
@@ -233,6 +242,7 @@ void TiledBodyCreator::createStaticBodies(b2World *world,  ValueVector staticBod
             CCLOG("Error when get objects");
         }
     }
+    staticBodyList.clear();
 }
 
 void TiledBodyCreator::createDynamicBodies(cocos2d::TMXTiledMap *map, b2World *world,  ValueVector dynamicBodyList, uint16 categorybits, uint16 maskbits)
@@ -285,6 +295,7 @@ void TiledBodyCreator::createDynamicBodies(cocos2d::TMXTiledMap *map, b2World *w
             CCLOG("Error when get objects");
         }
     }
+    dynamicBodyList.clear();
 }
 
 b2Vec2 TiledBodyCreator::getPositionBody(ValueMap object)
@@ -450,4 +461,48 @@ std::vector<Rect> TiledBodyCreator::getRectListObjects(cocos2d::TMXTiledMap *map
         listRect.push_back(pos);
     }
     return listRect;
+}
+
+ValueVector TiledBodyCreator::getListObjects(cocos2d::TMXTiledMap *map, std::string layerName)
+{
+    // get list objects
+    auto layerGroup = map->getObjectGroup(layerName);
+    cocos2d::ValueVector physicObjects = layerGroup->getObjects();
+    return physicObjects;
+}
+
+ValueVector TiledBodyCreator::getListObjectByType(cocos2d::TMXTiledMap *map, std::string layerName, std::string type)
+{
+    ValueVector objectsByType;
+    
+    // get list object physics
+    auto physicObjects = getListObjects(map, layerName);
+    
+    // get list objects by type
+    for (cocos2d::Value objectValue : physicObjects) {
+        auto object = objectValue.asValueMap();
+        if (object["type"].asString() == type) {
+            objectsByType.push_back(objectValue);
+        }
+    }
+    
+    return objectsByType;
+}
+
+ValueVector TiledBodyCreator::getListPhysicsByBodytype(cocos2d::TMXTiledMap *map, std::string layerName, std::string type, std::string bodytype)
+{
+    ValueVector listPhysicsByBodytype;
+    auto listObjectByType = getListObjectByType(map, layerName, type);
+    
+    for (cocos2d::Value objectValue : listObjectByType) {
+        auto object = objectValue.asValueMap();
+        // only for auto create body
+        if (object["autocreate"].asBool()) {
+            if (object["bodyType"].asString() == bodytype) {
+                listPhysicsByBodytype.push_back(objectValue);
+            }
+        }
+    }
+    
+    return listPhysicsByBodytype;
 }

@@ -8,9 +8,8 @@
 
 #include "BallContactListener.h"
 
-BallContactListener::BallContactListener(b2Fixture* platform) : _contacts()
+BallContactListener::BallContactListener() : _contacts()
 {
-    this->mPlatform = platform;
 }
 
 BallContactListener::~BallContactListener()
@@ -21,6 +20,12 @@ void BallContactListener::setFixtureForBall(b2Fixture *fixBallA, b2Fixture *fixB
 {
     this->mFixBallA = fixBallA;
     this->mFixBallB = fixBallB;
+}
+
+void BallContactListener::setListConveyorBelt(std::vector<ConveyorBelt> list)
+{
+    this->mListConveyorBelt = list;
+    CCLOG("size ConveyorBelt %zd", mListConveyorBelt.size());
 }
 
 void BallContactListener::BeginContact(b2Contact *contact)
@@ -59,30 +64,24 @@ void BallContactListener::PreSolve(b2Contact *contact, const b2Manifold *oldMani
     b2Fixture* fixtureA = contact->GetFixtureA();
     b2Fixture* fixtureB = contact->GetFixtureB();
     
-    if (fixtureA == mPlatform)
-    {
-        contact->SetTangentSpeed(50.0f);
-    }
-    
-    if (fixtureB == mPlatform)
-    {
-        contact->SetTangentSpeed(-50.0f);
+    // contact with all Conveyor belt fixture
+    for (int i = 0; i < mListConveyorBelt.size(); i++) {
+        ConveyorBelt conveyorBelt = mListConveyorBelt[i];
+        auto vect = b2Vec2(conveyorBelt.tangentSpeed, 0);
+        
+        if (fixtureA == conveyorBelt.fixture)
+        {
+//            contact->SetTangentSpeed(conveyorBelt.tangentSpeed);
+            fixtureB->GetBody()->ApplyForceToCenter(vect, true);
+        }
+        else if (fixtureB == conveyorBelt.fixture)
+        {
+//            contact->SetTangentSpeed(conveyorBelt.tangentSpeed);
+            fixtureA->GetBody()->ApplyForceToCenter(vect, true);
+        }
     }
 }
 
 void BallContactListener::PostSolve(b2Contact *contact, const b2ContactImpulse *impulse)
 {
-//    b2Fixture* fixtureA = contact->GetFixtureA();
-//    b2Fixture* fixtureB = contact->GetFixtureB();
-//    
-//    if ((fixtureA == mFixBallA || fixtureA == mFixBallB) && fixtureB != mPlatform) {
-//        b2Vec2 velocity = fixtureA->GetBody()->GetLinearVelocity();
-//        CCLOG("velocity %f %f", velocity.x, velocity.y);
-//        fixtureA->GetBody()->ApplyLinearImpulse( b2Vec2(velocity.x+1, velocity.y), fixtureA->GetBody()->GetWorldCenter(), true);
-//    }
-//    else  if ((fixtureB == mFixBallA || fixtureB == mFixBallB) && fixtureA != mPlatform) {
-//        b2Vec2 velocity = fixtureB->GetBody()->GetLinearVelocity();
-//        CCLOG("velocity %f %f", velocity.x, velocity.y);
-//        fixtureB->GetBody()->ApplyLinearImpulse( b2Vec2(velocity.x+1, velocity.y), fixtureB->GetBody()->GetWorldCenter(), true);
-//    }
 }

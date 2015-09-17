@@ -53,6 +53,6 @@ private:
     
     float tempX;
     
-    std::vector<Sprite*> listPencil;
+    Vector<Sprite*> listPencil;
 };
 #endif /* defined(__BrainDotsDebug__BaseCoverFlow__) */

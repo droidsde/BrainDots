@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="36" height="20" tilewidth="38" tileheight="38" nextobjectid="17">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="36" height="20" tilewidth="38" tileheight="38" nextobjectid="26">
  <tileset firstgid="1" name="background" tilewidth="38" tileheight="38">
   <image source="triangle1.png" width="380" height="190"/>
  </tileset>
@@ -738,13 +738,14 @@
     <property name="autocreate" value="false"/>
    </properties>
   </object>
-  <object id="11" name="conveyor1" type="object" x="6.66667" y="365.333" width="488" height="37.3333">
+  <object id="11" name="conveyor1" type="object" x="2" y="365.333" width="488" height="37.3333">
    <properties>
     <property name="autocreate" value="true"/>
     <property name="bodyType" value="StaticBody"/>
     <property name="conveyorBeltSpeed" value="100"/>
     <property name="friction" value="10.0"/>
     <property name="isConveyorBelt" value="true"/>
+    <property name="spriteName" value="tileset.png"/>
    </properties>
   </object>
   <object id="12" name="conveyor2" type="object" x="913.333" y="362.667" width="452" height="41.3333">
@@ -754,6 +755,7 @@
     <property name="conveyorBeltSpeed" value="-200"/>
     <property name="friction" value="10.0"/>
     <property name="isConveyorBelt" value="true"/>
+    <property name="spriteName" value="tileset.png"/>
    </properties>
   </object>
   <object id="14" name="ground1" type="object" x="649.333" y="2.66667" width="109.333" height="112">
@@ -772,7 +774,48 @@
    <properties>
     <property name="autocreate" value="true"/>
     <property name="bodyType" value="StaticBody"/>
+    <property name="spriteName" value="tileset.png"/>
    </properties>
+  </object>
+  <object id="18" name="rotation1" type="object" x="17.3333" y="365.333" width="38" height="38">
+   <properties>
+    <property name="angularVelocity" value="-2"/>
+    <property name="autocreate" value="true"/>
+    <property name="bodyType" value="KinematicBody"/>
+    <property name="shape" value="circle"/>
+    <property name="spriteName" value="setting.png"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="23" name="rotation2" type="object" x="432" y="365.333" width="38" height="38">
+   <properties>
+    <property name="angularVelocity" value="-2"/>
+    <property name="autocreate" value="true"/>
+    <property name="bodyType" value="KinematicBody"/>
+    <property name="shape" value="circle"/>
+    <property name="spriteName" value="setting.png"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="24" name="rotation3" type="object" x="928" y="364" width="38" height="38">
+   <properties>
+    <property name="angularVelocity" value="4"/>
+    <property name="autocreate" value="true"/>
+    <property name="bodyType" value="KinematicBody"/>
+    <property name="shape" value="circle"/>
+    <property name="spriteName" value="setting.png"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="25" name="rotation4" type="object" x="1316" y="364" width="38" height="38">
+   <properties>
+    <property name="angularVelocity" value="4"/>
+    <property name="autocreate" value="true"/>
+    <property name="bodyType" value="KinematicBody"/>
+    <property name="shape" value="circle"/>
+    <property name="spriteName" value="setting.png"/>
+   </properties>
+   <ellipse/>
   </object>
  </objectgroup>
 </map>

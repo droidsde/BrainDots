@@ -11,7 +11,70 @@
 
 USING_NS_CC;
 using namespace cocos2d::ui;
+
+class RayCastMultipleCallback : public b2RayCastCallback {
+public:
+    enum {
+        e_maxCount = 3
+    };
+    
+    RayCastMultipleCallback() {
+        m_count = 0;
+    }
+    
+    float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction) {
+        b2Body* body = fixture->GetBody();
+        void* userData = body->GetUserData();
+        if (userData) {
+            int32 index = *(int32*)userData;
+            if (index == 0)
+                return -1.0f;
+        }
+        
+        b2Assert(m_count < e_maxCount);
+        
+        m_points[m_count] = point;
+        m_normals[m_count] = normal;
+        ++m_count;
+        
+        if (m_count == e_maxCount)
+            return 0.0f;
+        return 1.0f;
+    }
+    
+    b2Vec2 m_points[e_maxCount];
+    b2Vec2 m_normals[e_maxCount];
+    int32 m_count;
+};
+
+class RayCastClosestCallback : public b2RayCastCallback {
+public:
+    RayCastClosestCallback() {
+        m_hit = false;
+    }
+    
+    float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction) {
+        b2Body* body = fixture->GetBody();
+        void* userData = body->GetUserData();
+        if (userData) {
+            int32 index = *(int32*)userData;
+            if (index == 0)
+                return -1.0f;
+        }
+        
+        m_hit = true;
+        m_point = point;
+        m_normal = normal;
+        return fraction;
+    }
+    
+    bool m_hit;
+    b2Vec2 m_point;
+    b2Vec2 m_normal;
+};
+
 class BallContactListener;
+class TiledBodyCreator;
 class GameScene : public cocos2d::LayerColor
 {
 public:
@@ -39,15 +102,17 @@ public:
     void update(float dt);
     void addRectangleBetweenPointsToBody(b2Body* body, Vec2 start, Vec2 end);
     Vec2 checkBodyWeighOnSomebody(Vec2 start, Vec2 end);
+    Vec2 checkDrawingWithOtherBodies(Vec2 start, Vec2 end);
     std::vector<Vec2> getListPointsIn2Point(Vec2 start, Vec2 end);
     void backMenu();
     void touchButtonEvent(Ref* sender, Widget::TouchEventType type);
     void endGame();
     
+    // function test
     void revoluteJoint();
     void weldJoint();
     void conveyorBelts();
-    
+
 private:
     // size and pos screen
     Size visibleSize;
@@ -55,6 +120,9 @@ private:
     
     // map variable
     TMXTiledMap* map;
+    
+    // reader map
+    TiledBodyCreator* tiledmap;
     
     // test draw node
     DrawNode* drawnode;
@@ -93,6 +161,7 @@ private:
     Sprite *brush;
     
     std::vector<ConveyorBelt> listConveyorBelt;
+    
 };
 
 #endif // __HELLOWORLD_SCENE_H__

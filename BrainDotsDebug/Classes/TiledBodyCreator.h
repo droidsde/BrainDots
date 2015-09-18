@@ -14,7 +14,7 @@
 #include "SceneManager.h"
 
 USING_NS_CC;
-
+class GameScene;
 class FixtureDef
 {
 public:
@@ -67,7 +67,10 @@ public:
 class TiledBodyCreator
 {
 public:
-
+    
+    TiledBodyCreator();
+    ~TiledBodyCreator();
+    
     // init map
     static void initMapLevel(TMXTiledMap* map, b2World* world, std::string layerName, uint16 categorybits, uint16 maskbits);
     
@@ -86,10 +89,12 @@ public:
     static b2Vec2 getPositionBody(ValueMap object);
     
     // static body
-    static void createStaticBodies(b2World *world, ValueVector staticBodyList, uint16 categorybits, uint16 maskbits);
+    static void createStaticBodies(cocos2d::TMXTiledMap *map,b2World *world, ValueVector staticBodyList, uint16 categorybits, uint16 maskbits);
     
     // dynamic body
-    static void createDynamicBodies(cocos2d::TMXTiledMap *map, b2World *world, ValueVector dynamicBodyList, uint16 categorybits, uint16 maskbits);
+    static void createDynamicBodies(cocos2d::TMXTiledMap *map, b2World *world, ValueVector dynamicBodyList, uint16 categorybits, uint16 maskbits, b2BodyType type);
+    
+    static void createSpriteBody(cocos2d::TMXTiledMap *map, b2Body* body, FixtureDef* fixtureShape, std::string spriteName,  b2Shape::Type type);
     
     // create joints
     static void createJoint(b2World* world, Joint2Body* joint);

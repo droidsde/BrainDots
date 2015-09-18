@@ -4,6 +4,7 @@ GameScene::GameScene()
 {
     CCLOG("GameScene::GameScene()");
     map = nullptr;
+    tiledmap = nullptr;
     drawnode = nullptr;
     world = nullptr;
     currentPlatformBody = nullptr;
@@ -17,6 +18,8 @@ GameScene::~GameScene()
     CCLOG("GameScene::~GameScene()");
     map = nullptr;
     drawnode = nullptr;
+    delete tiledmap;
+    tiledmap = nullptr;
     brush = nullptr;
     delete world;
     world = nullptr;
@@ -218,7 +221,7 @@ void GameScene::conveyorBelts()
         ConveyorBelt cb;
         cb.fixture = mPlatform;
         cb.friction = fd.friction;
-        cb.tangentSpeed = 500;
+        cb.tangentSpeed = 100;
         listConveyorBelt.push_back(cb);
     }
     
@@ -233,6 +236,7 @@ void GameScene::conveyorBelts()
         b2CircleShape shape;
         shape.m_radius = 0.5f;
         body->CreateFixture(&shape, 20.0f);
+        body->SetAngularVelocity(-50);
     }
 }
 
@@ -240,9 +244,15 @@ void GameScene::draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform
     Layer::draw(renderer, transform, transformUpdated);
     Director* director = Director::getInstance();
     
-    GL::enableVertexAttribs( cocos2d::GL::VERTEX_ATTRIB_FLAG_POSITION );
+    CCASSERT(nullptr != director, "Director is null when seting matrix stack");
     director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+    director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, transform);
+    GL::enableVertexAttribs(cocos2d::GL::VERTEX_ATTRIB_FLAG_POSITION);
+    if (this->isScheduled(schedule_selector(GameScene::update))) {
+        this->update(0.0f);
+    }
     world->DrawDebugData();
+    CHECK_GL_ERROR_DEBUG();
     director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
 }
 
@@ -263,8 +273,12 @@ void GameScene::initPhysics()
     _ballContactListener = new BallContactListener();
     world->SetContactListener(_ballContactListener);
     
-    uint32 flags = 0;
+    uint32  flags = 0;
     flags += b2Draw::e_shapeBit;
+    flags += b2Draw::e_jointBit;
+//    flags += b2Draw::e_aabbBit;
+//    flags += b2Draw::e_pairBit;
+//    flags += b2Draw::e_centerOfMassBit;
     this->debugDraw->SetFlags(flags);
 }
 
@@ -282,10 +296,10 @@ void GameScene::initMapLevel(int level)
         addChild(map, ZORDER_GAME::ZORDER_MAPLEVEL, 1);
         
         // auto create physics objects
-        TiledBodyCreator::initMapLevel(map, world, "braindots", CATEGORY_BARRAGE, MASK_BARRAGE);
-        listConveyorBelt = TiledBodyCreator::getListConveyorBelt();
+        tiledmap = new TiledBodyCreator();
+        tiledmap->initMapLevel(map, world, "braindots", CATEGORY_BARRAGE, MASK_BARRAGE);
+        listConveyorBelt = tiledmap->getListConveyorBelt();
 //        this->conveyorBelts();
-        CCLOG("listConveyorBelt %zd", listConveyorBelt.size());
         _ballContactListener->setListConveyorBelt(listConveyorBelt);
         
         // get ball group
@@ -310,10 +324,10 @@ void GameScene::initMapLevel(int level)
         std::vector<Rect> listRectGrid;
         auto gridGroup = map->getObjectGroup("hexgridobjects");
         if (gridGroup==nullptr) {
-            CCLOG("hexgridobjects group not found");
+//            CCLOG("hexgridobjects group not found");
         } else {
             listGirdLayer.clear();
-            listRectGrid = TiledBodyCreator::getRectListObjects(map, "hexgridobjects", "hexgridlayer");
+            listRectGrid = tiledmap->getRectListObjects(map, "hexgridobjects", "hexgridlayer");
             if (listRectGrid.size() > 0) {
                 for (int i = 0; i < listRectGrid.size(); i++) {
                     Rect rect = listRectGrid.at(i);
@@ -457,6 +471,7 @@ void GameScene::update(float dt) {
     int velocityIterations = 1;
     if (!gameOver) {
         world->Step(dt, velocityIterations, positionIterations);
+        
     } else {
         CCLOG("endgames %f %f", collisionPoint.x, collisionPoint.y);
         ParticleSystemQuad* starParticle = ParticleSystemQuad::create("star_particle.plist");
@@ -493,6 +508,7 @@ void GameScene::update(float dt) {
                                       body->GetPosition().y * PTM_RATIO));
             sprite->setRotation(-1 * CC_RADIANS_TO_DEGREES(body->GetAngle()));
         }
+//        world->DrawDebugData();
     }
     
     std::vector<b2Body *>toStatic;
@@ -585,15 +601,10 @@ bool GameScene::onTouchBegan(Touch* touch, Event* event) {
     
     // touch in any physic body
     if (checkBodyWeighOnSomebody(touch->getLocation(), touch->getLocation()) != Vec2::ZERO)
+//    if (checkDrawingWithOtherBodies(touch->getLocation(), touch->getLocation()) != Vec2::ZERO)
     {
         return false;
     }
-    
-    srand((int)time(NULL));
-    int r = rand() % 255;
-    int b = rand() % 255;
-    int g = rand() % 255;
-    brush->setColor(Color3B(r, b, g));
     
     platformPoints.clear();
     Vec2 location = touch->getLocation();
@@ -609,22 +620,30 @@ bool GameScene::onTouchBegan(Touch* touch, Event* event) {
 void GameScene::onTouchMoved(Touch* touch, Event* event) {
     drawnode->clear();
     
-    Vec2 start = touch->getLocation();
-    Vec2 end = touch->getPreviousLocation();
-    Vec2 collision = checkBodyWeighOnSomebody(start, end);
+    Vec2 start = touch->getPreviousLocation();
+    Vec2 end = touch->getLocation();
+    
+//    Vec2 collision = checkBodyWeighOnSomebody(start, end);
+    Vec2 collision = checkDrawingWithOtherBodies(start, end);
     
     // if before error draw
     if (isErrorDraw) {
-        Vec2 _collision = checkBodyWeighOnSomebody(start, posErrorDraw);
-        // if error draw
-        if (_collision != Vec2::ZERO) {
-            Color4F color = Color4F(brush->getColor().r, brush->getColor().g, brush->getColor().b, 100);
+        if (checkBodyWeighOnSomebody(start, start)!= Vec2::ZERO) {
+            Color4F color = Color4F(1, 1, 0, 0.5);
             drawnode->drawSegment(start, posErrorDraw, brush->getContentSize().width/2 , Color4F(color));
-        }
-        else {
-            // draw from pos error -> poos now
-            isErrorDraw = false;
-            end = posErrorDraw;
+        } else {
+//            Vec2 _collision = checkBodyWeighOnSomebody(posErrorDraw, end);
+            Vec2 _collision = checkDrawingWithOtherBodies(start, posErrorDraw);
+            // if error draw
+            if (_collision != Vec2::ZERO) {
+                Color4F color = Color4F(1, 1, 0, 0.5);
+                drawnode->drawSegment(start, posErrorDraw, brush->getContentSize().width/2 , Color4F(color));
+            }
+            else {
+                // draw from pos error -> poos now
+                isErrorDraw = false;
+                start = posErrorDraw;
+            }
         }
     }
     
@@ -642,7 +661,7 @@ void GameScene::onTouchMoved(Touch* touch, Event* event) {
             }
         }
         isErrorDraw = true;
-        start = collision;
+        end = collision;
     }
     
     // if draw no problem
@@ -657,7 +676,6 @@ void GameScene::onTouchMoved(Touch* touch, Event* event) {
             float delta = (float) i / distance;
             Sprite * sprite = Sprite::createWithTexture(brush->getTexture());
             sprite->setPosition(Vec2(start.x + (difX * delta), start.y + (difY * delta)));
-            sprite->setColor(brush->getColor());
             sprite->visit();
         }
         target->end();
@@ -717,6 +735,29 @@ void GameScene::onTouchEnded(Touch* touch, Event* event) {
     target->retain();
     target->setPosition(visibleSize.width / 2, visibleSize.height / 2);
     addChild(target);
+}
+
+Vec2 GameScene::checkDrawingWithOtherBodies(cocos2d::Vec2 start, cocos2d::Vec2 end)
+{
+    Vec2 result = Vec2::ZERO;
+    
+    if (start.distance(end) <= 0) {
+        return  result;
+    }
+    // use ray cast check bodies inside start-end
+    b2Vec2 point1(start.x / PTM_RATIO , start.y / PTM_RATIO);
+    b2Vec2 point2(end.x / PTM_RATIO , end.y / PTM_RATIO);
+    
+    // Loại 1
+    RayCastClosestCallback callback;
+    world->RayCast(&callback, point1, point2);
+    
+    if (callback.m_hit) {
+        result = Vec2(callback.m_point.x * PTM_RATIO, callback.m_point.y * PTM_RATIO);
+        CCLOG("ray cast collision %f %f", result.x, result.y);
+    }
+    
+    return result;
 }
 
 void GameScene::addRectangleBetweenPointsToBody(b2Body* body, Vec2 start,

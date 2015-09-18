@@ -21,6 +21,17 @@ typedef enum {
     UNKNOWN_FIXTURE
 } fixtureTypes;
 
+TiledBodyCreator::TiledBodyCreator()
+{
+    
+}
+
+TiledBodyCreator::~TiledBodyCreator()
+{
+    mapBodyList.clear();
+    listConveyorBelt.clear();
+}
+
 void TiledBodyCreator::initMapLevel(cocos2d::TMXTiledMap *map, b2World *world, std::string layerName,
                                     uint16 categorybits, uint16 maskbits)
 {
@@ -59,6 +70,7 @@ void TiledBodyCreator::executeObjectList(cocos2d::TMXTiledMap *map, b2World *wor
     
     ValueVector staticBodyList;
     ValueVector dynamicBodyList;
+    ValueVector kinematicBodyList;
     
     // check static or dynamic
     for (cocos2d::Value objectValue : objectList) {
@@ -69,15 +81,20 @@ void TiledBodyCreator::executeObjectList(cocos2d::TMXTiledMap *map, b2World *wor
                 dynamicBodyList.push_back(objectValue);
             } else if (object["bodyType"].asString() == "StaticBody" || object["bodyType"].asString() == "") {
                 staticBodyList.push_back(objectValue);
+            } else if (object["bodyType"].asString() == "KinematicBody") {
+                kinematicBodyList.push_back(objectValue);
             }
         }
     }
     
     // create auto staticbodies
-    createStaticBodies(world, staticBodyList, categorybits, maskbits);
+    createStaticBodies(map, world, staticBodyList, categorybits, maskbits);
     
     // create auto dynamic bodies
-    createDynamicBodies(map, world, dynamicBodyList, categorybits, maskbits);
+    createDynamicBodies(map, world, dynamicBodyList, categorybits, maskbits, b2_dynamicBody);
+    
+    // create auto kinematic bodies
+    createDynamicBodies(map, world, kinematicBodyList, categorybits, maskbits, b2_kinematicBody);
 }
 
 void TiledBodyCreator::executeJointList(b2World *world, ValueVector jointList)
@@ -143,7 +160,6 @@ void TiledBodyCreator::executeJointList(b2World *world, ValueVector jointList)
         }
     }
     
-    listJoint2body.clear();
     mapBodyList.clear();
 }
 
@@ -199,7 +215,7 @@ std::vector<ConveyorBelt> TiledBodyCreator::getListConveyorBelt()
     return listConveyorBelt;
 }
 
-void TiledBodyCreator::createStaticBodies(b2World *world,  ValueVector staticBodyList, uint16 categorybits, uint16 maskbits)
+void TiledBodyCreator::createStaticBodies(cocos2d::TMXTiledMap *map, b2World *world,  ValueVector staticBodyList, uint16 categorybits, uint16 maskbits)
 {
     listConveyorBelt.clear();
     if (staticBodyList.size() <= 0) {
@@ -212,6 +228,8 @@ void TiledBodyCreator::createStaticBodies(b2World *world,  ValueVector staticBod
         bool isConveyorBelts = objectValue.asValueMap()["isConveyorBelt"].asBool();
         float conveyorSpeed = objectValue.asValueMap()["conveyorBeltSpeed"].asFloat();
         float friction = objectValue.asValueMap()["friction"].asFloat();
+        std::string spriteName = objectValue.asValueMap()["spriteName"].asString();
+        
         // create fixture shape
         auto fixtureShape = createFixture(objectValue.asValueMap());
         if(fixtureShape != NULL) {
@@ -232,8 +250,12 @@ void TiledBodyCreator::createStaticBodies(b2World *world,  ValueVector staticBod
                 cb.fixture = platform;
                 cb.tangentSpeed = conveyorSpeed;
                 cb.friction = friction;
-                CCLOG("friction %f", friction);
                 listConveyorBelt.push_back(cb);
+            }
+            
+            // create sprite for polygon
+            if (spriteName != "") {
+                createSpriteBody(map, staticBody, fixtureShape, spriteName, fixtureShape->fixture.shape->GetType());
             }
             
             // insert to map
@@ -245,7 +267,7 @@ void TiledBodyCreator::createStaticBodies(b2World *world,  ValueVector staticBod
     staticBodyList.clear();
 }
 
-void TiledBodyCreator::createDynamicBodies(cocos2d::TMXTiledMap *map, b2World *world,  ValueVector dynamicBodyList, uint16 categorybits, uint16 maskbits)
+void TiledBodyCreator::createDynamicBodies(cocos2d::TMXTiledMap *map, b2World *world,  ValueVector dynamicBodyList, uint16 categorybits, uint16 maskbits, b2BodyType type)
 {
     if (dynamicBodyList.size() <= 0) {
         return;
@@ -264,7 +286,7 @@ void TiledBodyCreator::createDynamicBodies(cocos2d::TMXTiledMap *map, b2World *w
             
             // create body def
             b2BodyDef bd;
-            bd.type = b2_dynamicBody;
+            bd.type = type;
             b2Vec2 pos = getPositionBody(objectValue.asValueMap());
             if (pos.x != 0 && pos.y != 0) {
                 bd.position.Set(pos.x, pos.y);
@@ -278,17 +300,10 @@ void TiledBodyCreator::createDynamicBodies(cocos2d::TMXTiledMap *map, b2World *w
             fixtureShape->fixture.density = density;
             dynamicBody->CreateFixture(&fixtureShape->fixture);
             dynamicBody->SetAngularVelocity(angularVelocity);
-
-            // create sprite for polygon
-            Rect bodyRectangle = ExecuteShapePhysic::getBodyRectangle(map->getMapSize(), dynamicBody);
-            float anchorX = dynamicBody->GetPosition().x * PTM_RATIO - bodyRectangle.origin.x;
-            float anchorY = bodyRectangle.size.height - (map->getMapSize().height - bodyRectangle.origin.y - dynamicBody->GetPosition().y * PTM_RATIO);
-            Vec2 anchorPoint = Vec2(anchorX / bodyRectangle.size.width, anchorY / bodyRectangle.size.height);
-            auto dynamicSprite = Sprite::create(spriteName , bodyRectangle);
-            dynamicSprite->setAnchorPoint(anchorPoint);
-            dynamicBody->SetUserData(dynamicSprite);
-            map->addChild(dynamicSprite);
-
+            
+            // create sprite for polygon, circle, rect
+//            createSpriteBody(map, dynamicBody, fixtureShape, spriteName, fixtureShape->fixture.shape->GetType());
+            
             // insert to map
             mapBodyList.insert(std::pair<std::string, b2Body*>(objectValue.asValueMap()["name"].asString(), dynamicBody));
         } else {
@@ -296,6 +311,50 @@ void TiledBodyCreator::createDynamicBodies(cocos2d::TMXTiledMap *map, b2World *w
         }
     }
     dynamicBodyList.clear();
+}
+
+void TiledBodyCreator::createSpriteBody(cocos2d::TMXTiledMap *map, b2Body *body, FixtureDef* fixtureShape, std::string spriteName, b2Shape::Type type)
+{
+    switch (type) {
+        case b2Shape::e_polygon:
+        {
+            Rect bodyRectangle = ExecuteShapePhysic::getBodyRectangle(map->getMapSize(), body);
+            float anchorX = body->GetPosition().x * PTM_RATIO - bodyRectangle.origin.x;
+            float anchorY = bodyRectangle.size.height - (map->getMapSize().height - bodyRectangle.origin.y - body->GetPosition().y * PTM_RATIO);
+            Vec2 anchorPoint = Vec2(anchorX / bodyRectangle.size.width, anchorY / bodyRectangle.size.height);
+            auto dynamicSprite = Sprite::create(spriteName , bodyRectangle);
+            dynamicSprite->setAnchorPoint(anchorPoint);
+            body->SetUserData(dynamicSprite);
+            map->addChild(dynamicSprite);
+            break;
+        }
+        case b2Shape::e_circle:
+        {
+            Vec2 position = Vec2(body->GetPosition().x * PTM_RATIO, body->GetPosition().y * PTM_RATIO);
+            float radius = fixtureShape->fixture.shape->m_radius * PTM_RATIO;
+            Rect bodyRectangle = Rect(position.x, position.y, radius*2, radius*2);
+            auto dynamicSprite = Sprite::create(spriteName);
+            dynamicSprite->setPosition(Vec2(position));
+            dynamicSprite->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+            body->SetUserData(dynamicSprite);
+            map->addChild(dynamicSprite);
+            break;
+        }
+        case b2Shape::e_chain:
+        {
+            break;
+        }
+        case b2Shape::e_edge:
+        {
+            break;
+        }
+        case b2Shape::e_typeCount:
+        {
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 b2Vec2 TiledBodyCreator::getPositionBody(ValueMap object)
@@ -422,7 +481,7 @@ FixtureDef* TiledBodyCreator::createCircle(ValueMap object)
 
     b2CircleShape *circleshape = new b2CircleShape();
     circleshape->m_radius = radius;
-    circleshape->m_p.Set(position.x + radius, position.y + radius);
+//    circleshape->m_p.Set(position.x , position.y);
     
     auto fix = new FixtureDef();
     fix->fixture.shape = circleshape;

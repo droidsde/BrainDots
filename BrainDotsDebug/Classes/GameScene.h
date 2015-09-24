@@ -106,9 +106,11 @@ public:
     std::vector<Vec2> getListPointsIn2Point(Vec2 start, Vec2 end);
     void backMenu();
     void touchButtonEvent(Ref* sender, Widget::TouchEventType type);
+    void animationFail(Vec2 collisionPoint, std::string explosionName);
     void endGame();
     
     // function test
+    void explosionBall(b2Body* ball);
     void revoluteJoint();
     void weldJoint();
     void conveyorBelts();
@@ -131,7 +133,8 @@ private:
     Vector<Layer*> listGirdLayer;
     
     // control game
-    bool gameOver = false;
+    bool isSuccess = false;
+    bool isFail = false;
     bool m_bClearBox;
     
     // physics variable
@@ -151,6 +154,8 @@ private:
     // contacts physics
     BallContactListener* _ballContactListener;
     Vec2 collisionPoint = Vec2::ZERO;
+    Vec2 collisionFailA = Vec2::ZERO;
+    Vec2 collisionFailB = Vec2::ZERO;
     Vec2 posballA, posballB;
     
     // touch variable
@@ -161,7 +166,6 @@ private:
     Sprite *brush;
     
     std::vector<ConveyorBelt> listConveyorBelt;
-    
 };
 
 #endif // __HELLOWORLD_SCENE_H__

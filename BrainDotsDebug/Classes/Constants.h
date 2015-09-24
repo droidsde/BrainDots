@@ -31,9 +31,18 @@
 #define DELTA_TRANSLATE                 20
 #define PADDING_MENU_HEADER_ITEM        40
 
+#ifndef DEGTORAD
+#define DEGTORAD 0.0174532925199432957f
+#define RADTODEG 57.295779513082320876f
+#endif
+
 #define PTM_RATIO 32.0 // 32px = 1m in Box2D
+#define MAX_BLAST_RAYS 128
 
 const float BALL_RADIUS = 25.0f;
+const float BASE_EXPLOSION_SPACE = 200.0f;
+const int   NUM_EXPLOSION_CIRCLE = 60;
+const int   EXPLOSION_CIRCLE_RADIUS = 5;
 const float OUTSIDE = 500;
 
 // category definiti
@@ -42,6 +51,7 @@ const short CATEGORY_PLATFORM = 0x0002;
 const short CATEGORY_BARRAGE = 0x0004;
 const short CATEGORY_WALL1 = 0x0008;
 const short CATEGORY_WALL2 = 0x0016;
+const short CATEGORY_EXPLOSION = 0x0032;
 
 // maskbit definiti
 const short MASK_BALL = -1;
@@ -49,6 +59,7 @@ const short MASK_PLATFORM = CATEGORY_BALL | CATEGORY_BARRAGE | CATEGORY_PLATFORM
 const short MASK_BARRAGE = -1;
 const short MASK_WALL1 = CATEGORY_BALL | CATEGORY_BARRAGE;
 const short MASK_WALL2 = CATEGORY_BALL | CATEGORY_BARRAGE | CATEGORY_PLATFORM;
+const short MASK_EXPLOSION = 0;
 
 template <typename T>
 std::string to_string(T value)
@@ -101,6 +112,9 @@ enum TAG_GAME
 {
     TAG_BUTTON_BACK = 10,
     TAG_BUTTON_REPLAY,
+    TAG_BUTTON_NEXT,
+    TAG_BALLA,
+    TAG_BALLB,
 };
 
 enum ZORDER_GAME
@@ -108,6 +122,7 @@ enum ZORDER_GAME
 	ZORDER_MAPLEVEL = 0,
 	ZORDER_BUTTON_BACK = 10,
 	ZORDER_BUTTON_REPLAY = 11,
+    ZORDER_BUTTON_NEXT,
 };
 
 struct UserData

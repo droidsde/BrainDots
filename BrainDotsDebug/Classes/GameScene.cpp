@@ -425,10 +425,12 @@ void GameScene::initBalls()
     auto ballASprite = Sprite::create("ball_red.png");
     map->addChild(ballASprite);
     ballASprite->setPosition(posballA);
+    ballASprite->setTag(TAG_BALLA);
     
     auto ballBSprite = Sprite::create("ball_blue.png");
     map->addChild(ballBSprite);
     ballBSprite->setPosition(posballB);
+    ballBSprite->setTag(TAG_BALLB);
     
     // shape of body
     b2CircleShape circleShape;
@@ -469,33 +471,42 @@ void GameScene::update(float dt) {
     
     int positionIterations = 8;
     int velocityIterations = 1;
-    if (!gameOver) {
+    if (!isSuccess && !isFail) {
         world->Step(dt, velocityIterations, positionIterations);
         
     } else {
-        CCLOG("endgames %f %f", collisionPoint.x, collisionPoint.y);
-        ParticleSystemQuad* starParticle = ParticleSystemQuad::create("star_particle.plist");
-        starParticle->setPosition(collisionPoint);
-        starParticle->setAutoRemoveOnFinish(true);
-        starParticle->retain();
+        if (isSuccess) {
+            ParticleSystemQuad* starParticle = ParticleSystemQuad::create("star_particle.plist");
+            starParticle->setPosition(collisionPoint);
+            starParticle->setAutoRemoveOnFinish(true);
+            starParticle->retain();
+            this->addChild(starParticle);
+            
+            // run animation ring
+            auto ring = Sprite::create("explosion_yellow_ring.png");
+            ring->setScale(100 / ring->getContentSize().width);
+            ring->setPosition(collisionPoint);
+            map->addChild(ring);
+            auto zoomOut = ScaleTo::create(1.4f, 3000/ring->getContentSize().width);
+            auto fadeOut = FadeOut::create(1.5f);
+            auto spawn = Spawn::create(zoomOut, fadeOut, NULL);
+            ring->runAction(Sequence::create(spawn, RemoveSelf::create() , NULL));
+            
+            this->runAction(Sequence::create(DelayTime::create(2.0f), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)),  NULL));
+        } else if (isFail) {
+            if (collisionFailA != Vec2::ZERO && collisionFailB == Vec2::ZERO) {
+                this->runAction(Sequence::create(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailA, "explosion_red")), DelayTime::create(2), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)), NULL));
+            }
+            else if (collisionFailB != Vec2::ZERO && collisionFailA == Vec2::ZERO) {
+                this->runAction(Sequence::create(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailB, "explosion_blue")), DelayTime::create(2), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)), NULL));
+            }
+            else if (collisionFailA != Vec2::ZERO  && collisionFailB != Vec2::ZERO) {
+                this->runAction(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailA, "explosion_red")));
+                this->runAction(Sequence::create(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailB, "explosion_blue")), DelayTime::create(2), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)), NULL));
+            }
+        }
         
-        ParticleSystemQuad* ringParticle = ParticleSystemQuad::create("ring_particle.plist");
-        ringParticle->setPosition(collisionPoint);
-        ringParticle->setAutoRemoveOnFinish(true);
-        ringParticle->retain();
-        
-        auto call1 = CallFunc::create([=]()
-                                      {
-                                          this->addChild(ringParticle);
-                                      });
-        auto call2 = CallFunc::create([=]()
-                                      {
-                                          this->addChild(starParticle);
-                                      });
-        
-        this->runAction(Sequence::create(call1, DelayTime::create(1.0f), call2, DelayTime::create(2.0f), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)),  NULL));
-        
-        
+        // disbale update
         this->unschedule(schedule_selector(GameScene::update));
         return;
     }
@@ -522,13 +533,37 @@ void GameScene::update(float dt) {
         
         // contact ball with wall1
         for (int i=0; i<4; i++) {
-            if((contact.fixtureA == _ballAFixture && contact.fixtureB == _wallFixture1[i]) ||
-               (contact.fixtureA == _wallFixture1[i] && contact.fixtureB == _ballAFixture) ||
-               (contact.fixtureA == _ballBFixture && contact.fixtureB == _wallFixture1[i]) ||
-               (contact.fixtureA == _wallFixture1[i] && contact.fixtureB == _ballBFixture))
+            if((contact.fixtureA == _ballAFixture && contact.fixtureB == _wallFixture1[i]))
             {
-                collisionPoint = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
-                gameOver = true;
+                collisionFailA = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
+                if (std::find(toDestroy.begin(), toDestroy.end(), bodyA) == toDestroy.end()) {
+                    toDestroy.push_back(bodyA);
+                }
+                isFail = true;
+            }
+            else if (contact.fixtureA == _ballBFixture && contact.fixtureB == _wallFixture1[i])
+            {
+                collisionFailB = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
+                if (std::find(toDestroy.begin(), toDestroy.end(), bodyA) == toDestroy.end()) {
+                    toDestroy.push_back(bodyA);
+                }
+                isFail = true;
+            }
+            else if  ((contact.fixtureA == _wallFixture1[i] && contact.fixtureB == _ballAFixture))
+            {
+                collisionFailA = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
+                if (std::find(toDestroy.begin(), toDestroy.end(), bodyB) == toDestroy.end()) {
+                    toDestroy.push_back(bodyB);
+                }
+                isFail = true;
+            }
+            else if  (contact.fixtureA == _wallFixture1[i] && contact.fixtureB == _ballBFixture)
+            {
+                collisionFailB = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
+                if (std::find(toDestroy.begin(), toDestroy.end(), bodyB) == toDestroy.end()) {
+                    toDestroy.push_back(bodyB);
+                }
+                isFail = true;
             }
         }
         
@@ -556,7 +591,7 @@ void GameScene::update(float dt) {
                     toStatic.push_back(bodyA);
                     toStatic.push_back(bodyB);
                     collisionPoint = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
-                    gameOver = true;
+                    isSuccess = true;
                 }
             }
         }
@@ -576,7 +611,13 @@ void GameScene::update(float dt) {
         b2Body *body = *pos3;
         if (body->GetUserData() != NULL) {
             Sprite *sprite = (Sprite *) body->GetUserData();
-            this->removeChild(sprite, true);
+            if (sprite->getTag() == TAG_BALLA || sprite->getTag() == TAG_BALLB) {
+                map->removeChild(sprite, true);
+            }
+            else {
+                this->removeChild(sprite, true);
+            }
+            CCLOG("remove a sprite");
         }
         world->DestroyBody(body);
         CCLOG("remove a body");
@@ -587,7 +628,7 @@ bool GameScene::onTouchBegan(Touch* touch, Event* event) {
     drawnode->clear();
     isErrorDraw = false;
     posErrorDraw = Vec2::ZERO;
-    if (gameOver) {
+    if (isSuccess || isFail) {
         return false;
     }
     // touch in grid layer
@@ -792,7 +833,8 @@ void GameScene::addRectangleBetweenPointsToBody(b2Body* body, Vec2 start,
     
     b2FixtureDef boxFixtureDef;
     boxFixtureDef.shape = &boxShape;
-    boxFixtureDef.density = 5;
+    boxFixtureDef.density = 6.0;
+    boxFixtureDef.friction = 0.1;
     boxFixtureDef.filter.categoryBits = CATEGORY_PLATFORM;
     boxFixtureDef.filter.maskBits = MASK_PLATFORM;
     
@@ -900,8 +942,89 @@ void GameScene::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEventType ty
                 }
                 SceneManager::getInstance()->changeState(GAME_STATE::GAME);
                 break;
+            case TAG_GAME::TAG_BUTTON_NEXT:
+                SceneManager::getInstance()->setLevelGame(SceneManager::getInstance()->getLevelGame()+1);
+                SceneManager::getInstance()->changeState(GAME_STATE::GAME);
+                break;
         }
     }
+}
+
+void GameScene::explosionBall(b2Body *ball)
+{
+    float m_blastPower = 1000;
+    
+    srand((int)time(NULL));
+    if (ball) {
+        b2Vec2 center = ball->GetPosition();
+        for (int i = 0; i < NUM_EXPLOSION_CIRCLE; i++) {
+            float angle = CC_DEGREES_TO_RADIANS((i/(float)NUM_EXPLOSION_CIRCLE) * 360);
+            b2Vec2 rayDir (sinf(angle), cosf(angle) );
+            
+            b2BodyDef bd;
+            bd.type = b2_dynamicBody;
+            bd.fixedRotation = true;
+            bd.bullet = true;
+            bd.linearDamping = 10 + rand()%10;
+            bd.gravityScale = 0;
+            bd.position = center;
+            bd.linearVelocity = 0.125f * m_blastPower * rayDir;
+            b2Body* body = world->CreateBody(&bd);
+            
+            b2CircleShape circleShape;
+            //            CCLOG("radius %f", (rand()%10)/100);
+            circleShape.m_radius = 0.3 + (float)(rand()%10)/50;
+            
+            b2FixtureDef fd;
+            fd.shape = &circleShape;
+            fd.density = 60 / (float)NUM_EXPLOSION_CIRCLE;
+            fd.friction = 0;
+            fd.restitution = 0.99f;
+            fd.filter.categoryBits = CATEGORY_EXPLOSION;
+            fd.filter.maskBits = MASK_EXPLOSION;
+            body->CreateFixture(&fd);
+            
+        }
+    }
+}
+
+void GameScene::animationFail(cocos2d::Vec2 point, std::string explosionName)
+{
+    srand((int)time(0));
+    
+    for (int i = 0; i < NUM_EXPLOSION_CIRCLE; i ++) {
+        int rand_angle = rand() % 20;
+        float rand_scale = (float)(rand()%10)/10;
+        int rand_add_space = rand()%100;
+        float rand_delay = (float)(rand()%10)/100;
+        
+//        CCLOG("angle=%d add_radius=%f opacity=%d add_space=%d delay=%f", rand_angle, rand_scale, rand_opacity, rand_add_space, rand_delay);
+        
+        float rad = CC_DEGREES_TO_RADIANS((i/(float)NUM_EXPLOSION_CIRCLE) * 360 + rand_angle);
+        auto explosionSprite = Sprite::create(explosionName + ".png");
+        explosionSprite->setScale(rand_scale);
+        explosionSprite->setPosition(point);
+        
+        auto fadeout = FadeOut::create(0.7f);
+        auto zoomOut = ScaleTo::create(0.7f, 0);
+        auto spawn = Spawn::create(fadeout, zoomOut, NULL);
+        
+        Vec2 dest = Vec2(point.x + BASE_EXPLOSION_SPACE * sinf(rad) + rand_add_space, point.y + BASE_EXPLOSION_SPACE * cosf(rad) + rand_add_space);
+        auto move = MoveTo::create(0.7f, dest);
+        auto delay = DelayTime::create(0.2 + rand_delay);
+        auto sequence = Sequence::create(delay, move, delay, spawn, RemoveSelf::create(), NULL);
+        map->addChild(explosionSprite);
+        explosionSprite->runAction(sequence);
+    }
+    
+    auto ring = Sprite::create(explosionName + "_ring.png");
+    ring->setScale(100 / ring->getContentSize().width);
+    ring->setPosition(point);
+    map->addChild(ring);
+    auto zoomOut = ScaleTo::create(1.0f, 3000/ring->getContentSize().width);
+    auto fadeOut = FadeOut::create(1.0f);
+    auto spawn = Spawn::create(zoomOut, fadeOut, NULL);
+    ring->runAction(Sequence::create(spawn, RemoveSelf::create() , NULL));
 }
 
 void GameScene::endGame()
@@ -920,8 +1043,7 @@ void GameScene::endGame()
     Director::getInstance()->getRenderer()->render();
     auto _image = captureScreen->newImage();
     auto _key = to_string((int) time(NULL));
-    auto _texture2D = Director::getInstance()->getTextureCache()->addImage(
-                                                                           _image, _key);
+    auto _texture2D = Director::getInstance()->getTextureCache()->addImage(_image, _key);
     CC_SAFE_DELETE(_image);
     auto texture2D = Sprite::createWithTexture(_texture2D);
     texture2D->setPosition(visibleSize/2);
@@ -930,13 +1052,35 @@ void GameScene::endGame()
     removeChild(captureScreen, true);
     
     // create tick
-    auto tick = Sprite::create("mini_tick.png");
-    tick->setAnchorPoint(Vec2::ANCHOR_TOP_RIGHT);
-    tick->setPosition(Vec2(texture2D->getContentSize().width - PADDING, texture2D->getContentSize().height - PADDING));
+    std::string tickName;
+    if (isFail) {
+        tickName = "mini_fail.png";
+    } else if (isSuccess) {
+        tickName = "mini_tick.png";
+    }
+    
+    auto tick = Sprite::create(tickName);
+    tick->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    tick->setPosition(Vec2(texture2D->getContentSize().width - PADDING - tick->getContentSize().width/2, texture2D->getContentSize().height - PADDING - tick->getContentSize().height/2));
     tick->retain();
+    tick->setScale(3.0f);
     auto addtick = CallFunc::create([texture2D, tick] {
         texture2D->addChild(tick);
+        tick->runAction(ScaleTo::create(0.5f, 1.0f));
     });
-    texture2D->runAction(Sequence::create(ScaleTo::create(0.5, 0.5f), DelayTime::create(0.5), addtick, nullptr));
+    texture2D->runAction(Sequence::create(ScaleTo::create(0.5, 0.5f), DelayTime::create(0.5f), addtick, nullptr));
+    
+    // add next button
+    if (isSuccess) {
+        auto nextButton = Button::create("next_button.png");
+        nextButton->setScale(0.5f);
+        nextButton->setPosition(Vec2(visibleSize.width - PADDING, PADDING));
+        nextButton->setTag(TAG_GAME::TAG_BUTTON_NEXT);
+        nextButton->setZOrder(ZORDER_GAME::ZORDER_BUTTON_NEXT);
+        this->addChild(nextButton);
+        nextButton->setAnchorPoint(Vec2::ANCHOR_BOTTOM_RIGHT);
+        nextButton->setTouchEnabled(true);
+        nextButton->addTouchEventListener(CC_CALLBACK_2(GameScene::touchButtonEvent, this));
+    }
 }
 

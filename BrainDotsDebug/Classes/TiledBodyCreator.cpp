@@ -302,7 +302,7 @@ void TiledBodyCreator::createDynamicBodies(cocos2d::TMXTiledMap *map, b2World *w
             dynamicBody->SetAngularVelocity(angularVelocity);
             
             // create sprite for polygon, circle, rect
-//            createSpriteBody(map, dynamicBody, fixtureShape, spriteName, fixtureShape->fixture.shape->GetType());
+            createSpriteBody(map, dynamicBody, fixtureShape, spriteName, fixtureShape->fixture.shape->GetType());
             
             // insert to map
             mapBodyList.insert(std::pair<std::string, b2Body*>(objectValue.asValueMap()["name"].asString(), dynamicBody));

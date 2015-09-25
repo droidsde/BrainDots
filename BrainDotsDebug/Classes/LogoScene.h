@@ -23,8 +23,9 @@ public:
     CREATE_FUNC(LogoScene);
     
     virtual bool init();
-    
+
 private:
+    
     void addLogo();
     
     void loadResources();
@@ -40,6 +41,7 @@ private:
     void nextScene();
     
     virtual void onExit() override;
+    
 };
 
 #endif /* defined(__BrainDotsDebug__LogoScene__) */

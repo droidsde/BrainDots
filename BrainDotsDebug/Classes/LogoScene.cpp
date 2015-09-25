@@ -8,6 +8,7 @@
 
 #include "LogoScene.h"
 
+
 Scene* LogoScene::createScene()
 {
     auto scene = Scene::create();
@@ -30,6 +31,7 @@ void LogoScene::addLogo()
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     
+    
     auto logo = Sprite::create("logo.png");
     logo->setPosition(origin.x + visibleSize.width/2 , origin.y + visibleSize.height/2 );
     float scaleX = visibleSize.width / logo->getContentSize().width;
@@ -38,7 +40,7 @@ void LogoScene::addLogo()
     logo->setName("logo");
     logo->setOpacity(0);
     this->addChild(logo);
-    logo->runAction(Sequence::create(FadeIn::create(TIME_TRANSITION_SCENE), CallFunc::create(CC_CALLBACK_0(LogoScene::startSplashScreen, this)), nullptr));
+    logo->runAction(Sequence::create(FadeIn::create(TIME_LOGO_FADE), CallFunc::create(CC_CALLBACK_0(LogoScene::startSplashScreen, this)), nullptr));
 }
 
 void LogoScene::loadResources()
@@ -63,12 +65,16 @@ void LogoScene::loadSounds()
 void LogoScene::startSplashScreen()
 {
     CallFunc* nextScene = CallFunc::create(std::bind(&LogoScene::nextScene, this));
-    this->getChildByName("logo")->runAction(Sequence::create(DelayTime::create(TIME_TRANSITION_SCENE),FadeOut::create(TIME_TRANSITION_SCENE), nextScene, nullptr));
+    this->getChildByName("logo")->runAction(Sequence::create(DelayTime::create(TIME_LOGO_FADE),FadeOut::create(TIME_LOGO_FADE), nextScene, nullptr));
 }
 
 void LogoScene::nextScene()
 {
-    SceneManager::getInstance()->changeState(GAME_STATE::MENU);
+    auto fadeout = FadeOut::create(TIME_LOADING);
+    auto loading = CallFunc::create(CC_CALLBACK_0(SceneManager::loadingScene, SceneManager::getInstance(), this));
+    auto change = CallFunc::create(CC_CALLBACK_0(SceneManager::changeState, SceneManager::getInstance(), GAME_STATE::MENU));
+    
+    this->runAction(Sequence::create(Spawn::create(fadeout, loading, NULL), change, NULL));
 }
 
 void LogoScene::onExit()

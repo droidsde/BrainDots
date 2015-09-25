@@ -104,6 +104,9 @@ bool GameScene::init()
     listener->onTouchEnded = CC_CALLBACK_2(GameScene::onTouchEnded, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
     
+    // set scale
+    this->setScale(0.2);
+    
     return true;
 }
 
@@ -294,6 +297,7 @@ void GameScene::initMapLevel(int level)
         
     } else {
         addChild(map, ZORDER_GAME::ZORDER_MAPLEVEL, 1);
+        map->setColor(Color3B::RED);
         
         // auto create physics objects
         tiledmap = new TiledBodyCreator();
@@ -476,21 +480,15 @@ void GameScene::update(float dt) {
         
     } else {
         if (isSuccess) {
-            ParticleSystemQuad* starParticle = ParticleSystemQuad::create("star_particle.plist");
-            starParticle->setPosition(collisionPoint);
-            starParticle->setAutoRemoveOnFinish(true);
-            starParticle->retain();
-            this->addChild(starParticle);
+//            ParticleSystemQuad* starParticle = ParticleSystemQuad::create("star_particle.plist");
+//            starParticle->setPosition(collisionPoint);
+//            starParticle->setAutoRemoveOnFinish(true);
+//            starParticle->retain();
+//            map->addChild(starParticle);
             
+            this->animationFail(collisionPoint, "explosion_yellow");
             // run animation ring
-            auto ring = Sprite::create("explosion_yellow_ring.png");
-            ring->setScale(100 / ring->getContentSize().width);
-            ring->setPosition(collisionPoint);
-            map->addChild(ring);
-            auto zoomOut = ScaleTo::create(1.4f, 3000/ring->getContentSize().width);
-            auto fadeOut = FadeOut::create(1.5f);
-            auto spawn = Spawn::create(zoomOut, fadeOut, NULL);
-            ring->runAction(Sequence::create(spawn, RemoveSelf::create() , NULL));
+//            this->explosionRing("explosion_yellow_ring.png", collisionPoint);
             
             this->runAction(Sequence::create(DelayTime::create(2.0f), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)),  NULL));
         } else if (isFail) {
@@ -914,17 +912,19 @@ Vec2 GameScene::checkBodyWeighOnSomebody(cocos2d::Vec2 start, cocos2d::Vec2 end)
 }
 
 void GameScene::backMenu() {
-    this->m_bClearBox = true;
-    if (m_bClearBox) {
-        
-        for (b2Body* b = world->GetBodyList(); b; b = b->GetNext()) {
-            world->DestroyBody(b);
-        }
-        this->removeChild(target, true);
-        this->removeAllChildren();
-        m_bClearBox = false;
+    for (b2Body* b = world->GetBodyList(); b; b = b->GetNext()) {
+        world->DestroyBody(b);
     }
-    SceneManager::getInstance()->changeState(GAME_STATE::MENU);
+    this->removeChild(target, true);
+    this->removeAllChildrenWithCleanup(true);
+    
+    auto fadeout = CallFunc::create(CC_CALLBACK_0(Node::setOpacity, this, 0));
+    auto loading = CallFunc::create(CC_CALLBACK_0(SceneManager::loadingScene, SceneManager::getInstance(), this));
+    auto change = CallFunc::create(CC_CALLBACK_0(SceneManager::changeState, SceneManager::getInstance(), GAME_STATE::MENU));
+    
+    this->runAction(Sequence::create(Spawn::create(DelayTime::create(TIME_LOADING), fadeout, loading, NULL), change, NULL));
+    
+//    SceneManager::getInstance()->changeState(GAME_STATE::MENU);
 }
 
 void GameScene::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEventType type)
@@ -944,6 +944,10 @@ void GameScene::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEventType ty
                 break;
             case TAG_GAME::TAG_BUTTON_NEXT:
                 SceneManager::getInstance()->setLevelGame(SceneManager::getInstance()->getLevelGame()+1);
+                // open game level
+                SceneManager::getInstance()->saveLevel(SceneManager::getInstance()->getLevelGame());
+                
+                // check level
                 SceneManager::getInstance()->changeState(GAME_STATE::GAME);
                 break;
         }
@@ -998,8 +1002,6 @@ void GameScene::animationFail(cocos2d::Vec2 point, std::string explosionName)
         int rand_add_space = rand()%100;
         float rand_delay = (float)(rand()%10)/100;
         
-//        CCLOG("angle=%d add_radius=%f opacity=%d add_space=%d delay=%f", rand_angle, rand_scale, rand_opacity, rand_add_space, rand_delay);
-        
         float rad = CC_DEGREES_TO_RADIANS((i/(float)NUM_EXPLOSION_CIRCLE) * 360 + rand_angle);
         auto explosionSprite = Sprite::create(explosionName + ".png");
         explosionSprite->setScale(rand_scale);
@@ -1017,7 +1019,12 @@ void GameScene::animationFail(cocos2d::Vec2 point, std::string explosionName)
         explosionSprite->runAction(sequence);
     }
     
-    auto ring = Sprite::create(explosionName + "_ring.png");
+    this->explosionRing(explosionName + "_ring.png", point);
+}
+
+void GameScene::explosionRing(std::string name, Vec2 point)
+{
+    auto ring = Sprite::create(name);
     ring->setScale(100 / ring->getContentSize().width);
     ring->setPosition(point);
     map->addChild(ring);
@@ -1084,3 +1091,7 @@ void GameScene::endGame()
     }
 }
 
+void GameScene::onEnterTransitionDidFinish()
+{
+    this->runAction(ScaleTo::create(0.5, 1.0f));
+}

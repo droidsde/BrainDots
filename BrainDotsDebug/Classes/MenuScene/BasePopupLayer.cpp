@@ -38,14 +38,14 @@ bool BasePopupLayer::init()
     layoutTable = Layout::create();
     layoutTable->setBackGroundColorType(cocos2d::ui::Layout::BackGroundColorType::SOLID);
     layoutTable->setBackGroundColor(Color3B::WHITE);
-    layoutTable->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
-    layoutTable->setContentSize(Size(1066, 600));
+    layoutTable->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
+    layoutTable->setContentSize(Size(visibleSize.width*4/5, visibleSize.height*4/5));
     addChild(layoutTable);
     
     // set position
-    posOrigin = Vec2(visibleSize.width/2 - layoutTable->getContentSize().width/2, visibleSize.height + PADDING);
-    posNew = Vec2(visibleSize.width/2 - layoutTable->getContentSize().width/2, visibleSize.height/2 + layoutTable->getContentSize().height/2);
-    layoutTable->setRotation(-60);
+    posOrigin = Vec2(visibleSize.width/2 - layoutTable->getContentSize().width/2 + PADDING_MENU_HEADER_ITEM, visibleSize.height + PADDING);
+    posNew = Vec2(visibleSize.width/2 - layoutTable->getContentSize().width/2, visibleSize.height/2 - layoutTable->getContentSize().height/2);
+    layoutTable->setRotation(-10);
     layoutTable->setPosition(posOrigin);
     
     // button exit
@@ -74,13 +74,13 @@ void BasePopupLayer::onEnter()
     LayerColor::onEnter();
     auto rotate = RotateTo::create(0.3, 0);
     auto move = MoveTo::create(0.3, posNew);
-    auto spawn = Spawn::create(rotate, move, NULL);
+    auto spawn = Spawn::create(move, rotate, NULL);
     layoutTable->runAction(spawn);
 }
 
 void BasePopupLayer::closeLayer()
 {
-    auto rotate = RotateTo::create(0.3, -60);
+    auto rotate = RotateTo::create(0.3, -10);
     auto move = MoveTo::create(0.3, posOrigin);
     auto spawn = Spawn::create(rotate, move, NULL);
     auto exit = CallFunc::create([=] {

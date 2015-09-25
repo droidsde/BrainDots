@@ -18,6 +18,11 @@
 #include "SoundManager/SoundManager.h"
 #include "ExecuteShapePhysic.h"
 
+// lib gif
+#include "Gif/GIFMovie.h"
+#include "Gif/CacheGif.h"
+#include "Gif/InstantGif.h"
+
 USING_NS_CC;
 
 class SceneManager
@@ -34,6 +39,8 @@ public:
     CC_SYNTHESIZE(int, gameLevel, LevelGame);
     
     void changeState(GAME_STATE = GAME_STATE::LOGO);
+    void loadingScene(Layer*);
+    void saveLevel(int level);
     
 private:
   

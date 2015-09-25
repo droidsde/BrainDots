@@ -111,6 +111,7 @@ public:
     
     // function test
     void explosionBall(b2Body* ball);
+    void explosionRing(std::string name, Vec2 point);
     void revoluteJoint();
     void weldJoint();
     void conveyorBelts();
@@ -166,6 +167,9 @@ private:
     Sprite *brush;
     
     std::vector<ConveyorBelt> listConveyorBelt;
+    
+    // on enter, onexit
+    void onEnterTransitionDidFinish();
 };
 
 #endif // __HELLOWORLD_SCENE_H__

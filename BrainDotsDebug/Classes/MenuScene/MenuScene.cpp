@@ -253,7 +253,15 @@ void MenuScene::touchButtonEvent(Ref* sender, Widget::TouchEventType type) {
                 CCLOG("level %d", i);
                 // open game level
                 SceneManager::getInstance()->setLevelGame(i-TAG_MENU::TAG_LEVEL_CHOOSE);
-                SceneManager::getInstance()->changeState(GAME_STATE::GAME);
+                SceneManager::getInstance()->saveLevel(i-TAG_MENU::TAG_LEVEL_CHOOSE);
+                
+                auto fadeout = CallFunc::create(CC_CALLBACK_0(Node::setOpacity, this, 0));
+                auto remove = CallFunc::create(CC_CALLBACK_0(Node::removeAllChildrenWithCleanup, this, true));
+                auto loading = CallFunc::create(CC_CALLBACK_0(SceneManager::loadingScene, SceneManager::getInstance(), this));
+                auto change = CallFunc::create(CC_CALLBACK_0(SceneManager::changeState, SceneManager::getInstance(), GAME_STATE::GAME));
+                
+                this->runAction(Sequence::create(Spawn::create(DelayTime::create(TIME_LOADING), remove, fadeout, loading, NULL), change, NULL));
+//                SceneManager::getInstance()->changeState(GAME_STATE::GAME);
             }
         }
         

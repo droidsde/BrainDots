@@ -12,7 +12,7 @@ SceneManager* SceneManager::_sceneManager = nullptr;
 
 SceneManager::SceneManager()
 {
-    gameLevel = 0;
+    gameLevel = UserDefault::getInstance()->getIntegerForKey("level", 0);
 }
 
 SceneManager::~SceneManager()
@@ -73,10 +73,36 @@ void SceneManager::nextScene(cocos2d::Scene * scene)
     Director::getInstance()->replaceScene(transition);
 }
 
+void SceneManager::loadingScene(Layer* scene)
+{
+    auto visibleSize = Director::getInstance()->getVisibleSize();
+    std::string name = "loading4.gif";
+    name = FileUtils::getInstance()->fullPathForFilename(name.c_str());
+    GifBase *gif = InstantGif::create(name.c_str());//InstantGif ：While playing, while parsing
+    if(gif == NULL)
+    {
+        CCLOG("%s","create gif failed");
+        return ;
+    }
+    gif->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    gif->setPosition(visibleSize.width/2 , visibleSize.height/2);
+    //    gif->setScale(visibleSize.width/ gif->getContentSize().width, visibleSize.height/gif->getContentSize().height);
+    scene->addChild(gif);
+}
+
+void SceneManager::saveLevel(int level)
+{
+    int oldLevel = UserDefault::getInstance()->getIntegerForKey("level", 0);
+    if (level > oldLevel) {
+        UserDefault::getInstance()->setIntegerForKey("level", level);
+    }
+}
+
 void SceneManager::moveLogoScene()
 {
     auto scene = LogoScene::createScene();
-    this->nextScene(scene);
+    this->setCurScene(scene);
+    Director::getInstance()->replaceScene(scene);
 }
 
 void SceneManager::moveSplashScreen()

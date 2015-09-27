@@ -8,6 +8,12 @@
 
 #include "SceneManager.h"
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#define FILE_FORMAT ("/mnt/sdcard/loading4.gif") //On the Android platform, the resources are compressed in the asset directory. Therefore, the resources must be files on the sd card
+#else
+#define FILE_FORMAT ("loading4.gif")
+#endif
+
 SceneManager* SceneManager::_sceneManager = nullptr;
 
 SceneManager::SceneManager()
@@ -76,8 +82,9 @@ void SceneManager::nextScene(cocos2d::Scene * scene)
 void SceneManager::loadingScene(Layer* scene)
 {
     auto visibleSize = Director::getInstance()->getVisibleSize();
-    std::string name = "loading4.gif";
+    std::string name = FILE_FORMAT;
     name = FileUtils::getInstance()->fullPathForFilename(name.c_str());
+
     GifBase *gif = InstantGif::create(name.c_str());//InstantGif ：While playing, while parsing
     if(gif == NULL)
     {

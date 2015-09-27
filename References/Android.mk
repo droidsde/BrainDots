@@ -13,14 +13,28 @@ LOCAL_MODULE_FILENAME := libcocos2dcpp
 
 LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/AppDelegate.cpp \
+                   ../../Classes/Gif/Bitmap.cpp \
+                   ../../Classes/Gif/CacheGif.cpp \
+                   ../../Classes/Gif/GifBase.cpp \
+                   ../../Classes/Gif/GifMovie.cpp \
+                   ../../Classes/Gif/Movie.cpp \
+                   ../../Classes/Gif/InstantGif.cpp \
+                   ../../Classes/Gif/gif_lib/dgif_lib.c \
+                   ../../Classes/Gif/gif_lib/gif_err.c \
+                   ../../Classes/Gif/gif_lib/gif_font.c \
+                   ../../Classes/Gif/gif_lib/gif_hash.c \
+                   ../../Classes/Gif/gif_lib/gifalloc.c \
+                   ../../Classes/Gif/gif_lib/quantize.c \
                    ../../Classes/SoundManager/SoundManager.cpp \
                    ../../Classes/MenuScene/BasePopupLayer.cpp \
+                   ../../Classes/MenuScene/BaseCoverFlow.cpp \
                    ../../Classes/MenuScene/MenuPopupLayer.cpp \
                    ../../Classes/MenuScene/PencilPopupLayer.cpp \
                    ../../Classes/MenuScene/RecordPopupLayer.cpp \
                    ../../Classes/MenuScene/SharePopupLayer.cpp \
                    ../../Classes/MenuScene/MenuScene.cpp \
                    ../../Classes/BallContactListener.cpp \
+                   ../../Classes/ExecuteShapePhysic.cpp \
                    ../../Classes/GLESDebugDraw.cpp \
                    ../../Classes/TiledBodyCreator.cpp \
                    ../../Classes/GameScene.cpp \

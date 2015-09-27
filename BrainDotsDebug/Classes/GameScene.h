@@ -106,6 +106,7 @@ public:
     std::vector<Vec2> getListPointsIn2Point(Vec2 start, Vec2 end);
     void backMenu();
     void touchButtonEvent(Ref* sender, Widget::TouchEventType type);
+    void animationSuccess(Vec2 collisionPoint);
     void animationFail(Vec2 collisionPoint, std::string explosionName);
     void endGame();
     

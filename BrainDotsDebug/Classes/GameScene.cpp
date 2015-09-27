@@ -486,11 +486,11 @@ void GameScene::update(float dt) {
 //            starParticle->retain();
 //            map->addChild(starParticle);
             
-            this->animationFail(collisionPoint, "explosion_yellow");
+            this->animationSuccess(collisionPoint);
             // run animation ring
 //            this->explosionRing("explosion_yellow_ring.png", collisionPoint);
             
-            this->runAction(Sequence::create(DelayTime::create(2.0f), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)),  NULL));
+            this->runAction(Sequence::create(DelayTime::create(2.5f), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)),  NULL));
         } else if (isFail) {
             if (collisionFailA != Vec2::ZERO && collisionFailB == Vec2::ZERO) {
                 this->runAction(Sequence::create(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailA, "explosion_red")), DelayTime::create(2), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)), NULL));
@@ -990,6 +990,40 @@ void GameScene::explosionBall(b2Body *ball)
             
         }
     }
+}
+
+void GameScene::animationSuccess(Vec2 point)
+{
+	srand((int)time(0));
+
+	for (int i = 0; i < NUM_EXPLOSION_CIRCLE; ++i) {
+		int rand_angle = rand() % 20;
+		float rand_scale = (float)(rand()%10)/10;
+		int rand_add_space = rand()%100;
+		float rand_delay = (float)(rand()%10)/100;
+
+		float rad = CC_DEGREES_TO_RADIANS((i/(float)NUM_EXPLOSION_CIRCLE) * 360 + rand_angle);
+		auto starSprite = Sprite::create("explosion_yellow.png");
+		starSprite->setScale(0);
+		starSprite->setPosition(point);
+
+		// animation
+		Vec2 dest = Vec2(point.x + BASE_EXPLOSION_SPACE * sinf(rad) + rand_add_space, point.y + BASE_EXPLOSION_SPACE * cosf(rad) + rand_add_space);
+		auto move = MoveTo::create(1.0f, dest);
+		auto zoomOut = ScaleTo::create(1.0f, rand_scale);
+		auto rotate = RotateBy::create(1.3, rand() % 180);
+		auto spawn1 = Spawn::create(move, zoomOut, rotate, NULL);
+		auto delay = DelayTime::create(0.3 + rand_delay);
+		auto fadeout = FadeOut::create(0.3f);
+		auto zoomIn = ScaleTo::create(0.3, 0);
+		auto spawn2 = Spawn::create( fadeout, zoomIn, NULL);
+
+		auto sequence = Sequence::create(spawn1, delay, spawn2, RemoveSelf::create(), NULL);
+		map->addChild(starSprite);
+		starSprite->runAction(sequence);
+	}
+
+	this->explosionRing("explosion_yellow_ring.png", point);
 }
 
 void GameScene::animationFail(cocos2d::Vec2 point, std::string explosionName)

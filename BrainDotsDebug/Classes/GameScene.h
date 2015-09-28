@@ -171,6 +171,9 @@ private:
     
     // on enter, onexit
     void onEnterTransitionDidFinish();
+    void capturingScreen(std::string filename);
+    void afterCaptured(bool succeed, const std::string& outputFile);
+    void endGameComponent();
 };
 
 #endif // __HELLOWORLD_SCENE_H__

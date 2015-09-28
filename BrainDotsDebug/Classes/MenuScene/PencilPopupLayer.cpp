@@ -35,7 +35,7 @@ bool PencilPopupLayer::init()
     sizeLayout = layoutTable->getContentSize();
     
     // title
-    auto title = Text::create("Choose pencil", "arial.ttf", 80);
+    auto title = Text::create("Choose pencil", "arial.ttf", 60);
     title->setPosition(Vec2(sizeLayout.width/2, sizeLayout.height - PADDING));
     title->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
     title->setColor(Color3B::RED);

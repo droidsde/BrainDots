@@ -31,7 +31,7 @@ bool RecordPopupLayer::init()
     BasePopupLayer::init();
     
     // title
-    auto title = Text::create("Recording clip", "arial.ttf", 80);
+    auto title = Text::create("Recording clip", "arial.ttf", 60);
     title->setPosition(Vec2(layoutTable->getContentSize().width/2, layoutTable->getContentSize().height - PADDING));
     title->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
     title->setColor(Color3B::RED);

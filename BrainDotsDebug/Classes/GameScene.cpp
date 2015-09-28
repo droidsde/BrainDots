@@ -297,7 +297,6 @@ void GameScene::initMapLevel(int level)
         
     } else {
         addChild(map, ZORDER_GAME::ZORDER_MAPLEVEL, 1);
-        map->setColor(Color3B::RED);
         
         // auto create physics objects
         tiledmap = new TiledBodyCreator();
@@ -1019,7 +1018,7 @@ void GameScene::animationSuccess(Vec2 point)
 		auto spawn2 = Spawn::create( fadeout, zoomIn, NULL);
 
 		auto sequence = Sequence::create(spawn1, delay, spawn2, RemoveSelf::create(), NULL);
-		map->addChild(starSprite);
+		this->addChild(starSprite);
 		starSprite->runAction(sequence);
 	}
 
@@ -1049,7 +1048,7 @@ void GameScene::animationFail(cocos2d::Vec2 point, std::string explosionName)
         auto move = MoveTo::create(0.7f, dest);
         auto delay = DelayTime::create(0.2 + rand_delay);
         auto sequence = Sequence::create(delay, move, delay, spawn, RemoveSelf::create(), NULL);
-        map->addChild(explosionSprite);
+        this->addChild(explosionSprite);
         explosionSprite->runAction(sequence);
     }
     
@@ -1061,7 +1060,7 @@ void GameScene::explosionRing(std::string name, Vec2 point)
     auto ring = Sprite::create(name);
     ring->setScale(100 / ring->getContentSize().width);
     ring->setPosition(point);
-    map->addChild(ring);
+    this->addChild(ring);
     auto zoomOut = ScaleTo::create(1.0f, 3000/ring->getContentSize().width);
     auto fadeOut = FadeOut::create(1.0f);
     auto spawn = Spawn::create(zoomOut, fadeOut, NULL);
@@ -1087,10 +1086,16 @@ void GameScene::endGame()
     auto _texture2D = Director::getInstance()->getTextureCache()->addImage(_image, _key);
     CC_SAFE_DELETE(_image);
     auto texture2D = Sprite::createWithTexture(_texture2D);
-    texture2D->setPosition(visibleSize/2);
-    texture2D->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    addChild(texture2D);
     removeChild(captureScreen, true);
+    
+    // create paper sprite
+    PaperSprite* paperSprite = PaperSprite::create("paper3.png", true);
+    paperSprite->setPosition(visibleSize/2);
+    paperSprite->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    addChild(paperSprite);
+    texture2D->setPosition(paperSprite->getContentSize()/2);
+    texture2D->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    paperSprite->addChild(texture2D);
     
     // create tick
     std::string tickName;
@@ -1102,11 +1107,11 @@ void GameScene::endGame()
     
     auto tick = Sprite::create(tickName);
     tick->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    tick->setPosition(Vec2(texture2D->getContentSize().width - PADDING - tick->getContentSize().width/2, texture2D->getContentSize().height - PADDING - tick->getContentSize().height/2));
+    tick->setPosition(Vec2(paperSprite->getContentSize().width - tick->getContentSize().width, paperSprite->getContentSize().height - tick->getContentSize().height));
     tick->retain();
     tick->setScale(3.0f);
-    auto addtick = CallFunc::create([texture2D, tick] {
-        texture2D->addChild(tick);
+    auto addtick = CallFunc::create([paperSprite, tick] {
+        paperSprite->addChild(tick);
         tick->runAction(ScaleTo::create(0.5f, 1.0f));
     });
     texture2D->runAction(Sequence::create(ScaleTo::create(0.5, 0.5f), DelayTime::create(0.5f), addtick, nullptr));

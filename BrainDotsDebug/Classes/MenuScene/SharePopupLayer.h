@@ -11,6 +11,7 @@
 
 #include <cocos2d.h>
 #include "BasePopupLayer.h"
+#include "SceneManager.h"
 
 USING_NS_CC;
 using namespace cocos2d::ui;
@@ -24,5 +25,15 @@ public:
     static SharePopupLayer* create();
     virtual bool init();
     
+    void touchButtonEvent(Ref* sender, Widget::TouchEventType type);
+    
+private:
+    Button* twitterShare;
+    Button* facebookShare;
+    Button* lineShare;
+    Button* ggplusShare;
+    Button* moreShare;
+    
+    Sprite* imageShare;
 };
 #endif /* defined(__BrainDotsDebug__SharePopupLayer__) */

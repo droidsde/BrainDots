@@ -12,7 +12,7 @@
 #include <cocos2d.h>
 #include "SceneManager.h"
 #include "ui/CocosGUI.h"
-#include "SoundManager/ManageSoundDelegate.h"
+#include "ManageSoundDelegate.h"
 #include "PencilPopupLayer.h"
 #include "RecordPopupLayer.h"
 #include "SharePopupLayer.h"
@@ -60,6 +60,9 @@ private:
     void startGame();
 
     void reloadData();
+    
+    void capturingScreen(std::string filename);
+    void afterCaptured(bool succeed, const std::string& outputFile);
 
     void touchButtonEvent(Ref* sender, Widget::TouchEventType type);
     

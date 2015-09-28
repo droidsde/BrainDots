@@ -143,3 +143,11 @@ void SceneManager::moveHighScore()
 {
     
 }
+
+bool SceneManager::checkFileExist(std::string filename)
+{
+    if (FileUtils::getInstance()->isFileExist(filename)) {
+        return true;
+    }
+    else return false;
+}

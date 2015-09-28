@@ -730,23 +730,6 @@
    <tile gid="0"/>
   </data>
  </layer>
- <objectgroup name="braindots">
-  <object id="2" name="ballA" type="ball" x="434.667" y="324">
-   <properties>
-    <property name="autocreate" value="false"/>
-   </properties>
-  </object>
-  <object id="3" name="ballB" type="ball" x="925.333" y="325.333">
-   <properties>
-    <property name="autocreate" value="false"/>
-   </properties>
-  </object>
-  <object id="4" name="ground" type="object" x="0" y="686.667" width="1368" height="72">
-   <properties>
-    <property name="autocreate" value="true"/>
-   </properties>
-  </object>
- </objectgroup>
  <layer name="barrage" width="36" height="20">
   <data>
    <tile gid="0"/>
@@ -1471,4 +1454,21 @@
    <tile gid="1"/>
   </data>
  </layer>
+ <objectgroup name="braindots">
+  <object id="2" name="ballA" type="ball" x="434.667" y="324">
+   <properties>
+    <property name="autocreate" value="false"/>
+   </properties>
+  </object>
+  <object id="3" name="ballB" type="ball" x="925.333" y="325.333">
+   <properties>
+    <property name="autocreate" value="false"/>
+   </properties>
+  </object>
+  <object id="4" name="ground" type="object" x="0" y="686.667" width="1368" height="72">
+   <properties>
+    <property name="autocreate" value="true"/>
+   </properties>
+  </object>
+ </objectgroup>
 </map>

@@ -32,6 +32,9 @@ public:
     void onTouchEnded(Touch* touch, Event* event);
     void onTouchCancelled(Touch* touch, Event* event);
 
+    // add button method
+    Button* createButton(std::string fileName, int tag, Vec2 anchorPoint);
+    
     Vec2 origin;
     Size visibleSize;
     Layout* layoutTable;

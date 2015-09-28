@@ -18,12 +18,12 @@ BasePopupLayer* BasePopupLayer::create()
 
 BasePopupLayer::BasePopupLayer()
 {
-    
+    layoutTable = nullptr;
 }
 
 BasePopupLayer::~BasePopupLayer()
 {
-    
+
 }
 
 bool BasePopupLayer::init()
@@ -89,7 +89,16 @@ void BasePopupLayer::closeLayer()
     auto set = CallFunc::create(CC_CALLBACK_0(BasePopupLayer::setVisible, this, false));
     auto remove = CallFunc::create(CC_CALLBACK_0(BasePopupLayer::removeFromParent, this));
     
-    this->runAction(Sequence::create(exit, DelayTime::create(0.3f), set, remove, NULL));
+    this->runAction(Sequence::create(exit, DelayTime::create(0.3f), set, remove, RemoveSelf::create(), NULL));
+}
+
+cocos2d::ui::Button* BasePopupLayer::createButton(std::string fileName, int tag, Vec2 anchorPoint)
+{
+    auto button = Button::create(fileName);
+    button->setTag(tag);
+    button->setTouchEnabled(true);
+    button->setAnchorPoint(anchorPoint);
+    return button;
 }
 
 bool BasePopupLayer::onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *event)

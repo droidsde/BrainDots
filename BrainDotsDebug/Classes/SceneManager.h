@@ -18,6 +18,7 @@
 #include "SoundManager/SoundManager.h"
 #include "ExecuteShapePhysic.h"
 
+#include "PaperSprite.h"
 // lib gif
 #include "Gif/GIFMovie.h"
 #include "Gif/CacheGif.h"
@@ -42,6 +43,7 @@ public:
     void loadingScene(Layer*);
     void saveLevel(int level);
     
+    bool checkFileExist(std::string filename);
 private:
   
     static SceneManager* _sceneManager;

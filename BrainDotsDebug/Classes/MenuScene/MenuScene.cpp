@@ -25,7 +25,7 @@ bool MenuScene::init() {
 	visibleSize = Director::getInstance()->getVisibleSize();
     
     // prepare
-    auto sprite = Sprite::create("sticker.png");
+    auto sprite = Sprite::create("paper2.png");
     sprite->retain();
     auto ministicker = Sprite::create("mini_sticker.png");
     ministicker->retain();
@@ -146,7 +146,7 @@ void MenuScene::reloadData() {
 	for (int i = 0; i < LEVEL_MAX; ++i) {
         // layout include sticker and text
 		Layout* layout = Layout::create();
-        Button* stage = Button::create("sticker.png");
+        Button* stage = Button::create("paper2.png");
         
         if (i == 0 || i == LEVEL_MAX-1) {
             layout->setContentSize(Size(stickerSize.width/2+visibleSize.width/2, bodySize.height));
@@ -169,13 +169,14 @@ void MenuScene::reloadData() {
 		stage->setTitleFontSize(100);
 		stage->setTitleFontName("arial.ttf");
 		stage->setTouchEnabled(true);
+        stage->setZoomScale(0);
 		stage->setTag(i);
 		stage->addTouchEventListener(
 				CC_CALLBACK_2(MenuScene::touchButtonEvent, this));
 		// add tick icon in stage image
-		ImageView* tick = ImageView::create("tick.png");
+		ImageView* tick = ImageView::create("mini_tick.png");
 		tick->setAnchorPoint(Vec2::ANCHOR_TOP_RIGHT);
-		tick->setPosition(stickerSize);
+        tick->setPosition(Vec2(stickerSize.width - tick->getContentSize().width, stickerSize.height - tick->getContentSize().height));
         stage->addChild(tick, ZORDER_MENU::BODY_STICKER_TICK);
         layout->addChild(stage, ZORDER_MENU::BODY_STICKER);
         
@@ -230,7 +231,8 @@ void MenuScene::addPageView()
                 // add tick icon in stage image
                 ImageView* tick = ImageView::create("mini_tick.png");
                 tick->setAnchorPoint(Vec2::ANCHOR_TOP_RIGHT);
-                tick->setPosition(level->getContentSize());
+                tick->setPosition(Vec2(level->getContentSize().width-PADDING, level->getContentSize().height-PADDING));
+                tick->setScale(0.5);
                 level->addChild(tick, ZORDER_MENU::BODY_STICKER_TICK);
                 
                 layout->addChild(level);
@@ -242,6 +244,27 @@ void MenuScene::addPageView()
     pageview->addEventListener(CC_CALLBACK_2(MenuScene::pageViewEvent, this));
     addChild(pageview);
     pageview->setVisible(false);
+}
+
+
+void MenuScene::capturingScreen(std::string filename)
+{
+    utils::captureScreen(CC_CALLBACK_2(MenuScene::afterCaptured, this), filename);
+}
+
+void MenuScene::afterCaptured(bool succeed, const std::string &outputFile)
+{
+    if (succeed) {
+        // show screenshot
+        CCLOG("Capture screen successed");
+    }
+    else
+    {
+        CCLOG("Capture screen failed");
+    }
+    
+    auto baseLayer = SharePopupLayer::create();
+    this->addChild(baseLayer);
 }
 
 void MenuScene::touchButtonEvent(Ref* sender, Widget::TouchEventType type) {
@@ -285,8 +308,24 @@ void MenuScene::touchButtonEvent(Ref* sender, Widget::TouchEventType type) {
             }
             case TAG_MENU::TAG_BUTTON_SHARE :
             {
-                auto baseLayer = SharePopupLayer::create();
-                this->addChild(baseLayer);
+                std::string fileRemove = "capture_menu.png";
+                // remove cache image
+                Director::getInstance()->getTextureCache()->removeTextureForKey("capture_menu.png");
+                // remove file screen shoot
+                if(FileUtils::getInstance()->removeFile(FileUtils::getInstance()->getWritablePath() + fileRemove))
+                {
+                    CCLOG("fileRemove %s removed", fileRemove.c_str());
+                }
+                else {
+                    CCLOG("fileRemove %s not exist or error when removing", fileRemove.c_str());
+                }
+                // only capture when show pageview
+                if (pageview->isVisible()) {
+                    this->capturingScreen(fileRemove);
+                } else {
+                    auto baseLayer = SharePopupLayer::create();
+                    this->addChild(baseLayer);
+                }
                 break;
             }
             case TAG_MENU::TAG_BUTTON_MENU :

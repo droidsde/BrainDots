@@ -28,7 +28,7 @@
 #define LEVEL_MAX						10
 #define ITEMS_IN_PAGE                   6
 #define PADDING                         10
-#define LIST_ITEM_MARGIN                50
+#define LIST_ITEM_MARGIN                100
 #define SCROLL_THRESHOLD                50
 #define DELTA_TRANSLATE                 20
 #define PADDING_MENU_HEADER_ITEM        40
@@ -109,7 +109,16 @@ enum TAG_MENU
     TAG_BUTTON_SHARE,
     TAG_BUTTON_MENU,
 };
-
+    
+enum TAG_POPUP_SHARE
+    {
+        TAG_TWITTER = 0,
+        TAG_FACEBOOK,
+        TAG_LINE,
+        TAG_GGPLUS,
+        TAG_MORESHARE,
+    };
+    
 enum TAG_GAME
 {
     TAG_BUTTON_BACK = 10,

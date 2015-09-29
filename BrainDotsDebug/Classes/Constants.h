@@ -26,6 +26,7 @@
 #define PAUSE_GAME                      "pauseGame"
 
 #define LEVEL_MAX						10
+#define LEVEL_DEFAULT_UNLOCKED          1
 #define ITEMS_IN_PAGE                   6
 #define PADDING                         10
 #define LIST_ITEM_MARGIN                100
@@ -126,14 +127,20 @@ enum TAG_GAME
     TAG_BUTTON_NEXT,
     TAG_BALLA,
     TAG_BALLB,
+    TAG_PAPER_MINI,
 };
 
 enum ZORDER_GAME
 {
-	ZORDER_MAPLEVEL = 0,
+    ZORDER_GRID = 0,
+    ZORDER_MAPLEVEL,
+    ZORDER_DRAW_RENDER,
+    ZORDER_ANIMATION,
 	ZORDER_BUTTON_BACK = 10,
 	ZORDER_BUTTON_REPLAY = 11,
     ZORDER_BUTTON_NEXT,
+    ZORDER_CAPTURE_SCREEN_BIG,
+    ZORDER_CAPTURE_SCREEN_SMALL,
 };
 
 struct UserData

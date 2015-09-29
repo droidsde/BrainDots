@@ -53,6 +53,9 @@ bool GameScene::init()
     visibleSize = Director::getInstance()->getVisibleSize();
     origin = Director::getInstance()->getVisibleOrigin();
     
+    // draw grid
+    this->drawGrids();
+    
     // button back
     auto backButton = Button::create("back.png");
     backButton->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
@@ -89,7 +92,7 @@ bool GameScene::init()
                                    Texture2D::PixelFormat::RGBA8888);
     target->retain();
     target->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
-    this->addChild(target);
+    this->addChild(target, ZORDER_GAME::ZORDER_DRAW_RENDER);
     
     // brush
     brush = Sprite::create("brush.png");
@@ -243,21 +246,42 @@ void GameScene::conveyorBelts()
     }
 }
 
-void GameScene::draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformUpdated) {
-    Layer::draw(renderer, transform, transformUpdated);
-    Director* director = Director::getInstance();
+void GameScene::drawGrids()
+{
+    DrawNode* draw = DrawNode::create();
+    this->addChild(draw, ZORDER_GRID);
     
-    CCASSERT(nullptr != director, "Director is null when seting matrix stack");
-    director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-    director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, transform);
-    GL::enableVertexAttribs(cocos2d::GL::VERTEX_ATTRIB_FLAG_POSITION);
-    if (this->isScheduled(schedule_selector(GameScene::update))) {
-        this->update(0.0f);
+    float lineSize = 0.5;
+    Color4F color = Color4F(0/255, 205/255, 1, 0.2);
+    
+    // draw col
+    for (int x = 0; x < visibleSize.width; x++) {
+        float xPoint = x * TILE_SIZE;
+        draw->drawSegment(Vec2(xPoint, 0), Vec2(xPoint, visibleSize.height), lineSize, color);
     }
-    world->DrawDebugData();
-    CHECK_GL_ERROR_DEBUG();
-    director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+    
+    // draw row
+    for (int y = 0;  y < visibleSize.height; y++) {
+        float yPoint = y * TILE_SIZE;
+        draw->drawSegment(Vec2(0, yPoint), Vec2(visibleSize.width, yPoint), lineSize, color);
+    }
 }
+
+//void GameScene::draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformUpdated) {
+//    Layer::draw(renderer, transform, transformUpdated);
+//    Director* director = Director::getInstance();
+//    
+//    CCASSERT(nullptr != director, "Director is null when seting matrix stack");
+//    director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+//    director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, transform);
+//    GL::enableVertexAttribs(cocos2d::GL::VERTEX_ATTRIB_FLAG_POSITION);
+//    if (this->isScheduled(schedule_selector(GameScene::update))) {
+//        this->update(0.0f);
+//    }
+//    world->DrawDebugData();
+//    CHECK_GL_ERROR_DEBUG();
+//    director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+//}
 
 void GameScene::initPhysics()
 {
@@ -765,6 +789,8 @@ void GameScene::onTouchEnded(Touch* touch, Event* event) {
         texture2D->setAnchorPoint(anchorPoint);
         map->addChild(texture2D);
         newBody->SetUserData(texture2D);
+        
+        Director::getInstance()->getTextureCache()->removeTextureForKey(_key);
     }
     removeChild(target, true);
     //	target->release();
@@ -772,7 +798,7 @@ void GameScene::onTouchEnded(Touch* touch, Event* event) {
                                    Texture2D::PixelFormat::RGBA8888);
     target->retain();
     target->setPosition(visibleSize.width / 2, visibleSize.height / 2);
-    addChild(target);
+    addChild(target, ZORDER_GAME::ZORDER_DRAW_RENDER);
 }
 
 Vec2 GameScene::checkDrawingWithOtherBodies(cocos2d::Vec2 start, cocos2d::Vec2 end)
@@ -943,8 +969,6 @@ void GameScene::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEventType ty
                 break;
             case TAG_GAME::TAG_BUTTON_NEXT:
                 SceneManager::getInstance()->setLevelGame(SceneManager::getInstance()->getLevelGame()+1);
-                // open game level
-                SceneManager::getInstance()->saveLevel(SceneManager::getInstance()->getLevelGame());
                 
                 // check level
                 SceneManager::getInstance()->changeState(GAME_STATE::GAME);
@@ -1018,7 +1042,7 @@ void GameScene::animationSuccess(Vec2 point)
 		auto spawn2 = Spawn::create( fadeout, zoomIn, NULL);
 
 		auto sequence = Sequence::create(spawn1, delay, spawn2, RemoveSelf::create(), NULL);
-		this->addChild(starSprite);
+        this->addChild(starSprite, ZORDER_GAME::ZORDER_ANIMATION);
 		starSprite->runAction(sequence);
 	}
 
@@ -1048,7 +1072,7 @@ void GameScene::animationFail(cocos2d::Vec2 point, std::string explosionName)
         auto move = MoveTo::create(0.7f, dest);
         auto delay = DelayTime::create(0.2 + rand_delay);
         auto sequence = Sequence::create(delay, move, delay, spawn, RemoveSelf::create(), NULL);
-        this->addChild(explosionSprite);
+        this->addChild(explosionSprite, ZORDER_GAME::ZORDER_ANIMATION);
         explosionSprite->runAction(sequence);
     }
     
@@ -1060,42 +1084,71 @@ void GameScene::explosionRing(std::string name, Vec2 point)
     auto ring = Sprite::create(name);
     ring->setScale(100 / ring->getContentSize().width);
     ring->setPosition(point);
-    this->addChild(ring);
-    auto zoomOut = ScaleTo::create(1.0f, 3000/ring->getContentSize().width);
-    auto fadeOut = FadeOut::create(1.0f);
+    this->addChild(ring, ZORDER_GAME::ZORDER_ANIMATION);
+    auto zoomOut = ScaleTo::create(1.4f, 3000/ring->getContentSize().width);
+    auto fadeOut = FadeOut::create(1.4f);
     auto spawn = Spawn::create(zoomOut, fadeOut, NULL);
     ring->runAction(Sequence::create(spawn, RemoveSelf::create() , NULL));
 }
 
-void GameScene::endGame()
+void GameScene::showShareLayer()
 {
-    // init rendertexture capture screen
-    captureScreen = RenderTexture::create(visibleSize.width, visibleSize.height, Texture2D::PixelFormat::RGBA8888);
-    captureScreen->retain();
-    captureScreen->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
-    this->addChild(captureScreen);
+    auto baseLayer = SharePopupLayer::create();
+    this->addChild(baseLayer);
+}
 
-    // capture screen
-    captureScreen->begin();
-    Director::getInstance()->getRunningScene()->visit();
-    captureScreen->end();
-    
-    Director::getInstance()->getRenderer()->render();
-    auto _image = captureScreen->newImage();
-    auto _key = to_string((int) time(NULL));
-    auto _texture2D = Director::getInstance()->getTextureCache()->addImage(_image, _key);
-    CC_SAFE_DELETE(_image);
-    auto texture2D = Sprite::createWithTexture(_texture2D);
-    removeChild(captureScreen, true);
-    
+void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
+{
+    //remove all body physics
+    for (b2Body *body = world->GetBodyList(); body != NULL; body = body->GetNext()) {
+        if (body->GetUserData()) {
+            Sprite *sprite = (Sprite *) body->GetUserData();
+            map->removeChild(sprite, true);
+        }
+        world->DestroyBody(body);
+    }
+    map->removeAllChildrenWithCleanup(true);
+    this->removeChild(map,true);
+
+    Sprite* captureSprite;
+    if (succeed) {
+        CCLOG("capture screen game level success!");
+        captureSprite = Sprite::create(filenameCapture);
+    } else {
+        CCLOG("capture screen game fail");
+        captureSprite = Sprite::create("share_image.png");
+    }
+
     // create paper sprite
     PaperSprite* paperSprite = PaperSprite::create("paper3.png", true);
     paperSprite->setPosition(visibleSize/2);
     paperSprite->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    addChild(paperSprite);
-    texture2D->setPosition(paperSprite->getContentSize()/2);
-    texture2D->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    paperSprite->addChild(texture2D);
+    this->addChild(paperSprite);
+    captureSprite->setPosition(paperSprite->getContentSize()/2);
+    captureSprite->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    paperSprite->addChild(captureSprite);
+    
+    // create paper sprite small to share
+    PaperSprite* paperSmall = PaperSprite::create("paper8.png", true);
+    paperSmall->setPosition(Vec2(paperSprite->getPositionX() + paperSprite->getContentSize().width/2, paperSprite->getPositionY() - paperSprite->getContentSize().height/2 - PADDING));
+    paperSmall->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
+    paperSmall->setTag(TAG_GAME::TAG_PAPER_MINI);
+    
+    // image
+    auto captureSpriteMini = Sprite::createWithTexture(captureSprite->getTexture());
+    captureSpriteMini->setScale(0.25f);
+    captureSpriteMini->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
+    captureSpriteMini->setPosition(Vec2(paperSmall->getContentSize().width/2, paperSmall->getContentSize().height-PADDING));
+    paperSmall->addChild(captureSpriteMini);
+    
+    //text
+    auto text = Label::createWithTTF("Share image", "arial.ttf", 40);
+    text->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
+    text->setColor(Color3B::BLUE);
+    text->setPosition(Vec2(captureSpriteMini->getPositionX(), PADDING));
+    paperSmall->addChild(text);
+    
+    this->addChild(paperSmall);
     
     // create tick
     std::string tickName;
@@ -1114,7 +1167,7 @@ void GameScene::endGame()
         paperSprite->addChild(tick);
         tick->runAction(ScaleTo::create(0.5f, 1.0f));
     });
-    texture2D->runAction(Sequence::create(ScaleTo::create(0.5, 0.5f), DelayTime::create(0.5f), addtick, nullptr));
+    captureSprite->runAction(Sequence::create(ScaleTo::create(0.5, 0.5f), DelayTime::create(0.5f), addtick, nullptr));
     
     // add next button
     if (isSuccess) {
@@ -1128,6 +1181,33 @@ void GameScene::endGame()
         nextButton->setTouchEnabled(true);
         nextButton->addTouchEventListener(CC_CALLBACK_2(GameScene::touchButtonEvent, this));
     }
+}
+
+void GameScene::endGame()
+{
+    // capture screen
+    if (isSuccess) {
+        filenameCapture = "capture_level_" + to_string(SceneManager::getInstance()->getLevelGame()) + "_success.png";
+        // open game level
+        SceneManager::getInstance()->saveLevel(SceneManager::getInstance()->getLevelGame()+1);
+    } else if (isFail) {
+        filenameCapture = "capture_level_" + to_string(SceneManager::getInstance()->getLevelGame()) + "_fail.png";
+    }
+    
+    // remove cache and memory
+    Director::getInstance()->getTextureCache()->removeTextureForKey(filenameCapture);
+    // remove file screen shoot
+    if(FileUtils::getInstance()->removeFile(FileUtils::getInstance()->getWritablePath() + filenameCapture))
+    {
+        CCLOG("fileRemove %s removed", filenameCapture.c_str());
+    }
+    else {
+        CCLOG("fileRemove %s not exist or error when removing", filenameCapture.c_str());
+    }
+
+    // capturing
+    utils::captureScreen(CC_CALLBACK_2(GameScene::afterCaptured, this), filenameCapture);
+    
 }
 
 void GameScene::onEnterTransitionDidFinish()

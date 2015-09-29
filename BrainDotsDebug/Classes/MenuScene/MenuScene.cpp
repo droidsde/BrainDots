@@ -38,6 +38,9 @@ bool MenuScene::init() {
     bodySize = Size(visibleSize.width, visibleSize.height * 5 / 6);
     headerSize = Size(visibleSize.width, visibleSize.height / 6);
     
+    // draw grids
+    this->drawGrids();
+    
     // add header layer
     addHeaderLayer();
     
@@ -45,6 +48,27 @@ bool MenuScene::init() {
     addBodyLayer();
     
 	return true;
+}
+
+void MenuScene::drawGrids()
+{
+    DrawNode* draw = DrawNode::create();
+    this->addChild(draw);
+    
+    float lineSize = 0.5;
+    Color4F color = Color4F(0/255, 205/255, 1, 0.2);
+    
+    // draw col
+    for (int x = 0; x < visibleSize.width; x++) {
+        float xPoint = x * TILE_SIZE;
+        draw->drawSegment(Vec2(xPoint, 0), Vec2(xPoint, visibleSize.height), lineSize, color);
+    }
+    
+    // draw row
+    for (int y = 0;  y < visibleSize.height; y++) {
+        float yPoint = y * TILE_SIZE;
+        draw->drawSegment(Vec2(0, yPoint), Vec2(visibleSize.width, yPoint), lineSize, color);
+    }
 }
 
 void MenuScene::addHeaderLayer()
@@ -142,6 +166,7 @@ void MenuScene::addListHorizontal()
 }
 
 void MenuScene::reloadData() {
+    int maxStage = (int)((int) (SceneManager::getInstance()->getCurMaxLevel()/6)) % LEVEL_MAX;
 	listview->removeAllChildren();
 	for (int i = 0; i < LEVEL_MAX; ++i) {
         // layout include sticker and text
@@ -173,12 +198,6 @@ void MenuScene::reloadData() {
 		stage->setTag(i);
 		stage->addTouchEventListener(
 				CC_CALLBACK_2(MenuScene::touchButtonEvent, this));
-		// add tick icon in stage image
-		ImageView* tick = ImageView::create("mini_tick.png");
-		tick->setAnchorPoint(Vec2::ANCHOR_TOP_RIGHT);
-        tick->setPosition(Vec2(stickerSize.width - tick->getContentSize().width, stickerSize.height - tick->getContentSize().height));
-        stage->addChild(tick, ZORDER_MENU::BODY_STICKER_TICK);
-        layout->addChild(stage, ZORDER_MENU::BODY_STICKER);
         
         // text
         Text* text = Text::create(" 6 / 6", "arial.ttf", 60);
@@ -193,6 +212,32 @@ void MenuScene::reloadData() {
         minitick->setPosition(Vec2(text->getPositionX() - text->getContentSize().width/2 - PADDING, text->getPositionY() - text->getContentSize().height/2));
         layout->addChild(minitick, ZORDER_MENU::BODY_STICKER_MINI_TICK);
         
+        if (i > maxStage) {
+            stage->setTouchEnabled(false);
+            text->setString(" 0 / 6");
+            
+            auto frameGray = Layout::create();
+            frameGray->setContentSize(stickerSize);
+            frameGray->setBackGroundColorType(cocos2d::ui::Layout::BackGroundColorType::SOLID);
+            frameGray->setBackGroundColor(Color3B::GRAY);
+            frameGray->setBackGroundColorOpacity(150);
+            frameGray->setPosition(Vec2::ZERO);
+            stage->addChild(frameGray);
+            auto lockIcon = Sprite::create("lock_icon.png");
+            lockIcon->setPosition(stickerSize/2);
+            stage->addChild(lockIcon);
+        } else if (i < maxStage) {
+            
+            // add tick icon in stage image
+            ImageView* tick = ImageView::create("mini_tick.png");
+            tick->setAnchorPoint(Vec2::ANCHOR_TOP_RIGHT);
+            tick->setPosition(Vec2(stickerSize.width - PADDING, stickerSize.height - PADDING));
+            stage->addChild(tick, ZORDER_MENU::BODY_STICKER_TICK);
+            
+        } else {
+            text->setString(" "+to_string(SceneManager::getInstance()->getCurMaxLevel() % 6) + " / 6");
+        }
+        layout->addChild(stage, ZORDER_MENU::BODY_STICKER);
 		listview->insertCustomItem(layout, i);
 	}
 	listview->refreshView();
@@ -216,24 +261,39 @@ void MenuScene::addPageView()
         
         for (int j = 0; j < 2; j++) {
             for (int k = 0; k < 3; k++) {
-                Button* level = Button::create("mini_sticker.png");
-                level->setTitleText(to_string(ITEMS_IN_PAGE * i + 3 * j + k + 1));
+                Button* level = Button::create("paper7.png");
+                int index = ITEMS_IN_PAGE * i + 3 * j + k;
+                level->setTitleText(to_string(index + 1));
                 level->setAnchorPoint(Vec2::ANCHOR_TOP_RIGHT);
                 level->setTitleColor(Color3B::RED);
                 level->setTitleFontSize(60);
                 level->setTitleFontName("arial.ttf");
                 level->setTouchEnabled(true);
-                level->setTag(TAG_MENU::TAG_LEVEL_CHOOSE + ITEMS_IN_PAGE * i + 3 * j + k);
+                level->setTag(TAG_MENU::TAG_LEVEL_CHOOSE + index);
                 level->addTouchEventListener(
                                              CC_CALLBACK_2(MenuScene::touchButtonEvent, this));
                 level->setPosition(Vec2( (k+1) * spaceX, (2-j) * spaceY));
                 
-                // add tick icon in stage image
-                ImageView* tick = ImageView::create("mini_tick.png");
-                tick->setAnchorPoint(Vec2::ANCHOR_TOP_RIGHT);
-                tick->setPosition(Vec2(level->getContentSize().width-PADDING, level->getContentSize().height-PADDING));
-                tick->setScale(0.5);
-                level->addChild(tick, ZORDER_MENU::BODY_STICKER_TICK);
+                // lock level
+                if (index > SceneManager::getInstance()->getCurMaxLevel()) {
+                    auto frameGray = Layout::create();
+                    frameGray->setContentSize(level->getContentSize());
+                    frameGray->setBackGroundColorType(cocos2d::ui::Layout::BackGroundColorType::SOLID);
+                    frameGray->setBackGroundColor(Color3B::GRAY);
+                    frameGray->setBackGroundColorOpacity(150);
+                    frameGray->setPosition(Vec2::ZERO);
+                    level->addChild(frameGray);
+                    auto lockIcon = Sprite::create("mini_lock_icon.png");
+                    lockIcon->setPosition(level->getContentSize()/2);
+                    level->addChild(lockIcon);
+                    level->setTouchEnabled(false);
+                } else if (index < SceneManager::getInstance()->getCurMaxLevel()){
+                    // add tick icon in stage image
+                    ImageView* tick = ImageView::create("super_mini_tick.png");
+                    tick->setAnchorPoint(Vec2::ANCHOR_TOP_RIGHT);
+                    tick->setPosition(Vec2(level->getContentSize().width-tick->getContentSize().width/2-PADDING, level->getContentSize().height-PADDING-tick->getContentSize().height/2));
+                    level->addChild(tick, ZORDER_MENU::BODY_STICKER_TICK);
+                }
                 
                 layout->addChild(level);
             }
@@ -276,7 +336,6 @@ void MenuScene::touchButtonEvent(Ref* sender, Widget::TouchEventType type) {
                 CCLOG("level %d", i);
                 // open game level
                 SceneManager::getInstance()->setLevelGame(i-TAG_MENU::TAG_LEVEL_CHOOSE);
-                SceneManager::getInstance()->saveLevel(i-TAG_MENU::TAG_LEVEL_CHOOSE);
                 
                 auto fadeout = CallFunc::create(CC_CALLBACK_0(Node::setOpacity, this, 0));
                 auto remove = CallFunc::create(CC_CALLBACK_0(Node::removeAllChildrenWithCleanup, this, true));

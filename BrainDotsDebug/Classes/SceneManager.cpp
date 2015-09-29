@@ -19,6 +19,7 @@ SceneManager* SceneManager::_sceneManager = nullptr;
 SceneManager::SceneManager()
 {
     gameLevel = UserDefault::getInstance()->getIntegerForKey("level", 0);
+    curMaxLevel = UserDefault::getInstance()->getIntegerForKey("level", 0);
 }
 
 SceneManager::~SceneManager()
@@ -102,6 +103,7 @@ void SceneManager::saveLevel(int level)
     int oldLevel = UserDefault::getInstance()->getIntegerForKey("level", 0);
     if (level > oldLevel) {
         UserDefault::getInstance()->setIntegerForKey("level", level);
+        setCurMaxLevel(level);
     }
 }
 

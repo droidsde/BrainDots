@@ -47,6 +47,8 @@ private:
     int curPage = 1; // 1->10
     int curLevel; // 0 -> (6 * PAGE)-1
     
+    void drawGrids();
+    
     void addHeaderLayer();
     
     void addBodyLayer();

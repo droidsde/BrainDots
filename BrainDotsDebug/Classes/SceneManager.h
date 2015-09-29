@@ -38,6 +38,7 @@ public:
     CC_SYNTHESIZE(cocos2d::Scene*, curScene, CurScene);
     CC_SYNTHESIZE(GAME_STATE, curState, CurState);
     CC_SYNTHESIZE(int, gameLevel, LevelGame);
+    CC_SYNTHESIZE(int, curMaxLevel, CurMaxLevel);
     
     void changeState(GAME_STATE = GAME_STATE::LOGO);
     void loadingScene(Layer*);

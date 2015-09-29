@@ -84,7 +84,7 @@ public:
     
     static cocos2d::Scene* createScene();
     virtual bool init();
-    virtual void draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t flags) override;
+//    virtual void draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t flags) override;
     
     CREATE_FUNC(GameScene);
     
@@ -92,6 +92,7 @@ public:
     virtual void onTouchMoved(Touch* touch, Event* event);
     virtual void onTouchEnded(Touch* touch, Event* event);
     
+    void drawGrids();
     void initPhysics();
     void initMapLevel(int level);
     void initPhysicObjects();
@@ -116,7 +117,7 @@ public:
     void revoluteJoint();
     void weldJoint();
     void conveyorBelts();
-
+    
 private:
     // size and pos screen
     Size visibleSize;
@@ -164,16 +165,16 @@ private:
     Vec2 posErrorDraw;
     bool isErrorDraw = false;
     std::vector<Vec2> platformPoints;
-    RenderTexture *target, *captureScreen;
+    RenderTexture *target;
     Sprite *brush;
     
     std::vector<ConveyorBelt> listConveyorBelt;
     
     // on enter, onexit
     void onEnterTransitionDidFinish();
-    void capturingScreen(std::string filename);
+    std::string filenameCapture;
     void afterCaptured(bool succeed, const std::string& outputFile);
-    void endGameComponent();
+    void showShareLayer();
 };
 
 #endif // __HELLOWORLD_SCENE_H__

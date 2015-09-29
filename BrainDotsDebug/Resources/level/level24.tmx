@@ -6,9 +6,6 @@
  <tileset firstgid="71" name="barrage" tilewidth="38" tileheight="38">
   <image source="tileset1.png" width="38" height="38"/>
  </tileset>
- <tileset firstgid="72" name="bg" tilewidth="38" tileheight="38">
-  <image source="tileset2.jpg" width="38" height="39"/>
- </tileset>
  <objectgroup name="braindots">
   <object id="2" name="ballA" type="ball" x="513.334" y="663">
    <properties>
@@ -33,11 +30,6 @@
    </properties>
   </object>
  </objectgroup>
- <layer name="background" width="36" height="20">
-  <data encoding="base64" compression="zlib">
-   eJztwzENAAAMA6DKq39Fe3pPASQ0SVVVdfkdZee2QQ==
-  </data>
- </layer>
  <layer name="ground" width="36" height="20">
   <data encoding="base64" compression="zlib">
    eJztwzENAAAMA6C6q39HPfdNASQkAABw6ntvVRP5

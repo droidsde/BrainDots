@@ -20,9 +20,9 @@ class SharePopupLayer : public BasePopupLayer
 {
 public:
     
-    SharePopupLayer();
+    SharePopupLayer(std::string filename);
     ~SharePopupLayer();
-    static SharePopupLayer* create();
+    static SharePopupLayer* create(std::string filename);
     virtual bool init();
     
     void touchButtonEvent(Ref* sender, Widget::TouchEventType type);
@@ -35,5 +35,6 @@ private:
     Button* moreShare;
     
     Sprite* imageShare;
+    std::string filename;
 };
 #endif /* defined(__BrainDotsDebug__SharePopupLayer__) */

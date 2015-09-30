@@ -8,9 +8,10 @@
 
 #include "SharePopupLayer.h"
 
-SharePopupLayer::SharePopupLayer()
+SharePopupLayer::SharePopupLayer(std::string filename)
 {
     imageShare = nullptr;
+    this->filename = filename;
 }
 
 SharePopupLayer::~SharePopupLayer()
@@ -19,9 +20,9 @@ SharePopupLayer::~SharePopupLayer()
     imageShare = nullptr;
 }
 
-SharePopupLayer* SharePopupLayer::create()
+SharePopupLayer* SharePopupLayer::create(std::string filename)
 {
-    SharePopupLayer* layer = new SharePopupLayer();
+    SharePopupLayer* layer = new SharePopupLayer(filename);
     layer->init();
     layer->autorelease();
     return layer;
@@ -40,14 +41,14 @@ bool SharePopupLayer::init()
     
     // image share
     // create paper sprite
-    PaperSprite* paperSprite = PaperSprite::create("paper3.png", false);
+    PaperSprite* paperSprite = PaperSprite::create("paper3.png", false, false, false);
     paperSprite->setPosition(layoutSize/2);
     paperSprite->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     layoutTable->addChild(paperSprite);
     
     // check file capture screen isexist
-    if (SceneManager::getInstance()->checkFileExist(FileUtils::getInstance()->getWritablePath()+"capture_menu.png")) {
-        imageShare = Sprite::create(FileUtils::getInstance()->getWritablePath()+"capture_menu.png");
+    if (SceneManager::getInstance()->checkFileExist(FileUtils::getInstance()->getWritablePath()+this->filename)) {
+        imageShare = Sprite::create(FileUtils::getInstance()->getWritablePath()+this->filename);
     } else {
         imageShare = Sprite::create("share_image.png");
     }

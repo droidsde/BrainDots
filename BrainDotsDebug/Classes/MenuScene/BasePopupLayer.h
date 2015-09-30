@@ -13,6 +13,7 @@
 #include <cocos2d.h>
 #include "ui/CocosGUI.h"
 #include "Constants.h"
+#include "SoundManager.h"
 
 USING_NS_CC;
 using namespace cocos2d::ui;
@@ -39,6 +40,7 @@ public:
     Size visibleSize;
     Layout* layoutTable;
     Vec2 posOrigin, posNew;
+    CC_SYNTHESIZE(ManageSoundDelegate*, msDelegator, SoundManage);
 };
 
 #endif /* defined(__BrainDotsDebug__BasePopupLayer__) */

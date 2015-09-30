@@ -11,6 +11,7 @@
 
 #include <cocos2d.h>
 #include "BasePopupLayer.h"
+#include "SettingPopupLayer.h"
 
 USING_NS_CC;
 using namespace cocos2d::ui;
@@ -24,5 +25,9 @@ public:
     static MenuPopupLayer* create();
     virtual bool init();
     
+private:
+    Size layoutSize;
+    void touchButtonEvent(Ref* sender, Widget::TouchEventType type);
+    void moveOrigin();
 };
 #endif /* defined(__BrainDotsDebug__MenuPopupLayer__) */

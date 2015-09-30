@@ -31,7 +31,7 @@ bool BasePopupLayer::init()
     if (!LayerColor::initWithColor(Color4B(128, 128, 128, 150))) {
         return false;
     }
-    
+    this->setSoundManage(SoundManager::getInstance());
     visibleSize = Director::getInstance()->getVisibleSize();
     origin = Director::getInstance()->getVisibleOrigin();
     
@@ -50,7 +50,7 @@ bool BasePopupLayer::init()
     
     // button exit
     Button* exit = Button::create("close_button.png");
-    exit->setPosition(Vec2(layoutTable->getContentSize().width -  PADDING, layoutTable->getContentSize().height - PADDING));
+    exit->setPosition(Vec2(layoutTable->getContentSize().width -  PADDING_MENU_HEADER_ITEM, layoutTable->getContentSize().height - PADDING_MENU_HEADER_ITEM));
     exit->setAnchorPoint(Vec2::ANCHOR_TOP_RIGHT);
     exit->setTouchEnabled(true);
     exit->addTouchEventListener([this](Ref* pSender, Widget::TouchEventType type){

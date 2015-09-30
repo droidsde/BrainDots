@@ -8,9 +8,10 @@
 
 #include "PaperSprite.h"
 
-PaperSprite::PaperSprite(bool isScale)
+PaperSprite::PaperSprite(bool isScale, bool isCallbackFunction)
 {
     this->isScale = isScale;
+    this->isCallbackFunction = isCallbackFunction;
 }
 
 PaperSprite::~PaperSprite()
@@ -18,19 +19,32 @@ PaperSprite::~PaperSprite()
     
 }
 
-PaperSprite* PaperSprite::create(std::string filename, bool isScale)
+PaperSprite* PaperSprite::create(std::string filename, bool isFromPlist, bool isScale, bool isCallbackFunction)
 {
-    PaperSprite* pPaperSprite = new PaperSprite(isScale);
+    PaperSprite* pPaperSprite = new PaperSprite(isScale, isCallbackFunction);
     
-    if (pPaperSprite->initWithFile(filename)) {
-        
-        pPaperSprite->autorelease();
-        
-        pPaperSprite->initOptions();
-        
-        pPaperSprite->addEvents();
-        
-        return pPaperSprite;
+    if (isFromPlist) {
+        if (pPaperSprite->initWithSpriteFrameName(filename)) {
+            
+            pPaperSprite->autorelease();
+            
+            pPaperSprite->initOptions();
+            
+            pPaperSprite->addEvents();
+            
+            return pPaperSprite;
+        }
+    } else {
+        if (pPaperSprite->initWithFile(filename)) {
+            
+            pPaperSprite->autorelease();
+            
+            pPaperSprite->initOptions();
+            
+            pPaperSprite->addEvents();
+            
+            return pPaperSprite;
+        }
     }
     
     CC_SAFE_DELETE(pPaperSprite);
@@ -39,7 +53,20 @@ PaperSprite* PaperSprite::create(std::string filename, bool isScale)
 
 void PaperSprite::initOptions()
 {
-    
+    enableTouch = true;
+    _callback = NULL;
+    _callbackFunction = NULL;
+}
+
+void PaperSprite::setCallback(cocos2d::Sequence *callback)
+{
+    _callback = callback;
+    _callback->retain();
+}
+
+void PaperSprite::setCallbackFunction(std::function<void ()> callback)
+{
+    _callbackFunction = callback;
 }
 
 void PaperSprite::addEvents()
@@ -69,6 +96,7 @@ void PaperSprite::addEvents()
             this->setScale(1.0f);
         }
         PaperSprite::touchEvent(touch);
+//        Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(this);
     };
     
     Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
@@ -77,4 +105,20 @@ void PaperSprite::addEvents()
 void PaperSprite::touchEvent(cocos2d::Touch *touch)
 {
     CCLOG("touch papersprite");
+    if(isCallbackFunction){
+        if(_callbackFunction!=NULL) {
+            stopAllActions();
+            _callbackFunction();
+            //this->removeFromParentAndCleanup(true);
+            
+            
+        }
+        
+    }
+    if(_callback!=NULL) {
+        stopAllActions();
+        //_callback->autorelease();
+        runAction(_callback);
+        _callback->release();
+    }
 }

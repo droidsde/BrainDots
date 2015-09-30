@@ -323,7 +323,7 @@ void MenuScene::afterCaptured(bool succeed, const std::string &outputFile)
         CCLOG("Capture screen failed");
     }
     
-    auto baseLayer = SharePopupLayer::create();
+    auto baseLayer = SharePopupLayer::create("capture_menu.png");
     this->addChild(baseLayer);
 }
 
@@ -382,7 +382,7 @@ void MenuScene::touchButtonEvent(Ref* sender, Widget::TouchEventType type) {
                 if (pageview->isVisible()) {
                     this->capturingScreen(fileRemove);
                 } else {
-                    auto baseLayer = SharePopupLayer::create();
+                    auto baseLayer = SharePopupLayer::create(fileRemove);
                     this->addChild(baseLayer);
                 }
                 break;

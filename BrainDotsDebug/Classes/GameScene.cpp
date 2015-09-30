@@ -1091,9 +1091,9 @@ void GameScene::explosionRing(std::string name, Vec2 point)
     ring->runAction(Sequence::create(spawn, RemoveSelf::create() , NULL));
 }
 
-void GameScene::showShareLayer()
+void GameScene::showShareLayer(std::string filename)
 {
-    auto baseLayer = SharePopupLayer::create();
+    auto baseLayer = SharePopupLayer::create(filename);
     this->addChild(baseLayer);
 }
 
@@ -1120,7 +1120,7 @@ void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
     }
 
     // create paper sprite
-    PaperSprite* paperSprite = PaperSprite::create("paper3.png", true);
+    PaperSprite* paperSprite = PaperSprite::create("paper3.png", false, true, true);
     paperSprite->setPosition(visibleSize/2);
     paperSprite->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     this->addChild(paperSprite);
@@ -1129,7 +1129,8 @@ void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
     paperSprite->addChild(captureSprite);
     
     // create paper sprite small to share
-    PaperSprite* paperSmall = PaperSprite::create("paper8.png", true);
+    PaperSprite* paperSmall = PaperSprite::create("paper8.png", false, true, true);
+    paperSmall->setCallbackFunction(CC_CALLBACK_0(GameScene::showShareLayer, this, filenameCapture));
     paperSmall->setPosition(Vec2(paperSprite->getPositionX() + paperSprite->getContentSize().width/2, paperSprite->getPositionY() - paperSprite->getContentSize().height/2 - PADDING));
     paperSmall->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
     paperSmall->setTag(TAG_GAME::TAG_PAPER_MINI);

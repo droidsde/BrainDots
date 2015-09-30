@@ -174,7 +174,7 @@ private:
     void onEnterTransitionDidFinish();
     std::string filenameCapture;
     void afterCaptured(bool succeed, const std::string& outputFile);
-    void showShareLayer();
+    void showShareLayer(std::string filename);
 };
 
 #endif // __HELLOWORLD_SCENE_H__

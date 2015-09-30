@@ -89,6 +89,28 @@ enum ZORDER_MENU
     BODY_STICKER_TEXT,
 };
 
+enum TAG_MENU_ITEM
+{
+    NOTIFICATION = 0,
+    INFORMATION,
+    SETTING,
+    NOMOREADS,
+    SUPPORT,
+    TWITTER,
+    FACEBOOK,
+    YOUTUBE,
+};
+
+enum TAG_SETTING_ITEM
+{
+    MUSIC = 0,
+    SOUND,
+    VIDEO,
+    THUMBNAIL,
+    LANGUGAGE,
+    RELOAD_PURCHASES
+};
+
 typedef enum class game_state
 {
     LOGO = 0,
@@ -168,11 +190,11 @@ struct compare_level
     }
 };
 
-    class ConveyorBelt
-    {
-    public:
-        b2Fixture* fixture;
-        float friction;
-        float tangentSpeed;
-    };
+class ConveyorBelt
+{
+public:
+    b2Fixture* fixture;
+    float friction;
+    float tangentSpeed;
+};
 #endif

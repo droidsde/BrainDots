@@ -26,6 +26,21 @@ SettingPopupLayer* SettingPopupLayer::create()
     return layer;
 }
 
+void SettingPopupLayer::onEnter()
+{
+    BasePopupLayer::onEnter();
+    NotificationCenter::getInstance()->addObserver(this, callfuncO_selector(SettingPopupLayer::reloadData), RELOAD_LANGUAGE, NULL);
+    NotificationCenter::getInstance()->addObserver(this, callfuncO_selector(BasePopupLayer::moveOrigin), EXIT_LAYER_LANGUAGE, NULL);
+}
+
+void SettingPopupLayer::onExit()
+{
+    BasePopupLayer::onExit();
+    NotificationCenter::getInstance()->removeObserver(this, RELOAD_LANGUAGE);
+    NotificationCenter::getInstance()->removeObserver(this, EXIT_LAYER_LANGUAGE);
+    NotificationCenter::getInstance()->postNotification(EXIT_LAYER_SETTING);
+}
+
 bool SettingPopupLayer::init()
 {
     BasePopupLayer::init();
@@ -97,15 +112,29 @@ bool SettingPopupLayer::init()
                 default:
                     break;
             }
-        } else {
-            layout->setTag(i);
-            layout->addTouchEventListener(CC_CALLBACK_2(SettingPopupLayer::touchButtonEvent, this));
+        } else if(i==4){
+            languageText = Text::create("English", "arial.ttf", 35);
+            languageText->setString(SceneManager::getInstance()->getCurLanguage());
+            languageText->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+            languageText->setColor(Color3B::ORANGE);
+            languageText->setTouchEnabled(true);
+            languageText->setPosition(Vec2(listviewSize.width - PADDING, layout->getContentSize().height/2));
+            languageText->setTag(i);
+            languageText->addTouchEventListener(CC_CALLBACK_2(SettingPopupLayer::touchButtonEvent, this));
+            layout->addChild(languageText);
         }
         
         layoutTable->addChild(layout);
     }
     
     return true;
+}
+
+void SettingPopupLayer::reloadData(cocos2d::Ref *sender)
+{
+    if (languageText) {
+        languageText->setString(SceneManager::getInstance()->getCurLanguage());
+    }
 }
 
 void SettingPopupLayer::valueChanged(cocos2d::Ref *sender, cocos2d::extension::Control::EventType controlEvent)
@@ -145,6 +174,8 @@ void SettingPopupLayer::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEven
             {
                 LanguagePopupLayer* layer = LanguagePopupLayer::create();
                 this->addChild(layer);
+                moveOut(nullptr);
+                NotificationCenter::getInstance()->postNotification(OPEN_LAYER_LANGUAGE);
                 break;
             }
             case TAG_SETTING_ITEM::RELOAD_PURCHASES :

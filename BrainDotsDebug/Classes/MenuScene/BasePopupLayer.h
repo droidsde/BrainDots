@@ -35,6 +35,9 @@ public:
 
     // add button method
     Button* createButton(std::string fileName, int tag, Vec2 anchorPoint);
+    void moveOrigin(Ref* pSender);
+    void moveIn(Ref* pSender);
+    void moveOut(Ref* pSender);
     
     Vec2 origin;
     Size visibleSize;

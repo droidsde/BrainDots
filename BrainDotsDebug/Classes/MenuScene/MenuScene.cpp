@@ -157,8 +157,11 @@ void MenuScene::addListHorizontal()
     listview->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     listview->setPosition(bodySize/2);
     listview->setContentSize(bodySize);
+    listview->setInertiaScrollEnabled(true);
     listview->setItemsMargin(LIST_ITEM_MARGIN);
     listview->addEventListener(CC_CALLBACK_2(MenuScene::selectedItemEvent, this));
+    listview->addEventListener(CC_CALLBACK_2(MenuScene::scrollEvent, this));
+    
     bodyLayer->addChild(listview, ZORDER_MENU::BODY_LISTVIEW);
     
     // create item in listview
@@ -432,11 +435,24 @@ void MenuScene::selectedItemEvent(cocos2d::Ref *pSender, ListView::EventType typ
     }
 }
 
+void MenuScene::scrollEvent(cocos2d::Ref *pSender, ui::ScrollView::EventType type)
+{
+    ListView* listView = static_cast<ListView*>(pSender);
+    if ( type == ui::ScrollView::EventType::SCROLLING)
+    {
+        CCLOG("SCROLLING %f", listView->getInnerContainer()->getPositionX());
+    } else if ( type == ui::ScrollView::EventType::BOUNCE_LEFT) {
+        CCLOG("BOUNCE_LEFT %f", listView->getInnerContainer()->getPositionX());
+    } else if ( type == ui::ScrollView::EventType::BOUNCE_RIGHT) {
+        CCLOG("BOUNCE_RIGHT %f", listView->getInnerContainer()->getPositionX());
+    }
+}
+
 void MenuScene::openStage(int i)
 {
     float curPos = listview->getInnerContainer()->getPositionX();
     float exactPos = -(stickerSize.width + LIST_ITEM_MARGIN) * i;
-    
+    CCLOG("extractPos %f", exactPos);
     if (curPos > (exactPos + DELTA_TRANSLATE) || curPos < (exactPos - DELTA_TRANSLATE)) {
         listview->getInnerContainer()->setPositionX(exactPos);
     }

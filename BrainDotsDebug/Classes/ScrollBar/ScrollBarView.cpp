@@ -29,8 +29,8 @@ barSize(0.0f)
 ScrollBarView::~ScrollBarView()
 {
     // Remove and clean scroll bar sprite
-    removeChild(bar);
-    CC_SAFE_DELETE(bar);
+//    removeChild(bar);
+//    CC_SAFE_DELETE(bar);
 }
 
 
@@ -251,7 +251,8 @@ void ScrollBarView::refresh()
     }
     
     // Stop all scheduled queues ( e.g. fadeout )
-    this->unscheduleAllSelectors();
+//    this->unscheduleAllSelectors();
+    this->unscheduleAllCallbacks();
     // And re-attach fade out schedule queue
     this->scheduleOnce(schedule_selector(ScrollBarView::fadeOut), fadeDelayTime);
     

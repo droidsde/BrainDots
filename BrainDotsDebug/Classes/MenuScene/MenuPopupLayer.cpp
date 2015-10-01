@@ -26,6 +26,22 @@ MenuPopupLayer* MenuPopupLayer::create()
     return layer;
 }
 
+void MenuPopupLayer::onEnter()
+{
+    BasePopupLayer::onEnter();
+    NotificationCenter::getInstance()->addObserver(this, callfuncO_selector(BasePopupLayer::moveOrigin), EXIT_LAYER_SETTING, NULL);
+    NotificationCenter::getInstance()->addObserver(this, callfuncO_selector(BasePopupLayer::moveIn), EXIT_LAYER_LANGUAGE, NULL);
+    NotificationCenter::getInstance()->addObserver(this, callfuncO_selector(BasePopupLayer::moveOut), OPEN_LAYER_LANGUAGE, NULL);
+}
+
+void MenuPopupLayer::onExit()
+{
+    BasePopupLayer::onExit();
+    NotificationCenter::getInstance()->removeObserver(this, EXIT_LAYER_SETTING);
+    NotificationCenter::getInstance()->removeObserver(this, EXIT_LAYER_LANGUAGE);
+    NotificationCenter::getInstance()->removeObserver(this, OPEN_LAYER_LANGUAGE);
+}
+
 bool MenuPopupLayer::init()
 {
     BasePopupLayer::init();
@@ -69,10 +85,6 @@ bool MenuPopupLayer::init()
     return true;
 }
 
-void MenuPopupLayer::moveOrigin()
-{
-    layoutTable->runAction(MoveBy::create(0.3f, Vec2(PADDING_MENU_HEADER_ITEM, PADDING_MENU_HEADER_ITEM)));
-}
 
 void MenuPopupLayer::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEventType type)
 {
@@ -91,9 +103,9 @@ void MenuPopupLayer::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEventTy
                 
             case  TAG_MENU_ITEM::SETTING :
             {
-//                layoutTable->runAction(MoveBy::create(0.3f, Vec2(-PADDING_MENU_HEADER_ITEM, -PADDING_MENU_HEADER_ITEM)));
                 auto setting = SettingPopupLayer::create();
                 this->addChild(setting);
+                moveOut(nullptr);
                 break;
             }
                 

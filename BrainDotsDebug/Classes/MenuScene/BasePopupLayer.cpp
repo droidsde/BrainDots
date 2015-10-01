@@ -28,7 +28,7 @@ BasePopupLayer::~BasePopupLayer()
 
 bool BasePopupLayer::init()
 {
-    if (!LayerColor::initWithColor(Color4B(128, 128, 128, 150))) {
+    if (!LayerColor::initWithColor(Color4B(128, 128, 128, 100))) {
         return false;
     }
     this->setSoundManage(SoundManager::getInstance());
@@ -99,6 +99,21 @@ cocos2d::ui::Button* BasePopupLayer::createButton(std::string fileName, int tag,
     button->setTouchEnabled(true);
     button->setAnchorPoint(anchorPoint);
     return button;
+}
+
+void BasePopupLayer::moveOut(Ref* pSender)
+{
+    layoutTable->runAction(MoveBy::create(0.3f, Vec2(-PADDING_MENU_HEADER_ITEM, -PADDING_MENU_HEADER_ITEM)));
+}
+
+void BasePopupLayer::moveIn(cocos2d::Ref *pSender)
+{
+    layoutTable->runAction(MoveBy::create(0.3f, Vec2(PADDING_MENU_HEADER_ITEM, PADDING_MENU_HEADER_ITEM)));
+}
+
+void BasePopupLayer::moveOrigin(Ref* pSender)
+{
+    layoutTable->runAction(MoveTo::create(0.3f, posNew));
 }
 
 bool BasePopupLayer::onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *event)

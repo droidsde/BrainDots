@@ -11,13 +11,15 @@
 
 #include <cocos2d.h>
 #include "BasePopupLayer.h"
-#include <extensions/cocos-ext.h>
-#include "ScrollBarView.h"
+#include "SceneManager.h"
+//#include <extensions/cocos-ext.h>
+//#include "ScrollBarView.h"
 
 USING_NS_CC;
-USING_NS_CC_EXT;
+//USING_NS_CC_EXT;
+using namespace cocos2d::ui;
 
-class LanguagePopupLayer : public BasePopupLayer, cocos2d::extension::ScrollViewDelegate
+class LanguagePopupLayer : public BasePopupLayer
 {
 public:
     
@@ -26,14 +28,21 @@ public:
     static LanguagePopupLayer* create();
     virtual bool init();
     void touchButtonEvent(Ref* sender, Widget::TouchEventType type);
-    
-    void scrollViewDidScroll(cocos2d::extension::ScrollView* view);
-    void scrollViewDidZoom(cocos2d::extension::ScrollView *view);
+    void onExit();
     
 private:
     
     Size layoutSize;
-    ScrollBarView* bar;
+    Size listviewSize;
+    int countLanguage;
+    std::map<std::string, std::string> mapLanguage;
+    std::vector<std::string> listLanguageName;
+    
+    std::string getValueFromMap(std::string key);
+    
+    ListView* listView;
+    Vector<Button*> listButton;
+    void reloadData();
 };
 
 #endif /* defined(__BrainDotsDebug__LanguagePopupLayer__) */

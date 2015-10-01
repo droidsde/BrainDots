@@ -24,10 +24,11 @@ public:
     ~MenuPopupLayer();
     static MenuPopupLayer* create();
     virtual bool init();
+    void onEnter();
+    void onExit();
     
 private:
     Size layoutSize;
     void touchButtonEvent(Ref* sender, Widget::TouchEventType type);
-    void moveOrigin();
 };
 #endif /* defined(__BrainDotsDebug__MenuPopupLayer__) */

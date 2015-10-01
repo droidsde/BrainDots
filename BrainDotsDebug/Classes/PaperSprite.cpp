@@ -104,20 +104,15 @@ void PaperSprite::addEvents()
 
 void PaperSprite::touchEvent(cocos2d::Touch *touch)
 {
-    CCLOG("touch papersprite");
     if(isCallbackFunction){
         if(_callbackFunction!=NULL) {
             stopAllActions();
             _callbackFunction();
-            //this->removeFromParentAndCleanup(true);
-            
-            
         }
         
     }
     if(_callback!=NULL) {
         stopAllActions();
-        //_callback->autorelease();
         runAction(_callback);
         _callback->release();
     }

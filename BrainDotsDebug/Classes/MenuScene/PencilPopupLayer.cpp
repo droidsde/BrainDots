@@ -152,7 +152,8 @@ void PencilPopupLayer::adjustScrollView(Vec2 adjustPoint)
 {
     Vec2 endPoint;
     Vec2::add(scrollView->getContentOffset(), Vec2(adjustPoint.x, 0), &endPoint);
-    scrollView->unscheduleAllSelectors();
+//    scrollView->unscheduleAllSelectors();
+    scrollView->unscheduleAllCallbacks();
     scrollView->setContentOffset(endPoint,false);
 }
 

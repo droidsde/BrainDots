@@ -71,6 +71,7 @@ private:
     void pageViewEvent(Ref* pSender, PageView::EventType type);
     
     void selectedItemEvent(Ref *pSender, ListView::EventType type);
+    void scrollEvent(Ref* ref, ui::ScrollView::EventType EventType);
     
     void openStage(int i);
     

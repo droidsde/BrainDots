@@ -24,6 +24,11 @@
 #define TIME_LOADING                    1.0
 
 #define PAUSE_GAME                      "pauseGame"
+#define RELOAD_LANGUAGE                 "reloadLanguage"
+#define EXIT_LAYER_LANGUAGE             "exitLayerLanguage"
+#define OPEN_LAYER_LANGUAGE             "openLayerLanguage"
+#define EXIT_LAYER_SETTING              "exitLayerSetting"
+#define EXIT_LAYER_MENU                 "exitLayerMenu"
 
 #define LEVEL_MAX						10
 #define LEVEL_DEFAULT_UNLOCKED          1
@@ -119,7 +124,6 @@ typedef enum class game_state
     SETTING,
     GAME,
     OVER,
-    HIGHSCORE,
 }GAME_STATE;
 
 enum TAG_MENU

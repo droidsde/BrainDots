@@ -20,6 +20,7 @@ SceneManager::SceneManager()
 {
     gameLevel = UserDefault::getInstance()->getIntegerForKey("level", 0);
     curMaxLevel = UserDefault::getInstance()->getIntegerForKey("level", 0);
+    curLanguage = UserDefault::getInstance()->getStringForKey("language", "English");
 }
 
 SceneManager::~SceneManager()
@@ -65,9 +66,6 @@ void SceneManager::changeState(GAME_STATE state)
             moveGameOverScene();
             break;
             
-        case GAME_STATE::HIGHSCORE :
-            moveHighScore();
-            break;
         default:
             break;
     }
@@ -107,6 +105,83 @@ void SceneManager::saveLevel(int level)
     }
 }
 
+void SceneManager::saveLanguage()
+{
+    UserDefault::getInstance()->setStringForKey("language", getCurLanguage());
+}
+
+void SceneManager::loadListLanguage(std::string jsonFile)
+{
+    //below we open, read and parse language data file with rapidjson library
+    std::string clearContent = FileUtils::getInstance()->getStringFromFile(jsonFile);
+    
+    document.Parse<0>(clearContent.c_str());
+    if(document.HasParseError())
+    {
+        CCLOG("Language file parsing error!");
+        return;
+    }
+}
+
+std::string SceneManager::getStringForKey(std::string key)
+{
+    std::string result = "";
+    if (document.IsObject()) {
+        if (document.HasMember(key.c_str())) {
+            return document[key.c_str()].GetString();
+        }
+        else return result;
+    }
+    else return result;
+}
+
+int SceneManager::getIntForKey(std::string key)
+{
+    int result = 0;
+    if (document.IsObject()) {
+        if (document.HasMember(key.c_str())) {
+            result = document[key.c_str()].GetInt();
+        }
+    }
+    return result;
+}
+
+std::vector<std::string> SceneManager::getListData(std::string root, std::string key)
+{
+    std::vector<std::string> list;
+    if (document.IsObject()) {
+        if (document.HasMember(root.c_str()) && document[root.c_str()].IsArray()) {
+            const rapidjson::Value& arr = document[root.c_str()];
+            for (int i = 0; i < arr.Size(); i++) {
+                if (arr[i].HasMember(key.c_str())) {
+                    auto keyText = arr[i][key.c_str()].GetString();
+                    list.push_back(keyText);
+                }
+            }
+        }
+    }
+    return list;
+}
+
+std::map<std::string, std::string> SceneManager::getMapData(std::string root, std::string key, std::string value)
+{
+    std::map<std::string, std::string> map;
+    if (document.IsObject()) {
+        if (document.HasMember(root.c_str()) && document[root.c_str()].IsArray()) {
+            const rapidjson::Value& arr = document[root.c_str()];
+            for (int i = 0; i < arr.Size(); i++) {
+                std::string keyText, valueText;
+                if (arr[i].HasMember(key.c_str()) && arr[i].HasMember(value.c_str())) {
+                    keyText = arr[i][key.c_str()].GetString();
+                    valueText = arr[i][value.c_str()].GetString();
+                    map.insert(std::map<std::string, std::string>::value_type(keyText, valueText));
+                }
+            }
+        }
+    }
+    return map;
+}
+
 void SceneManager::moveLogoScene()
 {
     auto scene = LogoScene::createScene();
@@ -137,11 +212,6 @@ void SceneManager::moveGameScene()
 }
 
 void SceneManager::moveGameOverScene()
-{
-    
-}
-
-void SceneManager::moveHighScore()
 {
     
 }

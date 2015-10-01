@@ -1025,7 +1025,7 @@ void GameScene::animationSuccess(Vec2 point)
 		int rand_add_space = rand()%100;
 		float rand_delay = (float)(rand()%10)/100;
 
-		float rad = CC_DEGREES_TO_RADIANS((i/(float)NUM_EXPLOSION_CIRCLE) * 360 + rand_angle);
+		float rad = CC_DEGREES_TO_RADIANS((i/(float)NUM_EXPLOSION_CIRCLE + rand_angle) * 360);
 		auto starSprite = Sprite::create("explosion_yellow.png");
 		starSprite->setScale(0);
 		starSprite->setPosition(point);
@@ -1059,7 +1059,7 @@ void GameScene::animationFail(cocos2d::Vec2 point, std::string explosionName)
         int rand_add_space = rand()%100;
         float rand_delay = (float)(rand()%10)/100;
         
-        float rad = CC_DEGREES_TO_RADIANS((i/(float)NUM_EXPLOSION_CIRCLE) * 360 + rand_angle);
+        float rad = CC_DEGREES_TO_RADIANS((i/(float)NUM_EXPLOSION_CIRCLE + rand_angle) * 360);
         auto explosionSprite = Sprite::create(explosionName + ".png");
         explosionSprite->setScale(rand_scale);
         explosionSprite->setPosition(point);

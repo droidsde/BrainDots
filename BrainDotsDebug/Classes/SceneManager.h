@@ -24,6 +24,8 @@
 #include "Gif/CacheGif.h"
 #include "Gif/InstantGif.h"
 
+#include "json/document.h"
+
 USING_NS_CC;
 
 class SceneManager
@@ -32,6 +34,7 @@ public:
     
     SceneManager();
     ~SceneManager();
+    rapidjson::Document document;
     
     static SceneManager* getInstance();
     
@@ -39,10 +42,21 @@ public:
     CC_SYNTHESIZE(GAME_STATE, curState, CurState);
     CC_SYNTHESIZE(int, gameLevel, LevelGame);
     CC_SYNTHESIZE(int, curMaxLevel, CurMaxLevel);
+    CC_SYNTHESIZE(std::string, curLanguage, CurLanguage);
     
     void changeState(GAME_STATE = GAME_STATE::LOGO);
     void loadingScene(Layer*);
     void saveLevel(int level);
+    void saveLanguage();
+    
+    // load list language
+    void loadListLanguage(std::string jsonFile);
+    std::string getStringForKey(std::string key);
+    int getIntForKey(std::string key);
+    std::vector<std::string> getListData(std::string root, std::string key);
+    std::map<std::string, std::string> getMapData(std::string root, std::string key, std::string value);
+    // load current language
+    void loadCurrentLanguage(std::string jsonFile);
     
     bool checkFileExist(std::string filename);
 private:
@@ -63,7 +77,6 @@ private:
     
     void moveGameOverScene();
     
-    void moveHighScore();
 };
 
 #endif /* defined(__BrainDotsDebug__SceneManager__) */

@@ -158,7 +158,7 @@ void MenuScene::addListHorizontal()
     listview->setPosition(bodySize/2);
     listview->setContentSize(bodySize);
     listview->setInertiaScrollEnabled(true);
-    listview->setItemsMargin(LIST_ITEM_MARGIN);
+    listview->setItemsMargin(LIST_BIG_ITEM_MARGIN);
     listview->addEventListener(CC_CALLBACK_2(MenuScene::selectedItemEvent, this));
     listview->addEventListener(CC_CALLBACK_2(MenuScene::scrollEvent, this));
     
@@ -170,7 +170,7 @@ void MenuScene::addListHorizontal()
 
 void MenuScene::reloadData() {
     int maxStage = (int)((int) (SceneManager::getInstance()->getCurMaxLevel()/6)) % LEVEL_MAX;
-	listview->removeAllChildren();
+	listview->removeAllItems();
 	for (int i = 0; i < LEVEL_MAX; ++i) {
         // layout include sticker and text
 		Layout* layout = Layout::create();
@@ -437,24 +437,16 @@ void MenuScene::selectedItemEvent(cocos2d::Ref *pSender, ListView::EventType typ
 
 void MenuScene::scrollEvent(cocos2d::Ref *pSender, ui::ScrollView::EventType type)
 {
-    ListView* listView = static_cast<ListView*>(pSender);
-    if ( type == ui::ScrollView::EventType::SCROLLING)
-    {
-        CCLOG("SCROLLING %f", listView->getInnerContainer()->getPositionX());
-    } else if ( type == ui::ScrollView::EventType::BOUNCE_LEFT) {
-        CCLOG("BOUNCE_LEFT %f", listView->getInnerContainer()->getPositionX());
-    } else if ( type == ui::ScrollView::EventType::BOUNCE_RIGHT) {
-        CCLOG("BOUNCE_RIGHT %f", listView->getInnerContainer()->getPositionX());
-    }
+    
 }
 
 void MenuScene::openStage(int i)
 {
     float curPos = listview->getInnerContainer()->getPositionX();
-    float exactPos = -(stickerSize.width + LIST_ITEM_MARGIN) * i;
-    CCLOG("extractPos %f", exactPos);
+    float exactPos = -(stickerSize.width + LIST_BIG_ITEM_MARGIN) * i;
     if (curPos > (exactPos + DELTA_TRANSLATE) || curPos < (exactPos - DELTA_TRANSLATE)) {
-        listview->getInnerContainer()->setPositionX(exactPos);
+//        listview->getInnerContainer()->setPositionX(exactPos);
+        listview->getInnerContainer()->runAction(MoveTo::create(0.3f, Vec2(exactPos, 0)));
     }
     else
     {
@@ -475,10 +467,11 @@ void MenuScene::showStages(int i)
     listview->setVisible(true);
     pageview->setVisible(false);
     float curPos = listview->getInnerContainer()->getPositionX();
-    float exactPos = -(stickerSize.width + LIST_ITEM_MARGIN) * i;
+    float exactPos = -(stickerSize.width + LIST_BIG_ITEM_MARGIN) * i;
     
     if (curPos > (exactPos + DELTA_TRANSLATE) || curPos < (exactPos - DELTA_TRANSLATE)) {
-        listview->getInnerContainer()->setPositionX(exactPos);
+//        listview->getInnerContainer()->setPositionX(exactPos);
+        listview->getInnerContainer()->runAction(MoveTo::create(0.3f, Vec2(exactPos, 0)));
     }
 }
 

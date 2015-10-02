@@ -34,11 +34,15 @@
 #define LEVEL_DEFAULT_UNLOCKED          1
 #define ITEMS_IN_PAGE                   6
 #define PADDING                         10
-#define LIST_ITEM_MARGIN                100
+#define LIST_BIG_ITEM_MARGIN            100
+#define LIST_SMALL_ITEM_MARGIN          50
 #define SCROLL_THRESHOLD                50
 #define DELTA_TRANSLATE                 20
 #define PADDING_MENU_HEADER_ITEM        40
 
+#define PENCIL_MAX                      20
+#define MAX_SCALE_PENCIL                2.0
+#define MIN_SCALE_PENCIL                1.0
 #ifndef DEGTORAD
 #define DEGTORAD 0.0174532925199432957f
 #define RADTODEG 57.295779513082320876f

@@ -8,9 +8,6 @@
 
 #include "PencilPopupLayer.h"
 
-USING_NS_CC_EXT;
-using namespace cocos2d::extension;
-
 PencilPopupLayer::PencilPopupLayer()
 {
     
@@ -33,6 +30,7 @@ bool PencilPopupLayer::init()
 {
     BasePopupLayer::init();
     sizeLayout = layoutTable->getContentSize();
+    sizeListView = Size(sizeLayout.width *4/5, sizeLayout.height*2 / 3);
     
     // title
     auto title = Text::create("Choose pencil", "arial.ttf", 60);
@@ -41,225 +39,163 @@ bool PencilPopupLayer::init()
     title->setColor(Color3B::RED);
     layoutTable->addChild(title);
     
-    // define variables
-    this->swBox = Rect(0.01f * sizeLayout.width, 0.4f* sizeLayout.height, 0.98*sizeLayout.width, 0.33f*sizeLayout.height);
-    this->swPosition = swBox.origin;
-    this->swSize = swBox.size;
-    this->slSize = Size(2.3f * sizeLayout.width, 0.33f * sizeLayout.height);
-    this->disDistance = 0.2f * sizeLayout.width;
-    this->disScale = 0.25f;
+    // add listview horizontal
+    listViewPencils = ListView::create();
+    listViewPencils->setDirection(cocos2d::ui::ScrollView::Direction::HORIZONTAL);
+    listViewPencils->setGravity(cocos2d::ui::ListView::Gravity::CENTER_HORIZONTAL);
+    listViewPencils->setTouchEnabled(true);
+    listViewPencils->setBounceEnabled(true);
+    listViewPencils->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    listViewPencils->setPosition(Vec2(title->getPositionX(), sizeLayout.height/2));
+    listViewPencils->setContentSize(sizeListView);
+    listViewPencils->setInertiaScrollEnabled(true);
+    listViewPencils->setItemsMargin(LIST_SMALL_ITEM_MARGIN);
+    listViewPencils->addEventListener(CC_CALLBACK_2(PencilPopupLayer::selectedItemEvent, this));
+    listViewPencils->addEventListener(CC_CALLBACK_2(PencilPopupLayer::scrollEvent, this));
+
+    layoutTable->addChild(listViewPencils);
     
-    // init data
-    initData();
+    // reload data
+    reloadData();
     
-    // add item
-//    for (int i = 0; i < 100; i++) {
-//        auto item = Sprite::create("pencil1.png");
-//        addItem(item);
+    // button
+    Button* buyButton = Button::create("lang_normal.png");
+    buyButton->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
+    buyButton->setPosition(Vec2(sizeLayout.width/3, PADDING_MENU_HEADER_ITEM));
+    buyButton->setTitleText("Buy pencil");
+    buyButton->setTitleColor(Color3B::WHITE);
+    buyButton->setTitleFontSize(40);
+    buyButton->setTitleFontName("arial.ttf");
+    layoutTable->addChild(buyButton);
+    
+    Button* useButton = Button::create("lang_selected.png");
+    useButton->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
+    useButton->setPosition(Vec2(sizeLayout.width*2/3, PADDING_MENU_HEADER_ITEM));
+    useButton->setTitleText("Use pencil");
+    useButton->setTitleColor(Color3B::WHITE);
+    useButton->setTitleFontSize(40);
+    useButton->setTitleFontName("arial.ttf");
+    layoutTable->addChild(useButton);
+    
+    return true;
+}
+
+void PencilPopupLayer::reloadData()
+{
+    listViewPencils->removeAllItems();
+    listPencils.clear();
+    
+    for (int i = 0; i < PENCIL_MAX; i++) {
+        // container
+        Layout* layout = Layout::create();
+        auto pencil = Button::create("pencil1.png");
+        sizePencil = pencil->getContentSize();
+        
+        if ( i == 0 || i == PENCIL_MAX-1) {
+            layout->setContentSize(Size(sizeListView.width/2 + sizePencil.width/2, sizeListView.height));
+            if (i == 0) {
+                pencil->setPosition(Vec2(layout->getContentSize().width - sizePencil.width/2, sizeListView.height/2));
+            } else if ( i == PENCIL_MAX-1) {
+                pencil->setPosition(Vec2(sizePencil.width/2, sizeListView.height/2));
+            }
+        } else {
+            layout->setContentSize(Size(pencil->getContentSize().width, sizeListView.height));
+            pencil->setPosition(layout->getContentSize()/2);
+        }
+        
+        // pencil sprite
+        pencil->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+        pencil->setTitleText(StringUtils::format("%d",i+1));
+        pencil->setTitleColor(Color3B::BLACK);
+        pencil->setTitleFontSize(40);
+        pencil->setTitleFontName("arial.ttf");
+        layout->addChild(pencil);
+        
+        listPencils.pushBack(pencil);
+        // insert listview
+        listViewPencils->insertCustomItem(layout, i);
+    }
+    listViewPencils->refreshView();
+}
+
+void PencilPopupLayer::selectedItemEvent(cocos2d::Ref *pSender, ListView::EventType type)
+{
+    ListView* list = static_cast<ListView*>(pSender);
+    
+    switch (type) {
+        case ListView::EventType::ON_SELECTED_ITEM_START :
+            break;
+            
+        case ListView::EventType::ON_SELECTED_ITEM_END :
+        {
+            float curPos = list->getInnerContainer()->getPositionX();
+            float exactPos = -(sizePencil.width + LIST_SMALL_ITEM_MARGIN) * ((int) list->getCurSelectedIndex());
+            CCLOG("curPos %f exactPos %f", curPos, exactPos);
+            if (curPos > (exactPos + DELTA_TRANSLATE) || curPos < (exactPos - DELTA_TRANSLATE)) {
+                auto moveAndScale = Sequence::create(MoveTo::create(0.3f, Vec2(exactPos, 0)), CallFunc::create(CC_CALLBACK_0(PencilPopupLayer::scrollEvent, this, listViewPencils, ui::ScrollView::EventType::SCROLLING)),NULL);
+                list->getInnerContainer()->runAction(moveAndScale);
+            }
+            break;
+        }
+            
+        default:
+            break;
+    }
+}
+
+void PencilPopupLayer::scrollEvent(cocos2d::Ref *pSender, ui::ScrollView::EventType type)
+{
+    ListView* list = static_cast<ListView*>(pSender);
+    
+    if ( type == ui::ScrollView::EventType::SCROLLING || type == ui::ScrollView::EventType::BOUNCE_LEFT || type == ui::ScrollView::EventType::BOUNCE_RIGHT)
+    {
+//        CCLOG("SCROLLING");
+        curPosX = list->getInnerContainer()->getPositionX();
+        // scale item
+        this->scaleItems(curPosX);
+        
+    }
+//    else if ( type == ui::ScrollView::EventType::BOUNCE_LEFT) {
+//        CCLOG("BOUNCE_LEFT %f", list->getInnerContainer()->getPositionX());
+//    } else if ( type == ui::ScrollView::EventType::BOUNCE_RIGHT) {
+//        CCLOG("BOUNCE_RIGHT %f", list->getInnerContainer()->getPositionX());
 //    }
-    
-    BaseCoverFlow* cover = BaseCoverFlow::create(sizeLayout, 20);
-    cover->setContentSize(sizeLayout);
-    cover->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    cover->setPosition(Vec2::ZERO);
-    layoutTable->addChild(cover);
-    
-    // touch screen
-//    auto listener = EventListenerTouchOneByOne::create();
-//    listener->setEnabled(true);
-//    listener->onTouchBegan = CC_CALLBACK_2(PencilPopupLayer::onTouchBegan, this);
-//    listener->onTouchMoved = CC_CALLBACK_2(PencilPopupLayer::onTouchMoved, this);
-//    listener->onTouchEnded = CC_CALLBACK_2(PencilPopupLayer::onTouchEnded, this);
-//    this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, scrollLayer);
-
-    return true;
 }
 
-void PencilPopupLayer::initData()
+void PencilPopupLayer::scaleItems(float curPosX)
 {
-    // init array
-    itemArray = Array::create();
-    itemArray->retain();
-    
-    itemNum = 0;
-    // set offset to center
-    offsetPosition = Vec2(swSize.width/2, swSize.height/2);
-    
-    scrollLayer = Layer::create();
-    scrollLayer->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    scrollLayer->setPosition(offsetPosition);
-    scrollLayer->setContentSize(slSize);
-    
-    scrollView = cocos2d::extension::ScrollView::create(swSize, scrollLayer);
-    scrollView->setContentSize(swSize);
-    scrollView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    scrollView->setTouchEnabled(false);
-    scrollView->setDirection(cocos2d::extension::ScrollView::Direction::HORIZONTAL);
-    scrollView->setContentOffset(Vec2::ZERO);
-    scrollView->setDelegate(this);
-    layoutTable->addChild(scrollView,1);
-}
 
-void PencilPopupLayer::onExit()
-{
-    removeAllChildren();
-    LayerColor::onExit();
-}
-
-bool PencilPopupLayer::onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *pEvent)
-{
-    return true;
-}
-
-void PencilPopupLayer::onTouchMoved(cocos2d::Touch *touch, cocos2d::Event *pEvent)
-{
-    Vec2 scroll_prepoint = touch->getPreviousLocation();
-    Vec2 scroll_movepoint = touch->getLocation();
-    if(swBox.containsPoint(scroll_movepoint))
-    {
-//        Vec2 adjustPoint = scroll_movepoint-scroll_prepoint;
-//        adjustScrollView(adjustPoint);
-//        adjustItemScale(adjustPoint);
+    int index = -1;
+    float scale = MIN_SCALE_PENCIL;
+    
+    for (int i = 0 ; i < PENCIL_MAX; i++) {
+        
+        float startX = -(sizePencil.width + LIST_SMALL_ITEM_MARGIN) * i + sizePencil.width;
+        float endX = -(sizePencil.width + LIST_SMALL_ITEM_MARGIN) * i - sizePencil.width;
+        float centerX = (startX + endX) / 2;
+        
+        if (curPosX <= startX && curPosX >= endX) {
+            if (curPosX > (centerX + DELTA_TRANSLATE)) {
+                scale = MAX_SCALE_PENCIL - (curPosX-centerX) / sizePencil.width;
+            } else if ( curPosX < (centerX - DELTA_TRANSLATE)) {
+                scale = MAX_SCALE_PENCIL - (centerX - curPosX) / sizePencil.width;
+            } else  if (curPosX <=(centerX+DELTA_TRANSLATE) && curPosX >=(curPosX-DELTA_TRANSLATE)){
+                scale = MAX_SCALE_PENCIL;
+            }
+            
+            index = i;
+            break;
+        }
     }
-}
 
-void PencilPopupLayer::onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *pEvent)
-{
-    Vec2 scroll_prepoint = touch->getPreviousLocation();
-    Vec2 scroll_endpoint = touch->getLocation();
-//    float disX = scroll_endpoint.x - scroll_endpoint.x;
-//    adjustEndScrollView();
-}
-
-void PencilPopupLayer::adjustItemScale(Vec2 adjustPoint)
-{
-//    float disX = adjustPoint.x;
-    Ref* obj = NULL;
-    CCARRAY_FOREACH(itemArray,obj)
-    {
-        Node* card = (Node*) obj;
-        float offset = scrollView->getContentOffset().x;
-        float posX = card->getPositionX() + offset;
-        float disMid = abs(swSize.width/2-posX);
-        float scale = 1- disMid/disDistance*disScale;
-        card->setScale(scale);
-        int zOr = (int) (1000-disMid*0.1);
-        card->setZOrder(zOr);
-    }
-}
-
-void PencilPopupLayer::adjustScrollView(Vec2 adjustPoint)
-{
-    Vec2 endPoint;
-    Vec2::add(scrollView->getContentOffset(), Vec2(adjustPoint.x, 0), &endPoint);
-//    scrollView->unscheduleAllSelectors();
-    scrollView->unscheduleAllCallbacks();
-    scrollView->setContentOffset(endPoint,false);
-}
-
-void PencilPopupLayer::adjustEndScrollView()
-{
-    Ref* obj = NULL;
-    float minX = sizeLayout.height;
-    float midX = swSize.width/2;
-    //èŽ·å�–è·�ç¦»ä¸­é—´æœ€å°�å€¼çš„card
-    CCARRAY_FOREACH(itemArray,obj)
-    {
-        Node* card = (Node*) obj;
-        float offset = scrollView->getContentOffset().x;
-        //è½¬åŒ–çˆ¶ç±»å��æ ‡
-        float posX = card->getPositionX() + offset;
-        float disMid = midX-posX;
-        if(abs(disMid) < abs(minX)) minX = disMid;
-    }
+    if (index == -1) return;
     
-    CCARRAY_FOREACH(itemArray,obj)
-    {
-        Node* item = (Node*) obj;
-        //è½¬åŒ–çˆ¶ç±»å��æ ‡
-        float offset = scrollView->getContentOffset().x;
-        float posX = item->getPositionX() + offset ;
-        //è·�ç¦»ä¸­é—´é•¿åº¦
-        float disMid = abs(midX - posX - minX);
-        //ç›®æ ‡scale
-        float scale = 1- disMid/disDistance*disScale;
-        ScaleTo* scaleBy = ScaleTo::create(0.2f,scale);
-        item->runAction(scaleBy);
-        int zOr = (int) (1000-disMid*0.1);
-        item->setZOrder(zOr);
+    for(int i = 0; i< listPencils.size(); i++) {
+        auto layout = (Button*)listPencils.at(i);
+        if (i == (index)) {
+            layout->setScale(scale);
+        } else {
+            layout->setScale(MIN_SCALE_PENCIL);
+        }
     }
-    Layer* scrollLayer = (Layer*)scrollView->getContainer();
-    MoveBy* moveBy = MoveBy::create(0.2f,Vec2(minX,0));
-    //CCCallFuncN* callFuncN = CCCallFuncN::create(this,callfuncN_selector(CoverView::cardViewEnd_callBack));
-    //CCSequence* seq = CCSequence::create(moveBy,callFuncN,NULL);
-    //scrollLayer->runAction(seq);
-    scrollLayer->runAction(moveBy);
-}
-
-void PencilPopupLayer::itemViewEnd_callback(Ref* pSender)
-{
-    getCurItemIndex();
-}
-
-void PencilPopupLayer::scrollViewDidScroll(cocos2d::extension::ScrollView* view)
-{
-    CCLOG("scrolling %f %f", view->getContentOffset().x, view->getContentOffset().y);
-}
-
-void PencilPopupLayer::scrollViewDidZoom(cocos2d::extension::ScrollView* view)
-{
-    
-}
-
-void PencilPopupLayer::addItem(Node * item)
-{
-    int zOrder = 1000 - itemNum;
-    this->addItem(item, zOrder, 0);
-}
-
-void PencilPopupLayer::addItem(Node * item, int zOrder)
-{
-    this->addItem(item, zOrder,0);
-}
-
-void PencilPopupLayer::addItem(Node* item, int zOrder, int tag)
-{
-    float positionX = offsetPosition.x + disDistance*itemNum;
-    float scale = 1 - disScale*itemNum;
-    item->setPosition(Vec2(positionX,offsetPosition.y));
-    item->setScale(scale);
-    itemArray->addObject(item);
-    scrollLayer->addChild(item , zOrder,tag);
-    itemNum++;
-    //CCLog("crad%d:[%f , %f]",cardNum,card->getPositionX(),card->getPositionY());
-}
-
-int PencilPopupLayer::getCurItemIndex()
-{
-    float distance1 = - scrollLayer->getPositionX();
-    float distance2 = swSize.width/2 - offsetPosition.x;
-    //+5 æµ®ç‚¹æ•°è¯¯å·®
-    int index = (distance1 + distance2 + 5) / (disDistance);
-    //CCLog("card index:%d  distance1:%f",index,distance1);
-    return index;
-}
-
-void PencilPopupLayer::setOffsetPosition(Vec2 var)
-{
-    offsetPosition = var;
-    Ref* obj = NULL;
-    itemNum = 0;
-    CCARRAY_FOREACH(itemArray,obj)
-    {
-        Node* card = (Node*) obj;
-        float positionX = offsetPosition.x + disDistance*itemNum;
-        card->setPosition(Vec2(positionX,offsetPosition.y));
-        itemNum++;
-    }
-    adjustItemScale(Vec2::ZERO);
-}
-
-Vec2 PencilPopupLayer::getOffsetPosition()
-{
-    return offsetPosition;
 }

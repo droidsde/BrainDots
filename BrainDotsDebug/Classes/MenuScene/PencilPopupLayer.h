@@ -11,15 +11,12 @@
 
 #include <cocos2d.h>
 #include "BasePopupLayer.h"
-#include "BaseCoverFlow.h"
-#include <extensions/cocos-ext.h>
 
 USING_NS_CC;
 
 using namespace cocos2d::ui;
-using namespace cocos2d::extension;
 
-class PencilPopupLayer : public BasePopupLayer, public ScrollViewDelegate
+class PencilPopupLayer : public BasePopupLayer
 {
 public:
     
@@ -27,40 +24,19 @@ public:
     ~PencilPopupLayer();
     static PencilPopupLayer* create();
     virtual bool init();
-    void initData();
-
-    virtual void onExit();
-    
-    virtual bool onTouchBegan(Touch* touch, Event* pEvent);
-    virtual void onTouchMoved(Touch* touch, Event* pEvent);
-    virtual void onTouchEnded(Touch* touch, Event* pEvent);
-    
-    virtual void scrollViewDidScroll(cocos2d::extension::ScrollView* view);
-    virtual void scrollViewDidZoom(cocos2d::extension::ScrollView* view);
-    void adjustItemScale(Vec2 adjustPoint);
-    void adjustScrollView(Vec2 adjustPoint);
-    void adjustEndScrollView();
-    void itemViewEnd_callback(Ref* pSender);
-    
-    int getCurItemIndex();  // index of current item
-    void addItem(Node* item);
-    void addItem(Node* item, int zOrder);
-    void addItem(Node* item, int zOrder, int tag);
-    
-    CC_SYNTHESIZE(Vec2, swPosition, SwPosition); // scrollview position
-    CC_SYNTHESIZE(Size, swSize, SwSize);    // scrollview size
-    CC_SYNTHESIZE(Size, slSize, SlSize);    // scrollLayer size
-    CC_SYNTHESIZE(float, disDistance, DisDistance); // distance item
-    CC_SYNTHESIZE(float, disScale, DisScale);       // scale item
-    CC_SYNTHESIZE(Rect, swBox, SwBox);              //
-    CC_SYNTHESIZE(Layer*, scrollLayer, scrollLayer); // layer container
-    CC_SYNTHESIZE(int, itemNum, ItemNum);           // item index
-    CC_PROPERTY(Vec2, offsetPosition, OffsetPosition); // position offset
+    void reloadData();
     
 private:
     Size sizeLayout;
-    Array* itemArray;
-    cocos2d::extension::ScrollView* scrollView;
+    Size sizeListView;
+    Size sizePencil;
+    float curPosX;
+    ListView* listViewPencils;
+    Vector<Button*> listPencils;
+    
+    void scaleItems(float curPosX);
+    void selectedItemEvent(Ref *pSender, ListView::EventType type);
+    void scrollEvent(Ref* pSender, ui::ScrollView::EventType type);
 };
 
 #endif /* defined(__BrainDotsDebug__PencilPopupLayer__) */

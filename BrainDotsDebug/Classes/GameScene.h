@@ -84,7 +84,7 @@ public:
     
     static cocos2d::Scene* createScene();
     virtual bool init();
-//    virtual void draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t flags) override;
+    virtual void draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t flags) override;
     
     CREATE_FUNC(GameScene);
     

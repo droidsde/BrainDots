@@ -43,11 +43,15 @@ public:
     CC_SYNTHESIZE(int, gameLevel, LevelGame);
     CC_SYNTHESIZE(int, curMaxLevel, CurMaxLevel);
     CC_SYNTHESIZE(std::string, curLanguage, CurLanguage);
+    CC_SYNTHESIZE(int, curUnlockPencil, CurUnlockPencil);
+    CC_SYNTHESIZE(int, curUsePencil, CurUsePencil);
     
     void changeState(GAME_STATE = GAME_STATE::LOGO);
     void loadingScene(Layer*);
     void saveLevel(int level);
     void saveLanguage();
+    void saveUnlockPencil(int index);
+    void saveUsePencil(int pencil);
     
     // load list language
     void loadListLanguage(std::string jsonFile);

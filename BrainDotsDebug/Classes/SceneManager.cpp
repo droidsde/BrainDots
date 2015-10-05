@@ -21,6 +21,8 @@ SceneManager::SceneManager()
     gameLevel = UserDefault::getInstance()->getIntegerForKey("level", 0);
     curMaxLevel = UserDefault::getInstance()->getIntegerForKey("level", 0);
     curLanguage = UserDefault::getInstance()->getStringForKey("language", "English");
+    curUnlockPencil = UserDefault::getInstance()->getIntegerForKey("unlockpencil", PENCIL_DEFAULT_UNLOCK);
+    curUsePencil = UserDefault::getInstance()->getIntegerForKey("usepencil", 0);
 }
 
 SceneManager::~SceneManager()
@@ -108,6 +110,21 @@ void SceneManager::saveLevel(int level)
 void SceneManager::saveLanguage()
 {
     UserDefault::getInstance()->setStringForKey("language", getCurLanguage());
+}
+
+void SceneManager::saveUnlockPencil(int index)
+{
+    int oldPencil = UserDefault::getInstance()->getIntegerForKey("unlockpencil", PENCIL_DEFAULT_UNLOCK);
+    if (index > oldPencil) {
+        UserDefault::getInstance()->setIntegerForKey("unlockpencil", index);
+        setCurUnlockPencil(index);
+    }
+}
+
+void SceneManager::saveUsePencil(int index)
+{
+    UserDefault::getInstance()->setIntegerForKey("usepencil", index);
+    setCurUsePencil(index);
 }
 
 void SceneManager::loadListLanguage(std::string jsonFile)

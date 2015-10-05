@@ -41,8 +41,9 @@
 #define PADDING_MENU_HEADER_ITEM        40
 
 #define PENCIL_MAX                      20
-#define MAX_SCALE_PENCIL                2.0
+#define MAX_SCALE_PENCIL                2.2
 #define MIN_SCALE_PENCIL                1.0
+#define PENCIL_DEFAULT_UNLOCK           5
 #ifndef DEGTORAD
 #define DEGTORAD 0.0174532925199432957f
 #define RADTODEG 57.295779513082320876f
@@ -81,6 +82,16 @@ std::string to_string(T value)
     return os.str() ;
 }
 
+typedef enum class game_state
+{
+    LOGO = 0,
+    SPLASH_SCREEN,
+    MENU,
+    SETTING,
+    GAME,
+    OVER,
+}GAME_STATE;
+    
 enum ZORDER_MENU
 {
     HEADER_LAYER = 0,
@@ -110,6 +121,11 @@ enum TAG_MENU_ITEM
     YOUTUBE,
 };
 
+enum TAG_PENCIL_ITEM
+    {
+        BUY_BUTTON = 0,
+        SELECT_BUTTON,
+    };
 enum TAG_SETTING_ITEM
 {
     MUSIC = 0,
@@ -119,16 +135,6 @@ enum TAG_SETTING_ITEM
     LANGUGAGE,
     RELOAD_PURCHASES
 };
-
-typedef enum class game_state
-{
-    LOGO = 0,
-    SPLASH_SCREEN,
-    MENU,
-    SETTING,
-    GAME,
-    OVER,
-}GAME_STATE;
 
 enum TAG_MENU
 {
@@ -142,13 +148,13 @@ enum TAG_MENU
 };
     
 enum TAG_POPUP_SHARE
-    {
-        TAG_TWITTER = 0,
-        TAG_FACEBOOK,
-        TAG_LINE,
-        TAG_GGPLUS,
-        TAG_MORESHARE,
-    };
+{
+    TAG_TWITTER = 0,
+    TAG_FACEBOOK,
+    TAG_LINE,
+    TAG_GGPLUS,
+    TAG_MORESHARE,
+};
     
 enum TAG_GAME
 {

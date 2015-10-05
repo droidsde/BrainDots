@@ -11,6 +11,8 @@
 
 #include <cocos2d.h>
 #include "BasePopupLayer.h"
+#include "BlendFuncButton.h"
+#include "SceneManager.h"
 
 USING_NS_CC;
 
@@ -30,13 +32,23 @@ private:
     Size sizeLayout;
     Size sizeListView;
     Size sizePencil;
-    float curPosX;
+    float widthLayoutPencil;
+
     ListView* listViewPencils;
-    Vector<Button*> listPencils;
+    Vector<BlendFuncButton*> listPencils;
     
+    // scale item
     void scaleItems(float curPosX);
+    
+    // focus item
+    void autoFocusItemList();
+    
+    // scroll to index
+    void scrollToItem(int index);
+    
     void selectedItemEvent(Ref *pSender, ListView::EventType type);
     void scrollEvent(Ref* pSender, ui::ScrollView::EventType type);
+    void touchButtonEvent(Ref* pSender, Widget::TouchEventType type);
 };
 
 #endif /* defined(__BrainDotsDebug__PencilPopupLayer__) */

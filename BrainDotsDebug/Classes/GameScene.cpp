@@ -54,7 +54,7 @@ bool GameScene::init()
     origin = Director::getInstance()->getVisibleOrigin();
     
     // draw grid
-    this->drawGrids();
+//    this->drawGrids();
     
     // button back
     auto backButton = Button::create("back.png");
@@ -110,6 +110,13 @@ bool GameScene::init()
     // set scale
     this->setScale(0.2);
     
+    int p[] = {80,200,112,120,160,72,256,88,336,120,368,248,352,296,272,312,256,248,192,216,160,232,112,280,64,248,80,200};
+    for (int i = 0; i < 25; i += 2)
+        drawnode->drawLine(Vec2(p[i], p[i+1]), Vec2(p[i+2], p[i+3]), Color4F::RED);
+    
+    int h[] = {144,168,192,120,272,136,320,200,288,232,240,168,192,184,144,168};
+    for (int i = 0; i < 14; i += 2)
+        drawnode->drawLine(Vec2(h[i], h[i+1]), Vec2(h[i+2], h[i+3]), Color4F::RED);
     return true;
 }
 
@@ -267,21 +274,21 @@ void GameScene::drawGrids()
     }
 }
 
-//void GameScene::draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformUpdated) {
-//    Layer::draw(renderer, transform, transformUpdated);
-//    Director* director = Director::getInstance();
-//    
-//    CCASSERT(nullptr != director, "Director is null when seting matrix stack");
-//    director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-//    director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, transform);
-//    GL::enableVertexAttribs(cocos2d::GL::VERTEX_ATTRIB_FLAG_POSITION);
-//    if (this->isScheduled(schedule_selector(GameScene::update))) {
-//        this->update(0.0f);
-//    }
-//    world->DrawDebugData();
-//    CHECK_GL_ERROR_DEBUG();
-//    director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-//}
+void GameScene::draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformUpdated) {
+    Layer::draw(renderer, transform, transformUpdated);
+    Director* director = Director::getInstance();
+    
+    CCASSERT(nullptr != director, "Director is null when seting matrix stack");
+    director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+    director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, transform);
+    GL::enableVertexAttribs(cocos2d::GL::VERTEX_ATTRIB_FLAG_POSITION);
+    if (this->isScheduled(schedule_selector(GameScene::update))) {
+        this->update(0.0f);
+    }
+    world->DrawDebugData();
+    CHECK_GL_ERROR_DEBUG();
+    director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+}
 
 void GameScene::initPhysics()
 {
@@ -763,6 +770,7 @@ void GameScene::onTouchEnded(Touch* touch, Event* event) {
                                currentPlatformBody->GetPosition().y); //set the starting position
         world->DestroyBody(currentPlatformBody);
         b2Body* newBody = world->CreateBody(&myBodyDef);
+        CCLOG("size of list fixture %zd", platformPoints.size());
         for (int i = 0; i < platformPoints.size() - 1; i++) {
             Vec2 start = platformPoints.at(i);
             Vec2 end = platformPoints.at(i+1);
@@ -787,8 +795,8 @@ void GameScene::onTouchEnded(Touch* touch, Event* event) {
         CC_SAFE_DELETE(_image);
         auto texture2D = Sprite::createWithTexture(_texture2D, bodyRectangle);
         texture2D->setAnchorPoint(anchorPoint);
-        map->addChild(texture2D);
-        newBody->SetUserData(texture2D);
+//        map->addChild(texture2D);
+//        newBody->SetUserData(texture2D);
         
         Director::getInstance()->getTextureCache()->removeTextureForKey(_key);
     }
@@ -812,7 +820,6 @@ Vec2 GameScene::checkDrawingWithOtherBodies(cocos2d::Vec2 start, cocos2d::Vec2 e
     b2Vec2 point1(start.x / PTM_RATIO , start.y / PTM_RATIO);
     b2Vec2 point2(end.x / PTM_RATIO , end.y / PTM_RATIO);
     
-    // Loại 1
     RayCastClosestCallback callback;
     world->RayCast(&callback, point1, point2);
     

@@ -226,7 +226,7 @@ void MenuScene::reloadData() {
             frameGray->setBackGroundColorOpacity(150);
             frameGray->setPosition(Vec2::ZERO);
             stage->addChild(frameGray);
-            auto lockIcon = Sprite::create("lock_icon.png");
+            auto lockIcon = Sprite::create("lock_icon_256x256.png");
             lockIcon->setPosition(stickerSize/2);
             stage->addChild(lockIcon);
         } else if (i < maxStage) {
@@ -286,7 +286,7 @@ void MenuScene::addPageView()
                     frameGray->setBackGroundColorOpacity(150);
                     frameGray->setPosition(Vec2::ZERO);
                     level->addChild(frameGray);
-                    auto lockIcon = Sprite::create("mini_lock_icon.png");
+                    auto lockIcon = Sprite::create("lock_icon_128x128.png");
                     lockIcon->setPosition(level->getContentSize()/2);
                     level->addChild(lockIcon);
                     level->setTouchEnabled(false);
@@ -336,7 +336,11 @@ void MenuScene::touchButtonEvent(Ref* sender, Widget::TouchEventType type) {
         
         for (int i = TAG_MENU::TAG_LEVEL_CHOOSE; i < TAG_MENU::TAG_LEVEL_CHOOSE + LEVEL_MAX*ITEMS_IN_PAGE; i++) {
             if (receiver->getTag() == i) {
-                CCLOG("level %d", i);
+                // check file game
+                std::string nameLevel = "level" + to_string(i-TAG_MENU::TAG_LEVEL_CHOOSE) + ".tmx";
+                if (!SceneManager::getInstance()->checkFileExist(nameLevel)) {
+                    break;
+                }
                 // open game level
                 SceneManager::getInstance()->setLevelGame(i-TAG_MENU::TAG_LEVEL_CHOOSE);
                 
@@ -445,7 +449,6 @@ void MenuScene::openStage(int i)
     float curPos = listview->getInnerContainer()->getPositionX();
     float exactPos = -(stickerSize.width + LIST_BIG_ITEM_MARGIN) * i;
     if (curPos > (exactPos + DELTA_TRANSLATE) || curPos < (exactPos - DELTA_TRANSLATE)) {
-//        listview->getInnerContainer()->setPositionX(exactPos);
         listview->getInnerContainer()->runAction(MoveTo::create(0.3f, Vec2(exactPos, 0)));
     }
     else
@@ -470,7 +473,6 @@ void MenuScene::showStages(int i)
     float exactPos = -(stickerSize.width + LIST_BIG_ITEM_MARGIN) * i;
     
     if (curPos > (exactPos + DELTA_TRANSLATE) || curPos < (exactPos - DELTA_TRANSLATE)) {
-//        listview->getInnerContainer()->setPositionX(exactPos);
         listview->getInnerContainer()->runAction(MoveTo::create(0.3f, Vec2(exactPos, 0)));
     }
 }

@@ -15,7 +15,7 @@ PencilPopupLayer::PencilPopupLayer()
 
 PencilPopupLayer::~PencilPopupLayer()
 {
-//    CC_SAFE_RELEASE_NULL(itemArray);
+
 }
 
 PencilPopupLayer* PencilPopupLayer::create()
@@ -66,6 +66,8 @@ bool PencilPopupLayer::init()
     buyButton->setTitleColor(Color3B::WHITE);
     buyButton->setTitleFontSize(40);
     buyButton->setTitleFontName("arial.ttf");
+    buyButton->setTag(TAG_PENCIL_ITEM::BUY_BUTTON);
+    buyButton->addTouchEventListener(CC_CALLBACK_2(PencilPopupLayer::touchButtonEvent, this));
     layoutTable->addChild(buyButton);
     
     Button* useButton = Button::create("lang_selected.png");
@@ -75,6 +77,8 @@ bool PencilPopupLayer::init()
     useButton->setTitleColor(Color3B::WHITE);
     useButton->setTitleFontSize(40);
     useButton->setTitleFontName("arial.ttf");
+    useButton->setTag(TAG_PENCIL_ITEM::SELECT_BUTTON);
+    useButton->addTouchEventListener(CC_CALLBACK_2(PencilPopupLayer::touchButtonEvent, this));
     layoutTable->addChild(useButton);
     
     return true;
@@ -87,20 +91,20 @@ void PencilPopupLayer::reloadData()
     
     for (int i = 0; i < PENCIL_MAX; i++) {
         // container
-        Layout* layout = Layout::create();
-        auto pencil = Button::create("pencil1.png");
+        Layout* mainLayout = Layout::create();
+        auto pencil = BlendFuncButton::create("pencil1.png");
         sizePencil = pencil->getContentSize();
-        
+    
         if ( i == 0 || i == PENCIL_MAX-1) {
-            layout->setContentSize(Size(sizeListView.width/2 + sizePencil.width/2, sizeListView.height));
+            mainLayout->setContentSize(Size(sizeListView.width/2 + sizePencil.width/2, sizeListView.height));
             if (i == 0) {
-                pencil->setPosition(Vec2(layout->getContentSize().width - sizePencil.width/2, sizeListView.height/2));
+                pencil->setPosition(Vec2(mainLayout->getContentSize().width - sizePencil.width/2, sizeListView.height/2));
             } else if ( i == PENCIL_MAX-1) {
                 pencil->setPosition(Vec2(sizePencil.width/2, sizeListView.height/2));
             }
         } else {
-            layout->setContentSize(Size(pencil->getContentSize().width, sizeListView.height));
-            pencil->setPosition(layout->getContentSize()/2);
+            mainLayout->setContentSize(Size(pencil->getContentSize().width, sizeListView.height));
+            pencil->setPosition(mainLayout->getContentSize()/2);
         }
         
         // pencil sprite
@@ -109,13 +113,29 @@ void PencilPopupLayer::reloadData()
         pencil->setTitleColor(Color3B::BLACK);
         pencil->setTitleFontSize(40);
         pencil->setTitleFontName("arial.ttf");
-        layout->addChild(pencil);
         
+        if (i >= SceneManager::getInstance()->getCurUnlockPencil()) {
+            BlendFunc blend;
+            blend.src = GL_ONE_MINUS_DST_COLOR;
+            blend.dst = GL_ONE_MINUS_SRC_COLOR;
+            pencil->setBlendFunc(blend);
+            pencil->setColor(Color3B::GRAY);
+            
+            // add lock
+            auto lock = Sprite::create("lock_icon_64x64.png");
+            lock->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+            lock->setPosition(sizePencil/2);
+            pencil->addChild(lock);
+        }
         listPencils.pushBack(pencil);
+        mainLayout->addChild(pencil);
         // insert listview
-        listViewPencils->insertCustomItem(layout, i);
+        listViewPencils->insertCustomItem(mainLayout, i);
     }
     listViewPencils->refreshView();
+    // scroll to now using pencil
+    widthLayoutPencil = -(sizePencil.width + LIST_SMALL_ITEM_MARGIN);
+    this->scrollToItem(SceneManager::getInstance()->getCurUsePencil());
 }
 
 void PencilPopupLayer::selectedItemEvent(cocos2d::Ref *pSender, ListView::EventType type)
@@ -128,13 +148,7 @@ void PencilPopupLayer::selectedItemEvent(cocos2d::Ref *pSender, ListView::EventT
             
         case ListView::EventType::ON_SELECTED_ITEM_END :
         {
-            float curPos = list->getInnerContainer()->getPositionX();
-            float exactPos = -(sizePencil.width + LIST_SMALL_ITEM_MARGIN) * ((int) list->getCurSelectedIndex());
-            CCLOG("curPos %f exactPos %f", curPos, exactPos);
-            if (curPos > (exactPos + DELTA_TRANSLATE) || curPos < (exactPos - DELTA_TRANSLATE)) {
-                auto moveAndScale = Sequence::create(MoveTo::create(0.3f, Vec2(exactPos, 0)), CallFunc::create(CC_CALLBACK_0(PencilPopupLayer::scrollEvent, this, listViewPencils, ui::ScrollView::EventType::SCROLLING)),NULL);
-                list->getInnerContainer()->runAction(moveAndScale);
-            }
+            this->scrollToItem((int) list->getCurSelectedIndex());
             break;
         }
             
@@ -149,17 +163,29 @@ void PencilPopupLayer::scrollEvent(cocos2d::Ref *pSender, ui::ScrollView::EventT
     
     if ( type == ui::ScrollView::EventType::SCROLLING || type == ui::ScrollView::EventType::BOUNCE_LEFT || type == ui::ScrollView::EventType::BOUNCE_RIGHT)
     {
-//        CCLOG("SCROLLING");
-        curPosX = list->getInnerContainer()->getPositionX();
+        float curPosX = list->getInnerContainer()->getPositionX();
+        auto button = (Button*)layoutTable->getChildByTag(TAG_PENCIL_ITEM::SELECT_BUTTON);
+        if (curPosX < widthLayoutPencil * (SceneManager::getInstance()->getCurUnlockPencil()-1)) {
+            button->setCascadeColorEnabled(false);
+            button->setTouchEnabled(false);
+            button->setBright(false);
+        } else {
+            button->setTouchEnabled(true);
+            button->setBright(true);
+        }
         // scale item
         this->scaleItems(curPosX);
-        
     }
-//    else if ( type == ui::ScrollView::EventType::BOUNCE_LEFT) {
-//        CCLOG("BOUNCE_LEFT %f", list->getInnerContainer()->getPositionX());
-//    } else if ( type == ui::ScrollView::EventType::BOUNCE_RIGHT) {
-//        CCLOG("BOUNCE_RIGHT %f", list->getInnerContainer()->getPositionX());
-//    }
+}
+
+void PencilPopupLayer::scrollToItem(int index)
+{
+    float curPos = listViewPencils->getInnerContainer()->getPositionX();
+    float exactPos = widthLayoutPencil * index;
+    if (curPos > (exactPos + DELTA_TRANSLATE) || curPos < (exactPos - DELTA_TRANSLATE)) {
+        auto moveAndScale = Sequence::create(MoveTo::create(0.3f, Vec2(exactPos, 0)), CallFunc::create(CC_CALLBACK_0(PencilPopupLayer::scrollEvent, this, listViewPencils, ui::ScrollView::EventType::SCROLLING)),NULL);
+        listViewPencils->getInnerContainer()->runAction(moveAndScale);
+    }
 }
 
 void PencilPopupLayer::scaleItems(float curPosX)
@@ -170,8 +196,8 @@ void PencilPopupLayer::scaleItems(float curPosX)
     
     for (int i = 0 ; i < PENCIL_MAX; i++) {
         
-        float startX = -(sizePencil.width + LIST_SMALL_ITEM_MARGIN) * i + sizePencil.width;
-        float endX = -(sizePencil.width + LIST_SMALL_ITEM_MARGIN) * i - sizePencil.width;
+        float startX = widthLayoutPencil * i + sizePencil.width;
+        float endX = widthLayoutPencil * i - sizePencil.width;
         float centerX = (startX + endX) / 2;
         
         if (curPosX <= startX && curPosX >= endX) {
@@ -191,11 +217,49 @@ void PencilPopupLayer::scaleItems(float curPosX)
     if (index == -1) return;
     
     for(int i = 0; i< listPencils.size(); i++) {
-        auto layout = (Button*)listPencils.at(i);
+        auto layout = (Layout*)listPencils.at(i);
         if (i == (index)) {
             layout->setScale(scale);
         } else {
             layout->setScale(MIN_SCALE_PENCIL);
+        }
+    }
+}
+
+void PencilPopupLayer::autoFocusItemList()
+{
+    float curPosX = listViewPencils->getInnerContainer()->getPositionX();
+    int index = (int)(curPosX / widthLayoutPencil);
+    float _index = curPosX / widthLayoutPencil;
+    if (_index - index > 0.5) {
+        index++;
+    }
+    this->scrollToItem(index);
+    
+    if (index < SceneManager::getInstance()->getCurUnlockPencil()) {
+        SceneManager::getInstance()->saveUsePencil(index);
+    }
+}
+
+void PencilPopupLayer::touchButtonEvent(cocos2d::Ref *pSender, Widget::TouchEventType type)
+{
+    auto receiver = (Button*) pSender;
+    if (type == ui::Widget::TouchEventType::ENDED) {
+        switch (receiver->getTag()) {
+            case TAG_PENCIL_ITEM::BUY_BUTTON :
+            {
+                this->autoFocusItemList();
+                break;
+            }
+                
+            case TAG_PENCIL_ITEM::SELECT_BUTTON :
+            {
+                this->autoFocusItemList();
+                break;
+            }
+                
+            default:
+                break;
         }
     }
 }

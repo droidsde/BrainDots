@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="36" height="20" tilewidth="38" tileheight="38" nextobjectid="7">
- <tileset firstgid="1" name="background" tilewidth="38" tileheight="38">
-  <image source="triangle1.png" width="380" height="190"/>
- </tileset>
- <tileset firstgid="51" name="hex" tilewidth="38" tileheight="38">
+ <tileset firstgid="1" name="hex" tilewidth="38" tileheight="38">
   <image source="hex1.png" width="380" height="266"/>
  </tileset>
- <tileset firstgid="121" name="base" tilewidth="38" tileheight="38">
-  <image source="background.png" width="380" height="380"/>
+ <tileset firstgid="71" name="barrage" tilewidth="38" tileheight="38">
+  <image source="tileset1.png" width="38" height="38"/>
  </tileset>
  <objectgroup name="braindots">
   <object id="2" name="ballA" type="ball" x="513.334" y="663">
@@ -33,14 +30,9 @@
    </properties>
   </object>
  </objectgroup>
- <layer name="background" width="36" height="20">
-  <data encoding="base64" compression="zlib">
-   eJzNVcsOwyAMY7tuv91cm08ehyFFnh1I1UkcLKBAcJxHj9basQms41zAOGtwF22ptYGN7A3GkX3zL8Z9B3vZ2sPohGvESfZQP+SyCvQLbaGvFs7FPYN19NNgP9NX8Yx2HL4xPyKXzL9od5YjDmM8y+LIuDD92TvIkeUwaoo5qfiYsBm5oG4sTpjDqA+LE9plMcpyBHXCGlB1Z+1XX/XWjJ/iZk3rzt5RvrA+oHpKVssVqLqo+F7t5Vn9x5ya9Y/VOFbmMZ6ME+YexqsaJ1bbWOcqbqzPVvLhjvxhNcN0WsGV/9iKvUrd/xPq/32nz1f0GfPHRnh2vDbCu+MD6gtdtg==
-  </data>
- </layer>
  <layer name="ground" width="36" height="20">
   <data encoding="base64" compression="zlib">
-   eJztwzENADAIADC8wDv8y4NvFjjapBEAAPDlobXfob0HEXILQw==
+   eJztwzENAAAMA6C6q39HPfdNASQkAABw6ntvVRP5
   </data>
  </layer>
  <layer name="hexgridlayer" width="36" height="20">
@@ -48,7 +40,7 @@
    <property name="zorder" value="100"/>
   </properties>
   <data encoding="base64" compression="zlib">
-   eJzt0rEOQAAQA9D7J0aMGDFixIjR5+tyH3CXVAxt8uZ2qJmiKMr/U0CZUJH21NAktKQ9HfQJA2nPCFPCTNqzwJqwkfb4n4+AL/58B+jP+rNnt9iX3Unac1nsy+4JdLwPCjtb
+   eJzt0rEOQAAQA9BjxIgRI0aMGP3/J+lyH3CXVAxt8uZ2qJmiKMr/U0CZUJH21NAktKQ9HfQJA2nPCFPCTNqzwJqwkfb4n4+AL/58B+jP+rNnt9iX3Unac1nsy+4JdLxhERgz
   </data>
  </layer>
 </map>

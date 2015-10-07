@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="36" height="20" tilewidth="38" tileheight="38" nextobjectid="6">
- <tileset firstgid="1" name="background" tilewidth="38" tileheight="38">
-  <image source="triangle1.png" width="380" height="190"/>
+ <tileset firstgid="1" name="triangle" tilewidth="38" tileheight="38">
+  <image source="triangle2.png" width="380" height="190"/>
  </tileset>
- <layer name="background" width="36" height="20">
+ <layer name="barrage" width="36" height="20">
   <data>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -628,8 +628,8 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
    <tile gid="41"/>
    <tile gid="42"/>
    <tile gid="43"/>
@@ -666,29 +666,49 @@
    <tile gid="25"/>
    <tile gid="25"/>
    <tile gid="25"/>
-   <tile gid="26"/>
-   <tile gid="36"/>
-   <tile gid="26"/>
-   <tile gid="26"/>
-   <tile gid="25"/>
-   <tile gid="26"/>
-   <tile gid="26"/>
-   <tile gid="26"/>
-   <tile gid="25"/>
-   <tile gid="26"/>
-   <tile gid="26"/>
-   <tile gid="25"/>
-   <tile gid="26"/>
-   <tile gid="26"/>
-   <tile gid="25"/>
-   <tile gid="26"/>
-   <tile gid="25"/>
-   <tile gid="26"/>
    <tile gid="25"/>
    <tile gid="25"/>
+   <tile gid="25"/>
+   <tile gid="25"/>
+   <tile gid="25"/>
+   <tile gid="25"/>
+   <tile gid="25"/>
+   <tile gid="25"/>
+   <tile gid="25"/>
+   <tile gid="25"/>
+   <tile gid="25"/>
+   <tile gid="25"/>
+   <tile gid="25"/>
+   <tile gid="25"/>
+   <tile gid="25"/>
+   <tile gid="25"/>
+   <tile gid="25"/>
+   <tile gid="25"/>
+   <tile gid="25"/>
+   <tile gid="35"/>
+   <tile gid="35"/>
+   <tile gid="25"/>
    <tile gid="26"/>
-   <tile gid="26"/>
-   <tile gid="26"/>
+   <tile gid="35"/>
+   <tile gid="35"/>
+   <tile gid="35"/>
+   <tile gid="35"/>
+   <tile gid="35"/>
+   <tile gid="35"/>
+   <tile gid="35"/>
+   <tile gid="35"/>
+   <tile gid="35"/>
+   <tile gid="35"/>
+   <tile gid="35"/>
+   <tile gid="35"/>
+   <tile gid="35"/>
+   <tile gid="35"/>
+   <tile gid="35"/>
+   <tile gid="35"/>
+   <tile gid="35"/>
+   <tile gid="35"/>
+   <tile gid="35"/>
+   <tile gid="35"/>
    <tile gid="35"/>
    <tile gid="35"/>
    <tile gid="35"/>
@@ -704,26 +724,6 @@
    <tile gid="35"/>
    <tile gid="36"/>
    <tile gid="35"/>
-   <tile gid="36"/>
-   <tile gid="36"/>
-   <tile gid="35"/>
-   <tile gid="36"/>
-   <tile gid="36"/>
-   <tile gid="36"/>
-   <tile gid="35"/>
-   <tile gid="36"/>
-   <tile gid="36"/>
-   <tile gid="35"/>
-   <tile gid="36"/>
-   <tile gid="36"/>
-   <tile gid="35"/>
-   <tile gid="36"/>
-   <tile gid="35"/>
-   <tile gid="36"/>
-   <tile gid="35"/>
-   <tile gid="35"/>
-   <tile gid="36"/>
-   <tile gid="36"/>
    <tile gid="36"/>
   </data>
  </layer>

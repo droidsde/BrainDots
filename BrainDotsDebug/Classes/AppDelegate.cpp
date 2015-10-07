@@ -34,6 +34,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     // initialize path resource
     std::vector<std::string> paths;
     paths.push_back("fonts");
+    paths.push_back("data");
     paths.push_back("images");
     paths.push_back("sounds");
     paths.push_back("res");

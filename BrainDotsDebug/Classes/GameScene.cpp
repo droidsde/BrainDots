@@ -2,7 +2,6 @@
 
 GameScene::GameScene()
 {
-    CCLOG("GameScene::GameScene()");
     map = nullptr;
     tiledmap = nullptr;
     drawnode = nullptr;
@@ -15,7 +14,6 @@ GameScene::GameScene()
 
 GameScene::~GameScene()
 {
-    CCLOG("GameScene::~GameScene()");
     map = nullptr;
     drawnode = nullptr;
     delete tiledmap;
@@ -23,7 +21,6 @@ GameScene::~GameScene()
     brush = nullptr;
     delete world;
     world = nullptr;
-    
     delete _ballContactListener;
     CC_SAFE_RELEASE(target);
     delete this->debugDraw;
@@ -32,7 +29,6 @@ GameScene::~GameScene()
 
 Scene* GameScene::createScene()
 {
-    CCLOG("GameScene::createScene()");
     auto scene = Scene::create();
     auto layer = GameScene::create();
     scene->addChild(layer);
@@ -42,7 +38,6 @@ Scene* GameScene::createScene()
 // on "init" you need to initialize your instance
 bool GameScene::init()
 {
-    CCLOG("GameScene::init()");
     //////////////////////////////
     // 1. super init first
     if ( !LayerColor::initWithColor(Color4B(255, 255, 255, 255)) )
@@ -54,7 +49,7 @@ bool GameScene::init()
     origin = Director::getInstance()->getVisibleOrigin();
     
     // draw grid
-//    this->drawGrids();
+    this->drawGrids();
     
     // button back
     auto backButton = Button::create("back.png");
@@ -110,13 +105,6 @@ bool GameScene::init()
     // set scale
     this->setScale(0.2);
     
-    int p[] = {80,200,112,120,160,72,256,88,336,120,368,248,352,296,272,312,256,248,192,216,160,232,112,280,64,248,80,200};
-    for (int i = 0; i < 25; i += 2)
-        drawnode->drawLine(Vec2(p[i], p[i+1]), Vec2(p[i+2], p[i+3]), Color4F::RED);
-    
-    int h[] = {144,168,192,120,272,136,320,200,288,232,240,168,192,184,144,168};
-    for (int i = 0; i < 14; i += 2)
-        drawnode->drawLine(Vec2(h[i], h[i+1]), Vec2(h[i+2], h[i+3]), Color4F::RED);
     return true;
 }
 
@@ -274,25 +262,24 @@ void GameScene::drawGrids()
     }
 }
 
-void GameScene::draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformUpdated) {
-    Layer::draw(renderer, transform, transformUpdated);
-    Director* director = Director::getInstance();
-    
-    CCASSERT(nullptr != director, "Director is null when seting matrix stack");
-    director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-    director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, transform);
-    GL::enableVertexAttribs(cocos2d::GL::VERTEX_ATTRIB_FLAG_POSITION);
-    if (this->isScheduled(schedule_selector(GameScene::update))) {
-        this->update(0.0f);
-    }
-    world->DrawDebugData();
-    CHECK_GL_ERROR_DEBUG();
-    director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-}
+//void GameScene::draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformUpdated) {
+//    Layer::draw(renderer, transform, transformUpdated);
+//    Director* director = Director::getInstance();
+//    
+//    CCASSERT(nullptr != director, "Director is null when seting matrix stack");
+//    director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+//    director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, transform);
+//    GL::enableVertexAttribs(cocos2d::GL::VERTEX_ATTRIB_FLAG_POSITION);
+//    if (this->isScheduled(schedule_selector(GameScene::update))) {
+//        this->update(0.0f);
+//    }
+//    world->DrawDebugData();
+//    CHECK_GL_ERROR_DEBUG();
+//    director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+//}
 
 void GameScene::initPhysics()
 {
-    CCLOG("GameScene::initPhysics()");
     // create physics world box2d
     b2Vec2 gravity = b2Vec2(0.0f, -10.0f);
     world = new b2World(gravity);
@@ -318,22 +305,16 @@ void GameScene::initPhysics()
 
 void GameScene::initMapLevel(int level)
 {
-    CCLOG("GameScene::initMapLevel()");
     //reading in a tiled map
     std::string nameLevel = "level" + to_string(level) + ".tmx";
     map = TMXTiledMap::create(nameLevel);
-    if (map==nullptr) {
-        
-        CCLOG("file not found");
-        
-    } else {
+    if (map!=nullptr) {
         addChild(map, ZORDER_GAME::ZORDER_MAPLEVEL, 1);
         
         // auto create physics objects
         tiledmap = new TiledBodyCreator();
         tiledmap->initMapLevel(map, world, "braindots", CATEGORY_BARRAGE, MASK_BARRAGE);
         listConveyorBelt = tiledmap->getListConveyorBelt();
-//        this->conveyorBelts();
         _ballContactListener->setListConveyorBelt(listConveyorBelt);
         
         // get ball group
@@ -368,7 +349,6 @@ void GameScene::initMapLevel(int level)
                     auto layer = LayerColor::create();
                     layer->setContentSize(Size(rect.size));
                     layer->setPosition(Vec2(rect.origin));
-                    CCLOG("layer %f %f %f %f", layer->getPositionX(), layer->getPositionY(), layer->getContentSize().width, layer->getContentSize().height);
                     addChild(layer, 100);
                     listGirdLayer.pushBack(layer);
                     
@@ -406,7 +386,13 @@ void GameScene::initMapLevel(int level)
 
 void GameScene::initPhysicObjects()
 {
-    CCLOG("GameScene::initPhysicObjects()");
+    // Define fixture platform
+    boxFixtureDef.shape = &boxShape;
+    boxFixtureDef.density = 6.0;
+    boxFixtureDef.friction = 0.1;
+    boxFixtureDef.filter.categoryBits = CATEGORY_PLATFORM;
+    boxFixtureDef.filter.maskBits = MASK_PLATFORM;
+    
     //Define the ground body
     b2BodyDef groundBodyDef;
     groundBodyDef.position.Set(0, 0); // bottom-left corner
@@ -455,7 +441,6 @@ void GameScene::initWall(b2Body *body, b2Fixture* _wallFixture[], float outside,
 
 void GameScene::initBalls()
 {
-    CCLOG("GameScene::initBalls()");
     auto ballASprite = Sprite::create("ball_red.png");
     map->addChild(ballASprite);
     ballASprite->setPosition(posballA);
@@ -639,16 +624,9 @@ void GameScene::update(float dt) {
         b2Body *body = *pos3;
         if (body->GetUserData() != NULL) {
             Sprite *sprite = (Sprite *) body->GetUserData();
-            if (sprite->getTag() == TAG_BALLA || sprite->getTag() == TAG_BALLB) {
-                map->removeChild(sprite, true);
-            }
-            else {
-                this->removeChild(sprite, true);
-            }
-            CCLOG("remove a sprite");
+            map->removeChild(sprite, true);
         }
         world->DestroyBody(body);
-        CCLOG("remove a body");
     }
 }
 
@@ -718,7 +696,7 @@ void GameScene::onTouchMoved(Touch* touch, Event* event) {
     
     // if draw ok
     if (collision == Vec2::ZERO) {
-        if (!isErrorDraw) {
+        if (!isErrorDraw && start.getDistance(end) > 2) {
             platformPoints.push_back(start);
         }
     }
@@ -753,7 +731,8 @@ void GameScene::onTouchMoved(Touch* touch, Event* event) {
 
 void GameScene::onTouchEnded(Touch* touch, Event* event) {
     drawnode->clear();
-    
+    Vec2 location = touch->getLocation();
+    platformPoints.push_back(location);
     if (ballA && ballB) {
         if (ballA->GetType() == b2_staticBody) {
             ballA->SetType(b2_dynamicBody);
@@ -770,43 +749,29 @@ void GameScene::onTouchEnded(Touch* touch, Event* event) {
                                currentPlatformBody->GetPosition().y); //set the starting position
         world->DestroyBody(currentPlatformBody);
         b2Body* newBody = world->CreateBody(&myBodyDef);
-        CCLOG("size of list fixture %zd", platformPoints.size());
         for (int i = 0; i < platformPoints.size() - 1; i++) {
             Vec2 start = platformPoints.at(i);
             Vec2 end = platformPoints.at(i+1);
             this->addRectangleBetweenPointsToBody(newBody, start, end);
         }
         Rect bodyRectangle = ExecuteShapePhysic::getBodyRectangle(visibleSize, newBody);
-        float anchorX = newBody->GetPosition().x * PTM_RATIO
-        - bodyRectangle.origin.x;
-        float anchorY = bodyRectangle.size.height
-        - (visibleSize.height - bodyRectangle.origin.y
-           - newBody->GetPosition().y * PTM_RATIO);
-        
-        Vec2 anchorPoint = Vec2(anchorX / bodyRectangle.size.width,
-                                anchorY / bodyRectangle.size.height);
+        float anchorX = newBody->GetPosition().x * PTM_RATIO - bodyRectangle.origin.x;
+        float anchorY = bodyRectangle.size.height - (visibleSize.height - bodyRectangle.origin.y - newBody->GetPosition().y * PTM_RATIO);
+        Vec2 anchorPoint = Vec2(anchorX / bodyRectangle.size.width, anchorY / bodyRectangle.size.height);
         
         // draw sprite use render texture
-        Director::getInstance()->getRenderer()->render();
         auto _image = target->newImage();
         auto _key = to_string((int) time(NULL));
-        auto _texture2D = Director::getInstance()->getTextureCache()->addImage(
-                                                                               _image, _key);
+        auto _texture2D = Director::getInstance()->getTextureCache()->addImage(_image, _key);
         CC_SAFE_DELETE(_image);
         auto texture2D = Sprite::createWithTexture(_texture2D, bodyRectangle);
         texture2D->setAnchorPoint(anchorPoint);
-//        map->addChild(texture2D);
-//        newBody->SetUserData(texture2D);
+        map->addChild(texture2D);
+        newBody->SetUserData(texture2D);
         
         Director::getInstance()->getTextureCache()->removeTextureForKey(_key);
     }
-    removeChild(target, true);
-    //	target->release();
-    target = RenderTexture::create(visibleSize.width, visibleSize.height,
-                                   Texture2D::PixelFormat::RGBA8888);
-    target->retain();
-    target->setPosition(visibleSize.width / 2, visibleSize.height / 2);
-    addChild(target, ZORDER_GAME::ZORDER_DRAW_RENDER);
+    target->clear(0, 0, 0, 0);
 }
 
 Vec2 GameScene::checkDrawingWithOtherBodies(cocos2d::Vec2 start, cocos2d::Vec2 end)
@@ -858,15 +823,7 @@ void GameScene::addRectangleBetweenPointsToBody(b2Body* body, Vec2 start,
     }
     float width = MAX(abs(dist_x) / PTM_RATIO, minW);
     
-    b2PolygonShape boxShape;
     boxShape.SetAsBox(width / 2, height / 2, b2Vec2(px, py), angle);
-    
-    b2FixtureDef boxFixtureDef;
-    boxFixtureDef.shape = &boxShape;
-    boxFixtureDef.density = 6.0;
-    boxFixtureDef.friction = 0.1;
-    boxFixtureDef.filter.categoryBits = CATEGORY_PLATFORM;
-    boxFixtureDef.filter.maskBits = MASK_PLATFORM;
     
     body->CreateFixture(&boxFixtureDef);
 }
@@ -915,7 +872,6 @@ Vec2 GameScene::checkBodyWeighOnSomebody(cocos2d::Vec2 start, cocos2d::Vec2 end)
             for (int j = 0; j < listPoints.size(); j++) {
                 if (listGirdLayer.at(i)->getBoundingBox().containsPoint(listPoints.at(j))) {
                     result = listPoints.at(j);
-                    CCLOG("You touched a hex grid layer");
                     return result;
                 }
             }
@@ -933,7 +889,6 @@ Vec2 GameScene::checkBodyWeighOnSomebody(cocos2d::Vec2 start, cocos2d::Vec2 end)
                 if(f -> TestPoint(checkPoint))
                 {
                     result = listPoints.at(i);
-                    CCLOG("You touched a body");
                     return result;
                 }
             }
@@ -944,19 +899,13 @@ Vec2 GameScene::checkBodyWeighOnSomebody(cocos2d::Vec2 start, cocos2d::Vec2 end)
 }
 
 void GameScene::backMenu() {
-    for (b2Body* b = world->GetBodyList(); b; b = b->GetNext()) {
-        world->DestroyBody(b);
-    }
-    this->removeChild(target, true);
-    this->removeAllChildrenWithCleanup(true);
+    this->removeAllObjects();
     
     auto fadeout = CallFunc::create(CC_CALLBACK_0(Node::setOpacity, this, 0));
     auto loading = CallFunc::create(CC_CALLBACK_0(SceneManager::loadingScene, SceneManager::getInstance(), this));
     auto change = CallFunc::create(CC_CALLBACK_0(SceneManager::changeState, SceneManager::getInstance(), GAME_STATE::MENU));
     
     this->runAction(Sequence::create(Spawn::create(DelayTime::create(TIME_LOADING), fadeout, loading, NULL), change, NULL));
-    
-//    SceneManager::getInstance()->changeState(GAME_STATE::MENU);
 }
 
 void GameScene::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEventType type)
@@ -969,9 +918,7 @@ void GameScene::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEventType ty
                 backMenu();
                 break;
             case TAG_GAME::TAG_BUTTON_REPLAY:
-                for (b2Body* b = world->GetBodyList(); b; b = b->GetNext()) {
-                    world->DestroyBody(b);
-                }
+                this->removeAllObjects();
                 SceneManager::getInstance()->changeState(GAME_STATE::GAME);
                 break;
             case TAG_GAME::TAG_BUTTON_NEXT:
@@ -1006,7 +953,6 @@ void GameScene::explosionBall(b2Body *ball)
             b2Body* body = world->CreateBody(&bd);
             
             b2CircleShape circleShape;
-            //            CCLOG("radius %f", (rand()%10)/100);
             circleShape.m_radius = 0.3 + (float)(rand()%10)/50;
             
             b2FixtureDef fd;
@@ -1119,10 +1065,8 @@ void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
 
     Sprite* captureSprite;
     if (succeed) {
-        CCLOG("capture screen game level success!");
         captureSprite = Sprite::create(filenameCapture);
     } else {
-        CCLOG("capture screen game fail");
         captureSprite = Sprite::create("share_image.png");
     }
 
@@ -1222,3 +1166,20 @@ void GameScene::onEnterTransitionDidFinish()
 {
     this->runAction(ScaleTo::create(0.5, 1.0f));
 }
+
+void GameScene::removeAllObjects()
+{
+    CCLOG("remove all %zd box2d %d", this->getChildrenCount(), world->GetBodyCount());
+    
+    for(long i = this->getChildrenCount()-1; i > 0; i--){
+        Node* child = this->getChildren().at(i);
+        this->removeChild(child);
+    }
+    
+    for (b2Body *body = world->GetBodyList(); body != NULL; body =
+         body->GetNext()) {
+        world->DestroyBody(body);
+    }
+    CCLOG("remove done %zd box2d %d", this->getChildrenCount(), world->GetBodyCount());
+}
+

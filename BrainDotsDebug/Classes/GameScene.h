@@ -8,6 +8,7 @@
 #include "TiledBodyCreator.h"
 #include "GLESDebugDraw.h"
 #include "SceneManager.h"
+#include "SharePopupLayer.h"
 
 USING_NS_CC;
 using namespace cocos2d::ui;
@@ -84,7 +85,7 @@ public:
     
     static cocos2d::Scene* createScene();
     virtual bool init();
-    virtual void draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t flags) override;
+//    virtual void draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t flags) override;
     
     CREATE_FUNC(GameScene);
     
@@ -110,6 +111,7 @@ public:
     void animationSuccess(Vec2 collisionPoint);
     void animationFail(Vec2 collisionPoint, std::string explosionName);
     void endGame();
+    void removeAllObjects();
     
     // function test
     void explosionBall(b2Body* ball);
@@ -144,13 +146,15 @@ private:
     b2World* world;
     GLESDebugDraw* debugDraw;
     b2Body* currentPlatformBody;
+    b2PolygonShape boxShape;
+    b2FixtureDef boxFixtureDef;
     b2Body* ballA;
     b2Body* ballB;
     b2Fixture* _ballAFixture;
     b2Fixture* _ballBFixture;
     b2Fixture* _wallFixture1[4];
     b2Fixture* _wallFixture2[4];
-    b2Vec2 vertices[b2_maxPolygonVertices];
+
     //test
     b2Fixture* mPlatform;
     

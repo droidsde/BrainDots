@@ -102,13 +102,6 @@ public:
     // get list hex objects
     static std::vector<Rect> getRectListObjects(TMXTiledMap* map,std::string objectsName, std::string layerName);
     
-    // get list objects
-    static ValueVector getListObjects(TMXTiledMap* map, std::string layerName);
-    // get list object by type
-    static ValueVector getListObjectByType(TMXTiledMap* map, std::string layerName, std::string type);
-    // get list physics by bodyType
-    static ValueVector getListPhysicsByBodytype(TMXTiledMap* map, std::string layerName, std::string type, std::string bodytype);
-    
     // get list conveyor belts
     static std::vector<ConveyorBelt> getListConveyorBelt();
 };

@@ -12,7 +12,7 @@
 #include <cocos2d.h>
 #include "SceneManager.h"
 #include "ui/CocosGUI.h"
-#include "SoundManager/ManageSoundDelegate.h"
+#include "ManageSoundDelegate.h"
 #include "PencilPopupLayer.h"
 #include "RecordPopupLayer.h"
 #include "SharePopupLayer.h"

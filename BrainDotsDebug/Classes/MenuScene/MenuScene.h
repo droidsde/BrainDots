@@ -12,7 +12,12 @@
 #include <cocos2d.h>
 #include "SceneManager.h"
 #include "ui/CocosGUI.h"
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#include "SoundManager/ManageSoundDelegate.h"
+#endif
+#if(CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 #include "ManageSoundDelegate.h"
+#endif
 #include "PencilPopupLayer.h"
 #include "RecordPopupLayer.h"
 #include "SharePopupLayer.h"

@@ -8,7 +8,7 @@
 #include "TiledBodyCreator.h"
 #include "GLESDebugDraw.h"
 #include "SceneManager.h"
-#include "SharePopupLayer.h"
+//#include "SharePopupLayer.h"
 
 USING_NS_CC;
 using namespace cocos2d::ui;

@@ -13,7 +13,12 @@
 #include <cocos2d.h>
 #include "ui/CocosGUI.h"
 #include "Constants.h"
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#include "SoundManager/SoundManager.h"
+#endif
+#if(CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 #include "SoundManager.h"
+#endif
 
 USING_NS_CC;
 using namespace cocos2d::ui;

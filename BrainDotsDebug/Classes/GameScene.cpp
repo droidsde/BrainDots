@@ -918,12 +918,12 @@ void GameScene::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEventType ty
                 backMenu();
                 break;
             case TAG_GAME::TAG_BUTTON_REPLAY:
-                this->removeAllObjects();
+//                this->removeAllObjects();
                 SceneManager::getInstance()->changeState(GAME_STATE::GAME);
                 break;
             case TAG_GAME::TAG_BUTTON_NEXT:
+//            	this->removeAllObjects();
                 SceneManager::getInstance()->setLevelGame(SceneManager::getInstance()->getLevelGame()+1);
-                
                 // check level
                 SceneManager::getInstance()->changeState(GAME_STATE::GAME);
                 break;
@@ -1170,16 +1170,16 @@ void GameScene::onEnterTransitionDidFinish()
 void GameScene::removeAllObjects()
 {
     CCLOG("remove all %zd box2d %d", this->getChildrenCount(), world->GetBodyCount());
+    for (b2Body *body = world->GetBodyList(); body != NULL; body =
+             body->GetNext()) {
+            world->DestroyBody(body);
+    }
     
     for(long i = this->getChildrenCount()-1; i > 0; i--){
         Node* child = this->getChildren().at(i);
         this->removeChild(child);
     }
     
-    for (b2Body *body = world->GetBodyList(); body != NULL; body =
-         body->GetNext()) {
-        world->DestroyBody(body);
-    }
     CCLOG("remove done %zd box2d %d", this->getChildrenCount(), world->GetBodyCount());
 }
 

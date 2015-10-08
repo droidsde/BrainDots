@@ -6,9 +6,10 @@
 #include <ui/CocosGUI.h>
 #include "BallContactListener.h"
 #include "TiledBodyCreator.h"
-#include "GLESDebugDraw.h"
 #include "SceneManager.h"
-//#include "SharePopupLayer.h"
+#include "B2DebugDrawLayer.h"
+//#include "clipper.hpp"
+//#include "textpoly.h"
 
 USING_NS_CC;
 using namespace cocos2d::ui;
@@ -85,7 +86,6 @@ public:
     
     static cocos2d::Scene* createScene();
     virtual bool init();
-    virtual void draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t flags) override;
     
     CREATE_FUNC(GameScene);
     
@@ -134,9 +134,6 @@ private:
     // test draw node
     DrawNode* drawnode;
     
-    // list rect hex grid
-    Vector<Layer*> listGirdLayer;
-    
     // control game
     bool isSuccess = false;
     bool isFail = false;
@@ -144,7 +141,6 @@ private:
     
     // physics variable
     b2World* world;
-    GLESDebugDraw* debugDraw;
     b2Body* currentPlatformBody;
     b2PolygonShape boxShape;
     b2FixtureDef boxFixtureDef;
@@ -175,7 +171,6 @@ private:
     std::vector<ConveyorBelt> listConveyorBelt;
     
     // on enter, onexit
-    void onEnterTransitionDidFinish();
     std::string filenameCapture;
     void afterCaptured(bool succeed, const std::string& outputFile);
     void showShareLayer(std::string filename);

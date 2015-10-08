@@ -28,6 +28,8 @@ private:
     
     void addLogo();
     
+    void transferData();
+    
     void loadResources();
     
     void loadImage(Texture2D* texture);

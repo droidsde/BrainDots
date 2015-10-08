@@ -37,7 +37,7 @@ bool HelloWorld::init()
 {
     //////////////////////////////
     // 1. super init first
-    if ( !Layer::init() )
+    if ( !LayerColor::initWithColor(Color4B(255, 255, 255, 0)) )
     {
         return false;
     }
@@ -101,7 +101,7 @@ bool HelloWorld::init()
      hole.push_back(Point(h[i],h[i+1]));
      
      /// Create the polygon and add it to the layer
-//     addChild(TexPoly::create(path, hole, "pattern.png", world));
+     addChild(TexPoly::create(path, hole, "pattern.png", world));
 
     CCPointVector test;
     test.push_back(Point(500, 500));
@@ -112,7 +112,7 @@ bool HelloWorld::init()
     test.push_back(Point(700, 400));
     test.push_back(Point(600, 400));
     test.push_back(Point(600, 500));
-//    addChild(TexPoly::create(test, "pattern.png", world));
+    addChild(TexPoly::create(test, "pattern.png", world));
     
 //    Texture2D* texture = Director::getInstance()->getTextureCache()->addImage("pattern.png");
 //    FilledPolygon* filledPolygon = FilledPolygon::create(texture, test);

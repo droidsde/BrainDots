@@ -22,11 +22,12 @@
     <property name="autocreate" value="true"/>
    </properties>
   </object>
- </objectgroup>
- <objectgroup name="hexgridobjects">
   <object id="6" name="hexgrid1" type="object" x="418.667" y="306.667" width="568" height="452">
    <properties>
-    <property name="autocreate" value="false"/>
+    <property name="autocreate" value="true"/>
+    <property name="bodyType" value="StaticBody"/>
+    <property name="isMaskBits" value="true"/>
+    <property name="maskbits" value="0"/>
    </properties>
   </object>
  </objectgroup>

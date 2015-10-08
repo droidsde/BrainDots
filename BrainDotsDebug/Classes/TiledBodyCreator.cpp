@@ -228,6 +228,8 @@ void TiledBodyCreator::createStaticBodies(cocos2d::TMXTiledMap *map, b2World *wo
         bool isConveyorBelts = objectValue.asValueMap()["isConveyorBelt"].asBool();
         float conveyorSpeed = objectValue.asValueMap()["conveyorBeltSpeed"].asFloat();
         float friction = objectValue.asValueMap()["friction"].asFloat();
+        bool isMaskBits = objectValue.asValueMap()["isMaskBits"].asBool();
+        uint16 _maskbits = (uint16)objectValue.asValueMap()["maskbits"].asFloat();
         std::string spriteName = objectValue.asValueMap()["spriteName"].asString();
         
         // create fixture shape
@@ -243,7 +245,10 @@ void TiledBodyCreator::createStaticBodies(cocos2d::TMXTiledMap *map, b2World *wo
             // create body
             b2Body* staticBody = world->CreateBody(&bd);
             fixtureShape->fixture.filter.categoryBits = categorybits;
-            fixtureShape->fixture.filter.maskBits = maskbits;
+            if (isMaskBits) {
+                fixtureShape->fixture.filter.maskBits = _maskbits;
+            }
+            else fixtureShape->fixture.filter.maskBits = maskbits;
             platform = staticBody->CreateFixture(&fixtureShape->fixture);
             if (isConveyorBelts) {
                 ConveyorBelt cb;

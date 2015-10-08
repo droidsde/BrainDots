@@ -76,8 +76,10 @@ void SceneManager::changeState(GAME_STATE state)
 void SceneManager::nextScene(cocos2d::Scene * scene)
 {
     this->setCurScene(scene);
+    scene->retain();
     TransitionScene* transition = TransitionFade::create(TIME_TRANSITION_SCENE, scene);
     Director::getInstance()->replaceScene(transition);
+    scene->release();
 }
 
 void SceneManager::loadingScene(Layer* scene)

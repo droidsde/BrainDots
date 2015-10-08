@@ -47,7 +47,7 @@ bool GameScene::init()
     origin = Director::getInstance()->getVisibleOrigin();
     
     // draw grid
-//    this->drawGrids();
+    this->drawGrids();
     
     // button back
     auto backButton = Button::create("back.png");

@@ -7,7 +7,12 @@
 #include "BallContactListener.h"
 #include "TiledBodyCreator.h"
 #include "SceneManager.h"
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#include "B2DebugDraw/B2DebugDrawLayer.h"
+#endif
+#if(CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 #include "B2DebugDrawLayer.h"
+#endif
 //#include "clipper.hpp"
 //#include "textpoly.h"
 

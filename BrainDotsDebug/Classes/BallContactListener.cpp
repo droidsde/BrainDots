@@ -25,7 +25,7 @@ void BallContactListener::setFixtureForBall(b2Fixture *fixBallA, b2Fixture *fixB
 void BallContactListener::setListConveyorBelt(std::vector<ConveyorBelt> list)
 {
     this->mListConveyorBelt = list;
-    CCLOG("size ConveyorBelt %zd", mListConveyorBelt.size());
+//    CCLOG("size ConveyorBelt %zd", mListConveyorBelt.size());
 }
 
 void BallContactListener::BeginContact(b2Contact *contact)

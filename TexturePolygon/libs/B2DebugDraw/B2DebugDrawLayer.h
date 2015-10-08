@@ -13,7 +13,7 @@
 #include "Box2D/Box2D.h"
 #include "GLES-Render.h"
 
-class B2DebugDrawLayer : public cocos2d::CCLayer
+class B2DebugDrawLayer : public cocos2d::Layer
 {
   b2World* mB2World;
   GLESDebugDraw* mB2DebugDraw;

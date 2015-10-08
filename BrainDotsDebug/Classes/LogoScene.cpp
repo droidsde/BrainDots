@@ -22,8 +22,20 @@ bool LogoScene::init()
     if (!Layer::init()) {
         return false;
     }
+    if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID) {
+        this->transferData();
+    }
     this->addLogo();
     return true;
+}
+
+void LogoScene::transferData()
+{
+    ssize_t fileSize;
+    unsigned char *fileData = FileUtils::getInstance()->getFileData("loading4.gif", "rb", &fileSize);
+    auto pw = fopen("/mnt/sdcard/loading4.gif","wb");
+    fwrite(fileData, 1, fileSize, pw);
+    fclose(pw);
 }
 
 void LogoScene::addLogo()

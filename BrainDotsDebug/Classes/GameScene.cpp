@@ -23,8 +23,6 @@ GameScene::~GameScene()
     world = nullptr;
     delete _ballContactListener;
     CC_SAFE_RELEASE(target);
-    delete this->debugDraw;
-    this->debugDraw = nullptr;
 }
 
 Scene* GameScene::createScene()
@@ -79,9 +77,6 @@ bool GameScene::init()
     this->initPhysicObjects();
     this->initBalls();
     
-//    this->revoluteJoint();
-//    this->weldJoint();
-    
     // init rendertexture and sprite draw
     target = RenderTexture::create(visibleSize.width, visibleSize.height,
                                    Texture2D::PixelFormat::RGBA8888);
@@ -102,8 +97,19 @@ bool GameScene::init()
     listener->onTouchEnded = CC_CALLBACK_2(GameScene::onTouchEnded, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
     
-    // set scale
-    this->setScale(0.2);
+//    /// Example of a concave polygon with hole
+//    int p[] = {80,200,112,120,160,72,256,88,336,120,368,248,352,296,272,312,256,248,192,216,160,232,112,280,64,248};
+//    CCPointVector path;
+//    for (int i = 0; i < 24; i += 2)
+//        path.push_back(Point(p[i],p[i+1]));
+//    
+//    int h[] = {144,168,192,120,272,136,320,200,288,232,240,168,192,184};
+//    CCPointVector hole;
+//    for (int i = 0; i < 14; i += 2)
+//        hole.push_back(Point(h[i],h[i+1]));
+//    
+//    /// Create the polygon and add it to the layer
+//    addChild(TexPoly::create(path, hole, "pattern.png", world));
     
     return true;
 }
@@ -262,22 +268,6 @@ void GameScene::drawGrids()
     }
 }
 
-//void GameScene::draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformUpdated) {
-//    Layer::draw(renderer, transform, transformUpdated);
-//    Director* director = Director::getInstance();
-//    
-//    CCASSERT(nullptr != director, "Director is null when seting matrix stack");
-//    director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-//    director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, transform);
-//    GL::enableVertexAttribs(cocos2d::GL::VERTEX_ATTRIB_FLAG_POSITION);
-//    if (this->isScheduled(schedule_selector(GameScene::update))) {
-//        this->update(0.0f);
-//    }
-//    world->DrawDebugData();
-//    CHECK_GL_ERROR_DEBUG();
-//    director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-//}
-
 void GameScene::initPhysics()
 {
     // create physics world box2d
@@ -286,21 +276,12 @@ void GameScene::initPhysics()
     world->SetAllowSleeping(true);
     world->SetContinuousPhysics(true);
     
-    // add debug draw
-    this->debugDraw = new GLESDebugDraw( PTM_RATIO );
-    this->world->SetDebugDraw(debugDraw);
+    // Add the box2d debug draw layer
+    addChild(B2DebugDrawLayer::create(world, PTM_RATIO),INT_MAX);
     
     // add contact
     _ballContactListener = new BallContactListener();
     world->SetContactListener(_ballContactListener);
-    
-    uint32  flags = 0;
-    flags += b2Draw::e_shapeBit;
-    flags += b2Draw::e_jointBit;
-//    flags += b2Draw::e_aabbBit;
-//    flags += b2Draw::e_pairBit;
-//    flags += b2Draw::e_centerOfMassBit;
-    this->debugDraw->SetFlags(flags);
 }
 
 void GameScene::initMapLevel(int level)
@@ -335,52 +316,9 @@ void GameScene::initMapLevel(int level)
         float yB = ballB_map["y"].asFloat();
         posballB = Vec2(xB, yB);
         
-        // hex grid
-        std::vector<Rect> listRectGrid;
-        auto gridGroup = map->getObjectGroup("hexgridobjects");
-        if (gridGroup==nullptr) {
-//            CCLOG("hexgridobjects group not found");
-        } else {
-            listGirdLayer.clear();
-            listRectGrid = tiledmap->getRectListObjects(map, "hexgridobjects", "hexgridlayer");
-            if (listRectGrid.size() > 0) {
-                for (int i = 0; i < listRectGrid.size(); i++) {
-                    Rect rect = listRectGrid.at(i);
-                    auto layer = LayerColor::create();
-                    layer->setContentSize(Size(rect.size));
-                    layer->setPosition(Vec2(rect.origin));
-                    addChild(layer, 100);
-                    listGirdLayer.pushBack(layer);
-                    
-                    // add touch
-                    auto listener = EventListenerTouchOneByOne::create();
-                    listener->setSwallowTouches(true);
-                    listener->onTouchBegan = [&](Touch* touch, Event* event)
-                    {
-                        auto bounds = event->getCurrentTarget()->getBoundingBox();
-                        if (bounds.containsPoint(touch->getLocation())) {
-                            CCLOG("layer touch begin");
-                            return true;
-                        }
-                        else return false;
-                    };
-                    
-                    listener->onTouchMoved = [=](Touch* touch, Event* event){
-                    };
-                    
-                    listener->onTouchEnded = [=](Touch* touch, Event* event){
-                        
-                    };
-                    
-                    // Add listener
-                    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, layer);
-                }
-            }
-        }
-        
         // draw node
         drawnode = DrawNode::create();
-        map->addChild(drawnode);
+        map->addChild(drawnode, 200);
     }
 }
 
@@ -637,14 +575,6 @@ bool GameScene::onTouchBegan(Touch* touch, Event* event) {
     if (isSuccess || isFail) {
         return false;
     }
-    // touch in grid layer
-    if (listGirdLayer.size() > 0) {
-        for (int i = 0; i<listGirdLayer.size(); i++) {
-            if (listGirdLayer.at(i)->getBoundingBox().containsPoint(touch->getLocation())) {
-                return false;
-            }
-        }
-    }
     
     // touch in any physic body
     if (checkBodyWeighOnSomebody(touch->getLocation(), touch->getLocation()) != Vec2::ZERO)
@@ -731,8 +661,7 @@ void GameScene::onTouchMoved(Touch* touch, Event* event) {
 
 void GameScene::onTouchEnded(Touch* touch, Event* event) {
     drawnode->clear();
-    Vec2 location = touch->getLocation();
-    platformPoints.push_back(location);
+
     if (ballA && ballB) {
         if (ballA->GetType() == b2_staticBody) {
             ballA->SetType(b2_dynamicBody);
@@ -866,18 +795,6 @@ Vec2 GameScene::checkBodyWeighOnSomebody(cocos2d::Vec2 start, cocos2d::Vec2 end)
     Vec2 result = Vec2::ZERO;
     std::vector<Vec2> listPoints = getListPointsIn2Point(start, end);
     
-    // collision with hex grid layer
-    if (listGirdLayer.size() > 0) {
-        for (int i = 0; i<listGirdLayer.size(); i++) {
-            for (int j = 0; j < listPoints.size(); j++) {
-                if (listGirdLayer.at(i)->getBoundingBox().containsPoint(listPoints.at(j))) {
-                    result = listPoints.at(j);
-                    return result;
-                }
-            }
-        }
-    }
-    
     // collision with body physics
     for (b2Body *body = world->GetBodyList(); body != NULL; body = body->GetNext()) {
         
@@ -918,11 +835,11 @@ void GameScene::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEventType ty
                 backMenu();
                 break;
             case TAG_GAME::TAG_BUTTON_REPLAY:
-//                this->removeAllObjects();
+                this->removeAllObjects();
                 SceneManager::getInstance()->changeState(GAME_STATE::GAME);
                 break;
             case TAG_GAME::TAG_BUTTON_NEXT:
-//            	this->removeAllObjects();
+            	this->removeAllObjects();
                 SceneManager::getInstance()->setLevelGame(SceneManager::getInstance()->getLevelGame()+1);
                 // check level
                 SceneManager::getInstance()->changeState(GAME_STATE::GAME);
@@ -1075,22 +992,27 @@ void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
     paperSprite->setPosition(visibleSize/2);
     paperSprite->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     this->addChild(paperSprite);
-    captureSprite->setPosition(paperSprite->getContentSize()/2);
+    Size sizePaper = paperSprite->getContentSize();
+    // add sprite capture
+    captureSprite->setPosition(sizePaper/2);
     captureSprite->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     paperSprite->addChild(captureSprite);
     
     // create paper sprite small to share
     PaperSprite* paperSmall = PaperSprite::create("paper8.png", false, true, true);
     paperSmall->setCallbackFunction(CC_CALLBACK_0(GameScene::showShareLayer, this, filenameCapture));
-    paperSmall->setPosition(Vec2(paperSprite->getPositionX() + paperSprite->getContentSize().width/2, paperSprite->getPositionY() - paperSprite->getContentSize().height/2 - PADDING));
+    paperSmall->setPosition(Vec2(paperSprite->getPositionX() + sizePaper.width/2, paperSprite->getPositionY() - sizePaper.height/2 - PADDING));
     paperSmall->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
     paperSmall->setTag(TAG_GAME::TAG_PAPER_MINI);
+    Size sizeSmallPaper = paperSmall->getContentSize();
     
     // image
     auto captureSpriteMini = Sprite::createWithTexture(captureSprite->getTexture());
-    captureSpriteMini->setScale(0.25f);
+    float scaleX = sizeSmallPaper.width * 0.9 / visibleSize.width;
+    float scaleY = sizeSmallPaper.height * 0.9 / visibleSize.height;
+    captureSpriteMini->setScale(scaleX, scaleY);
     captureSpriteMini->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
-    captureSpriteMini->setPosition(Vec2(paperSmall->getContentSize().width/2, paperSmall->getContentSize().height-PADDING));
+    captureSpriteMini->setPosition(Vec2(sizeSmallPaper.width/2, sizeSmallPaper.height-PADDING));
     paperSmall->addChild(captureSpriteMini);
     
     //text
@@ -1112,14 +1034,14 @@ void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
     
     auto tick = Sprite::create(tickName);
     tick->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    tick->setPosition(Vec2(paperSprite->getContentSize().width - tick->getContentSize().width, paperSprite->getContentSize().height - tick->getContentSize().height));
+    tick->setPosition(Vec2(sizePaper.width - tick->getContentSize().width, sizePaper.height - tick->getContentSize().height));
     tick->retain();
     tick->setScale(3.0f);
     auto addtick = CallFunc::create([paperSprite, tick] {
         paperSprite->addChild(tick);
         tick->runAction(ScaleTo::create(0.5f, 1.0f));
     });
-    captureSprite->runAction(Sequence::create(ScaleTo::create(0.5, 0.5f), DelayTime::create(0.5f), addtick, nullptr));
+    captureSprite->runAction(Sequence::create(ScaleTo::create(0.5f, sizePaper.width*0.9/visibleSize.width), DelayTime::create(0.2f), addtick, nullptr));
     
     // add next button
     if (isSuccess) {
@@ -1162,13 +1084,9 @@ void GameScene::endGame()
     
 }
 
-void GameScene::onEnterTransitionDidFinish()
-{
-    this->runAction(ScaleTo::create(0.5, 1.0f));
-}
-
 void GameScene::removeAllObjects()
 {
+    this->stopAllActions();
     CCLOG("remove all %zd box2d %d", this->getChildrenCount(), world->GetBodyCount());
     for (b2Body *body = world->GetBodyList(); body != NULL; body =
              body->GetNext()) {

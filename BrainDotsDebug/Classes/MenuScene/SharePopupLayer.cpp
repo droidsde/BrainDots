@@ -45,6 +45,7 @@ bool SharePopupLayer::init()
     paperSprite->setPosition(layoutSize/2);
     paperSprite->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     layoutTable->addChild(paperSprite);
+    Size sizePaper = paperSprite->getContentSize();
     
     // check file capture screen isexist
     if (SceneManager::getInstance()->checkFileExist(FileUtils::getInstance()->getWritablePath()+this->filename)) {
@@ -52,7 +53,7 @@ bool SharePopupLayer::init()
     } else {
         imageShare = Sprite::create("share_image.png");
     }
-    imageShare->setScale(0.5f);
+    imageShare->setScale(sizePaper.width*0.9 / imageShare->getContentSize().width, sizePaper.height*0.9 / imageShare->getContentSize().height);
     imageShare->setPosition(paperSprite->getContentSize()/2);
     imageShare->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     paperSprite->addChild(imageShare);

@@ -27,11 +27,12 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/Gif/gif_lib/quantize.c \
                    ../../Classes/SoundManager/SoundManager.cpp \
                    ../../Classes/MenuScene/BasePopupLayer.cpp \
-                   ../../Classes/MenuScene/BaseCoverFlow.cpp \
+                   ../../Classes/MenuScene/LanguagePopupLayer.cpp \
                    ../../Classes/MenuScene/MenuPopupLayer.cpp \
                    ../../Classes/MenuScene/PencilPopupLayer.cpp \
                    ../../Classes/MenuScene/RecordPopupLayer.cpp \
                    ../../Classes/MenuScene/SharePopupLayer.cpp \
+                   ../../Classes/MenuScene/SettingPopupLayer.cpp \
                    ../../Classes/MenuScene/MenuScene.cpp \
                    ../../Classes/BallContactListener.cpp \
                    ../../Classes/ExecuteShapePhysic.cpp \
@@ -39,6 +40,8 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/TiledBodyCreator.cpp \
                    ../../Classes/GameScene.cpp \
                    ../../Classes/LogoScene.cpp \
+                   ../../Classes/PaperSprite.cpp \
+                   ../../Classes/BlendFuncButton.cpp \
                    ../../Classes/SceneManager.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes

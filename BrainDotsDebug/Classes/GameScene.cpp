@@ -49,7 +49,7 @@ bool GameScene::init()
     origin = Director::getInstance()->getVisibleOrigin();
     
     // draw grid
-    this->drawGrids();
+//    this->drawGrids();
     
     // button back
     auto backButton = Button::create("back.png");
@@ -262,21 +262,21 @@ void GameScene::drawGrids()
     }
 }
 
-//void GameScene::draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformUpdated) {
-//    Layer::draw(renderer, transform, transformUpdated);
-//    Director* director = Director::getInstance();
-//    
-//    CCASSERT(nullptr != director, "Director is null when seting matrix stack");
-//    director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-//    director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, transform);
-//    GL::enableVertexAttribs(cocos2d::GL::VERTEX_ATTRIB_FLAG_POSITION);
-//    if (this->isScheduled(schedule_selector(GameScene::update))) {
-//        this->update(0.0f);
-//    }
-//    world->DrawDebugData();
-//    CHECK_GL_ERROR_DEBUG();
-//    director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-//}
+void GameScene::draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformUpdated) {
+    Layer::draw(renderer, transform, transformUpdated);
+    Director* director = Director::getInstance();
+
+    CCASSERT(nullptr != director, "Director is null when seting matrix stack");
+    director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+    director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, transform);
+    GL::enableVertexAttribs(cocos2d::GL::VERTEX_ATTRIB_FLAG_POSITION);
+    if (this->isScheduled(schedule_selector(GameScene::update))) {
+        this->update(0.0f);
+    }
+    world->DrawDebugData();
+    CHECK_GL_ERROR_DEBUG();
+    director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+}
 
 void GameScene::initPhysics()
 {

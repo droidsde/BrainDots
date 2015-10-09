@@ -12,6 +12,7 @@ BrainDotsDebug/proj.android/bin/*
 BrainDotsDebug/proj.android/gen/*
 BrainDotsDebug/proj.android/obj/*
 BrainDotsDebug/proj.android/libs/*
+BrainDotsDebug/proj.android/project.properties
 BrainDotsDebug/proj.ios_mac/BrainDotsDebug.xcodeproj/project.pbxproj
 BrainDotsDebug/proj.ios_mac/BrainDotsDebug.xcodeproj/project.xcworkspace/xcuserdata/Hoang.xcuserdatad/UserInterfaceState.xcuserstate
 TexturePolygon/proj.android/bin/*

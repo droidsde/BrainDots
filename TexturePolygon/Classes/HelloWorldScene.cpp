@@ -37,7 +37,7 @@ bool HelloWorld::init()
 {
     //////////////////////////////
     // 1. super init first
-    if ( !LayerColor::initWithColor(Color4B(255, 255, 255, 0)) )
+    if ( !Layer::init() )
     {
         return false;
     }
@@ -63,12 +63,28 @@ bool HelloWorld::init()
     menu->setPosition(Vec2::ZERO);
     menu->setTag(10);
     this->addChild(menu, 1);
-
+    
+    /// Load the background sprite
+    if (Sprite* pSprite = Sprite::create("wood_pattern.png")) {
+        // position the sprite on the center of the screen
+        pSprite->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
+        pSprite->setScale(visibleSize.width/ pSprite->getContentSize().width, visibleSize.height / pSprite->getContentSize().height);
+        // add the sprite as a child to this layer
+        addChild(pSprite, 0);
+    }
+    
+    // Load the pix2d logo
+    if (Sprite *logo = Sprite::create("banner.png")) {
+        logo->setAnchorPoint(Vec2(0, 1));
+        logo->setPosition(Vec2(0, visibleSize.height));
+        addChild(logo);
+    }
+    
     // init physics
     this->initPhysics();
     
     // Add the box2d debug draw layer
-    addChild(B2DebugDrawLayer::create(world, 32),INT_MAX);
+//    addChild(B2DebugDrawLayer::create(world, 32),INT_MAX);
     
     // init rendertexture and sprite draw
     target = RenderTexture::create(visibleSize.width, visibleSize.height, Texture2D::PixelFormat::RGBA8888, GL_DEPTH24_STENCIL8_OES);
@@ -89,7 +105,7 @@ bool HelloWorld::init()
     listener->onTouchEnded = CC_CALLBACK_2(HelloWorld::onTouchEnded, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
-     /// Example of a concave polygon with hole
+//     /// Example of a concave polygon with hole
      int p[] = {80,200,112,120,160,72,256,88,336,120,368,248,352,296,272,312,256,248,192,216,160,232,112,280,64,248};
      CCPointVector path;
      for (int i = 0; i < 24; i += 2)
@@ -114,9 +130,9 @@ bool HelloWorld::init()
     test.push_back(Point(600, 500));
     addChild(TexPoly::create(test, "pattern.png", world));
     
-//    Texture2D* texture = Director::getInstance()->getTextureCache()->addImage("pattern.png");
-//    FilledPolygon* filledPolygon = FilledPolygon::create(texture, test);
-//    addChild(filledPolygon);
+    Texture2D* texture = Director::getInstance()->getTextureCache()->addImage("pattern.png");
+    FilledPolygon* filledPolygon = FilledPolygon::create(texture, test);
+    addChild(filledPolygon);
     return true;
 }
 
@@ -167,6 +183,48 @@ void HelloWorld::initPhysics()
     boxFixtureDef.shape = &boxShape;
     boxFixtureDef.density = 6.0;
     boxFixtureDef.friction = 0.1;
+    
+    for (int i = 0; i < 10; ++i) {
+        int size = 3 + (rand() % 7); /// Min 3. Max 10.
+        /// Texture size must be power of two
+        if (Node *node = createRandomPolygon(size, "pattern.png"))
+            addChild(node);
+    }
+}
+
+#define POLY_MAX_SIZE 200
+
+Node *HelloWorld::createRandomPolygon(int size, std::string filename)
+{
+    Size winSize = Director::getInstance()->getWinSizeInPixels();
+    
+    /// Polygon's origin point
+    ClipperLib::IntPoint pos(winSize.width * CCRANDOM_0_1(), winSize.height * CCRANDOM_0_1());
+    
+    ClipperLib::Path in;
+    for (int i = 0; i < size; ++i)
+        in.push_back(ClipperLib::IntPoint(pos.X + (POLY_MAX_SIZE * CCRANDOM_0_1()), pos.Y + (POLY_MAX_SIZE * CCRANDOM_0_1())));
+    
+    /// Simplify the polygon and turns complex polygon into simple polygon
+    ClipperLib::Paths out;
+    ClipperLib::SimplifyPolygon(in, out);
+    
+    if (out.size() < 1)
+        return NULL; /// No polygon
+    
+    ClipperLib::Path path = out.at(0);          /// TODO: manage all polygons
+    
+    /// Convert ClipperLib::IntPoint into cocos2d::CCPoint
+    CCPointVector points;
+    for (const ClipperLib::IntPoint &p : path)
+        points.push_back(Vec2(p.X, p.Y));
+    
+    /// We can safely create the polygon
+    TexPoly *poly = TexPoly::create(points, filename, world);
+    /// Set a random color. RGBA values must be from 0 to 1
+    /// poly->setColor(ccc4f(CCRANDOM_0_1(), CCRANDOM_0_1(), CCRANDOM_0_1(), 1.f));
+    
+    return poly;
 }
 
 void HelloWorld::update(float dt)

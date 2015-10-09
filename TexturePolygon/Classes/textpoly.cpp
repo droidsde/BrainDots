@@ -134,6 +134,13 @@ bool TexPoly::init(const CCPointVector &points, const CCPointVector &hole, const
     /// Enable texture repeat
     cocos2d::Texture2D::TexParams params = {GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT};
     mTexture->setTexParameters(params);
+    if ( !mTexture || !mTexture->hasPremultipliedAlpha() ) {
+        _blendFunc.src = GL_SRC_ALPHA;
+        _blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
+    } else {
+        _blendFunc.src = CC_BLEND_SRC;
+        _blendFunc.dst = CC_BLEND_DST;
+    }
     mTexture->retain();
     
     /// Create the shader program
@@ -155,10 +162,19 @@ void TexPoly::draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, 
 {
     if (! isVisible()) return;
     
+    _customCommand.init(_globalZOrder);
+    _customCommand.func = CC_CALLBACK_0(TexPoly::onDraw, this, transform, flags);
+    renderer->addCommand(&_customCommand);
+    
+}
+
+void TexPoly::onDraw(const cocos2d::Mat4 &transform, uint32_t flags)
+{
     /// Setup the OpenGL shader
     CC_NODE_DRAW_SETUP();
     /// Bind the 2D texture
     GL::bindTexture2D(mTexture->getName());
+    GL::blendFunc(_blendFunc.src, _blendFunc.dst);
     /// Enable shader attributes
     GL::enableVertexAttribs(GL::VERTEX_ATTRIB_FLAG_POSITION | GL::VERTEX_ATTRIB_FLAG_TEX_COORD);
     

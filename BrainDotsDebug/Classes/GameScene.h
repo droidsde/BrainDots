@@ -13,8 +13,8 @@
 #if(CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 #include "B2DebugDrawLayer.h"
 #endif
-//#include "clipper.hpp"
-//#include "textpoly.h"
+#include "clipper.hpp"
+#include "textpoly.h"
 
 USING_NS_CC;
 using namespace cocos2d::ui;
@@ -88,7 +88,7 @@ public:
     
     GameScene();
     ~GameScene();
-    
+
     static cocos2d::Scene* createScene();
     virtual bool init();
     
@@ -108,8 +108,8 @@ public:
     // adds a new sprite at a given coordinate
     void update(float dt);
     void addRectangleBetweenPointsToBody(b2Body* body, Vec2 start, Vec2 end);
-    Vec2 checkBodyWeighOnSomebody(Vec2 start, Vec2 end);
-    Vec2 checkDrawingWithOtherBodies(Vec2 start, Vec2 end);
+    Vec2 checkInsideBox2d(Vec2 start, Vec2 end);
+    Vec2 checkInsideBox2dByRayCats(Vec2 start, Vec2 end);
     std::vector<Vec2> getListPointsIn2Point(Vec2 start, Vec2 end);
     void backMenu();
     void touchButtonEvent(Ref* sender, Widget::TouchEventType type);

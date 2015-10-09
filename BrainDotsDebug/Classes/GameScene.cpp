@@ -29,13 +29,14 @@ Scene* GameScene::createScene()
 {
     auto scene = Scene::create();
     auto layer = GameScene::create();
-    scene->addChild(layer);
+    scene->addChild(layer, -1);
     return scene;
 }
 
 // on "init" you need to initialize your instance
 bool GameScene::init()
 {
+    
     //////////////////////////////
     // 1. super init first
     if ( !LayerColor::initWithColor(Color4B(255, 255, 255, 255)) )
@@ -97,19 +98,20 @@ bool GameScene::init()
     listener->onTouchEnded = CC_CALLBACK_2(GameScene::onTouchEnded, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
     
-//    /// Example of a concave polygon with hole
-//    int p[] = {80,200,112,120,160,72,256,88,336,120,368,248,352,296,272,312,256,248,192,216,160,232,112,280,64,248};
-//    CCPointVector path;
-//    for (int i = 0; i < 24; i += 2)
-//        path.push_back(Point(p[i],p[i+1]));
-//    
-//    int h[] = {144,168,192,120,272,136,320,200,288,232,240,168,192,184};
-//    CCPointVector hole;
-//    for (int i = 0; i < 14; i += 2)
-//        hole.push_back(Point(h[i],h[i+1]));
-//    
-//    /// Create the polygon and add it to the layer
-//    addChild(TexPoly::create(path, hole, "pattern.png", world));
+    /// Example of a concave polygon with hole
+    int p[] = {80,200,112,120,160,72,256,88,336,120,368,248,352,296,272,312,256,248,192,216,160,232,112,280,64,248};
+    CCPointVector path;
+    for (int i = 0; i < 24; i += 2)
+        path.push_back(Point(p[i],p[i+1]));
+    
+    int h[] = {144,168,192,120,272,136,320,200,288,232,240,168,192,184};
+    CCPointVector hole;
+    for (int i = 0; i < 14; i += 2)
+        hole.push_back(Point(h[i],h[i+1]));
+    
+    /// Create the polygon and add it to the layer
+    auto test = TexPoly::create(path, hole, "pattern.png", world);
+    map->addChild(test);
     
     return true;
 }
@@ -290,7 +292,7 @@ void GameScene::initMapLevel(int level)
     std::string nameLevel = "level" + to_string(level) + ".tmx";
     map = TMXTiledMap::create(nameLevel);
     if (map!=nullptr) {
-        addChild(map, ZORDER_GAME::ZORDER_MAPLEVEL, 1);
+        this->addChild(map, ZORDER_GAME::ZORDER_MAPLEVEL);
         
         // auto create physics objects
         tiledmap = new TiledBodyCreator();
@@ -315,6 +317,24 @@ void GameScene::initMapLevel(int level)
         float xB = ballB_map["x"].asFloat();
         float yB = ballB_map["y"].asFloat();
         posballB = Vec2(xB, yB);
+        
+        // electricity
+        auto electricityObject = group->getObject("electricity");
+        Rect rect = Rect(electricityObject["x"].asFloat(), electricityObject["y"].asFloat(), electricityObject["width"].asFloat(), electricityObject["height"].asFloat());
+        CCLOG("rect %f %f %f %f", rect.origin.x, rect.origin.y, rect.size.width, rect.size
+              .height);
+        std::string name = "electricity.gif";
+        name = FileUtils::getInstance()->fullPathForFilename(name.c_str());
+        GifBase *gif = InstantGif::create(name.c_str());//InstantGif ：While playing, while parsing
+        if(gif == NULL)
+        {
+            CCLOG("%s","create gif failed");
+            return ;
+        }
+        gif->setScale(rect.size.width / gif->getContentSize().width, rect.size.height / gif->getContentSize().height);
+        gif->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
+        gif->setPosition(rect.origin);
+        map->addChild(gif);
         
         // draw node
         drawnode = DrawNode::create();
@@ -432,25 +452,25 @@ void GameScene::update(float dt) {
         world->Step(dt, velocityIterations, positionIterations);
         
     } else {
+        ((Button*)this->getChildByTag(TAG_GAME::TAG_BUTTON_BACK))->setTouchEnabled(false);
+        ((Button*)this->getChildByTag(TAG_GAME::TAG_BUTTON_REPLAY))->setTouchEnabled(false);
+        
+        // result success
         if (isSuccess) {
-//            ParticleSystemQuad* starParticle = ParticleSystemQuad::create("star_particle.plist");
-//            starParticle->setPosition(collisionPoint);
-//            starParticle->setAutoRemoveOnFinish(true);
-//            starParticle->retain();
-//            map->addChild(starParticle);
             
             this->animationSuccess(collisionPoint);
-            // run animation ring
-//            this->explosionRing("explosion_yellow_ring.png", collisionPoint);
-            
             this->runAction(Sequence::create(DelayTime::create(2.5f), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)),  NULL));
+            
         } else if (isFail) {
+            // ballA was broken
             if (collisionFailA != Vec2::ZERO && collisionFailB == Vec2::ZERO) {
                 this->runAction(Sequence::create(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailA, "explosion_red")), DelayTime::create(2), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)), NULL));
             }
+            // ball B was broken
             else if (collisionFailB != Vec2::ZERO && collisionFailA == Vec2::ZERO) {
                 this->runAction(Sequence::create(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailB, "explosion_blue")), DelayTime::create(2), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)), NULL));
             }
+            // ball A and B together were broken
             else if (collisionFailA != Vec2::ZERO  && collisionFailB != Vec2::ZERO) {
                 this->runAction(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailA, "explosion_red")));
                 this->runAction(Sequence::create(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailB, "explosion_blue")), DelayTime::create(2), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)), NULL));
@@ -470,7 +490,6 @@ void GameScene::update(float dt) {
                                       body->GetPosition().y * PTM_RATIO));
             sprite->setRotation(-1 * CC_RADIANS_TO_DEGREES(body->GetAngle()));
         }
-//        world->DrawDebugData();
     }
     
     std::vector<b2Body *>toStatic;
@@ -577,7 +596,7 @@ bool GameScene::onTouchBegan(Touch* touch, Event* event) {
     }
     
     // touch in any physic body
-    if (checkBodyWeighOnSomebody(touch->getLocation(), touch->getLocation()) != Vec2::ZERO)
+    if (checkInsideBox2d(touch->getLocation(), touch->getLocation()) != Vec2::ZERO)
 //    if (checkDrawingWithOtherBodies(touch->getLocation(), touch->getLocation()) != Vec2::ZERO)
     {
         return false;
@@ -601,16 +620,16 @@ void GameScene::onTouchMoved(Touch* touch, Event* event) {
     Vec2 end = touch->getLocation();
     
 //    Vec2 collision = checkBodyWeighOnSomebody(start, end);
-    Vec2 collision = checkDrawingWithOtherBodies(start, end);
+    Vec2 collision = checkInsideBox2dByRayCats(start, end);
     
     // if before error draw
     if (isErrorDraw) {
-        if (checkBodyWeighOnSomebody(start, start)!= Vec2::ZERO) {
+        if (checkInsideBox2d(start, start)!= Vec2::ZERO) {
             Color4F color = Color4F(1, 1, 0, 0.5);
             drawnode->drawSegment(start, posErrorDraw, brush->getContentSize().width/2 , Color4F(color));
         } else {
 //            Vec2 _collision = checkBodyWeighOnSomebody(posErrorDraw, end);
-            Vec2 _collision = checkDrawingWithOtherBodies(start, posErrorDraw);
+            Vec2 _collision = checkInsideBox2dByRayCats(start, posErrorDraw);
             // if error draw
             if (_collision != Vec2::ZERO) {
                 Color4F color = Color4F(1, 1, 0, 0.5);
@@ -703,7 +722,7 @@ void GameScene::onTouchEnded(Touch* touch, Event* event) {
     target->clear(0, 0, 0, 0);
 }
 
-Vec2 GameScene::checkDrawingWithOtherBodies(cocos2d::Vec2 start, cocos2d::Vec2 end)
+Vec2 GameScene::checkInsideBox2dByRayCats(cocos2d::Vec2 start, cocos2d::Vec2 end)
 {
     Vec2 result = Vec2::ZERO;
     
@@ -790,7 +809,7 @@ std::vector<Vec2> GameScene::getListPointsIn2Point(cocos2d::Vec2 start, cocos2d:
     return list;
 }
 
-Vec2 GameScene::checkBodyWeighOnSomebody(cocos2d::Vec2 start, cocos2d::Vec2 end)
+Vec2 GameScene::checkInsideBox2d(cocos2d::Vec2 start, cocos2d::Vec2 end)
 {
     Vec2 result = Vec2::ZERO;
     std::vector<Vec2> listPoints = getListPointsIn2Point(start, end);
@@ -969,6 +988,9 @@ void GameScene::showShareLayer(std::string filename)
 
 void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
 {
+    ((Button*)this->getChildByTag(TAG_GAME::TAG_BUTTON_BACK))->setTouchEnabled(true);
+    ((Button*)this->getChildByTag(TAG_GAME::TAG_BUTTON_REPLAY))->setTouchEnabled(true);
+    
     //remove all body physics
     for (b2Body *body = world->GetBodyList(); body != NULL; body = body->GetNext()) {
         if (body->GetUserData()) {
@@ -1059,6 +1081,7 @@ void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
 
 void GameScene::endGame()
 {
+    
     // capture screen
     if (isSuccess) {
         filenameCapture = "capture_level_" + to_string(SceneManager::getInstance()->getLevelGame()) + "_success.png";

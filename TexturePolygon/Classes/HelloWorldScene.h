@@ -6,7 +6,7 @@
 
 USING_NS_CC;
 
-class HelloWorld : public cocos2d::LayerColor
+class HelloWorld : public cocos2d::Layer
 {
 public:
     // there's no 'id' in cpp, so we recommend returning the class instance pointer

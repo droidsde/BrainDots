@@ -30,7 +30,7 @@ public:
     static TexPoly *create(const CCPointVector &points, const CCPointVector &hole , const std::string &filename, b2World *world);
     virtual bool init(const CCPointVector &points, const CCPointVector &hole, const std::string &filename, b2World *world);
     virtual void draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t flags) override;
-    
+    void onDraw(const Mat4 &transform, uint32_t flags);
     void setColor(const Color4F &color);
     
 protected:
@@ -42,6 +42,8 @@ protected:
     GLint mColorLocation;
     Color4F mColor;
     Texture2D *mTexture;
+    BlendFunc _blendFunc;
+    CustomCommand _customCommand;
 };
 
 #endif /* defined(__TexturePolygon__textpoly__) */

@@ -14,7 +14,7 @@ LOCAL_MODULE_FILENAME := libcocos2dcpp
 CPP_FILES := $(shell find $(LOCAL_PATH)/../../Classes -name *.cpp)
 C_FILES := $(shell find $(LOCAL_PATH)/../../Classes -name *.c)
 CC_FILES := $(shell find $(LOCAL_PATH)/../../Classes -name *.cc)
-LOCAL_SRC_FILES := hellocpp/main.cpp $(CPP_FILES:$(LOCAL_PATH)/%=%) $(C_FILES:$(LOCAL_PATH)/%=%) $(CC_FILES:$(LOCAL_PATH)/%=%)
+LOCAL_SRC_FILES := hellocpp/main.cpp $(CPP_FILES:$(LOCAL_PATH)/%=%) $(C_FILES:$(LOCAL_PATH)/%=%)
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \
 					$(LOCAL_PATH)/../../Classes/SoundManager \

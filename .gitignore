@@ -6,12 +6,14 @@ BrainDots/proj.android/bin/*
 BrainDots/proj.android/gen/*
 BrainDots/proj.android/obj/*
 BrainDots/proj.android/libs/*
+BrainDots/proj.android/jni/Android.mk
 BrainDots/proj.ios_mac/BrainDots.xcodeproj/project.pbxproj
 BrainDots/proj.ios_mac/BrainDots.xcodeproj/project.xcworkspace/xcuserdata/Hoang.xcuserdatad/UserInterfaceState.xcuserstate
 BrainDotsDebug/proj.android/bin/*
 BrainDotsDebug/proj.android/gen/*
 BrainDotsDebug/proj.android/obj/*
 BrainDotsDebug/proj.android/libs/*
+BrainDotsDebug/proj.android/jni/Android.mk
 BrainDotsDebug/proj.android/project.properties
 BrainDotsDebug/proj.ios_mac/BrainDotsDebug.xcodeproj/project.pbxproj
 BrainDotsDebug/proj.ios_mac/BrainDotsDebug.xcodeproj/project.xcworkspace/xcuserdata/Hoang.xcuserdatad/UserInterfaceState.xcuserstate

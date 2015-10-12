@@ -29,7 +29,7 @@ Scene* GameScene::createScene()
 {
     auto scene = Scene::create();
     auto layer = GameScene::create();
-    scene->addChild(layer, -1);
+    scene->addChild(layer);
     return scene;
 }
 
@@ -319,22 +319,22 @@ void GameScene::initMapLevel(int level)
         posballB = Vec2(xB, yB);
         
         // electricity
-        auto electricityObject = group->getObject("electricity");
-        Rect rect = Rect(electricityObject["x"].asFloat(), electricityObject["y"].asFloat(), electricityObject["width"].asFloat(), electricityObject["height"].asFloat());
-        CCLOG("rect %f %f %f %f", rect.origin.x, rect.origin.y, rect.size.width, rect.size
-              .height);
-        std::string name = "electricity.gif";
-        name = FileUtils::getInstance()->fullPathForFilename(name.c_str());
-        GifBase *gif = InstantGif::create(name.c_str());//InstantGif ：While playing, while parsing
-        if(gif == NULL)
-        {
-            CCLOG("%s","create gif failed");
-            return ;
-        }
-        gif->setScale(rect.size.width / gif->getContentSize().width, rect.size.height / gif->getContentSize().height);
-        gif->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
-        gif->setPosition(rect.origin);
-        map->addChild(gif);
+//        auto electricityObject = group->getObject("electricity");
+//        Rect rect = Rect(electricityObject["x"].asFloat(), electricityObject["y"].asFloat(), electricityObject["width"].asFloat(), electricityObject["height"].asFloat());
+//        CCLOG("rect %f %f %f %f", rect.origin.x, rect.origin.y, rect.size.width, rect.size
+//              .height);
+//        std::string name = "electricity.gif";
+//        name = FileUtils::getInstance()->fullPathForFilename(name.c_str());
+//        GifBase *gif = InstantGif::create(name.c_str());//InstantGif ：While playing, while parsing
+//        if(gif == NULL)
+//        {
+//            CCLOG("%s","create gif failed");
+//            return ;
+//        }
+//        gif->setScale(rect.size.width / gif->getContentSize().width, rect.size.height / gif->getContentSize().height);
+//        gif->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
+//        gif->setPosition(rect.origin);
+//        map->addChild(gif);
         
         // draw node
         drawnode = DrawNode::create();

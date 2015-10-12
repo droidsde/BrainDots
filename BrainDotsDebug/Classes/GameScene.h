@@ -13,7 +13,13 @@
 #if(CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 #include "B2DebugDrawLayer.h"
 #endif
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#include "Clipper/clipper.hpp"
+#endif
+#if(CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 #include "clipper.hpp"
+#endif
 #include "textpoly.h"
 
 USING_NS_CC;

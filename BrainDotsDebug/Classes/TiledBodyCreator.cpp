@@ -10,8 +10,8 @@
 
 USING_NS_CC;
 
-std::map<std::string , b2Body*> mapBodyList;
 std::vector<ConveyorBelt> listConveyorBelt;
+b2Fixture* electricityFixture;
 
 typedef enum {
     POLYGON_FIXTURE,
@@ -21,21 +21,31 @@ typedef enum {
     UNKNOWN_FIXTURE
 } fixtureTypes;
 
-TiledBodyCreator::TiledBodyCreator()
+TiledBodyCreator::TiledBodyCreator(TMXTiledMap* map, b2World* world, std::string layerName)
 {
-    
+    this->_map = map;
+    this->_world = world;
+    this->_layerName = layerName;
 }
 
 TiledBodyCreator::~TiledBodyCreator()
 {
     mapBodyList.clear();
     listConveyorBelt.clear();
+    _map = nullptr;
+    delete _world;
+    _world = nullptr;
 }
 
-void TiledBodyCreator::initMapLevel(cocos2d::TMXTiledMap *map, b2World *world, std::string layerName,
-                                    uint16 categorybits, uint16 maskbits)
+void TiledBodyCreator::createMapLevel(cocos2d::TMXTiledMap *map, b2World *world, std::string layerName)
 {
-    auto layerGroup = map->getObjectGroup(layerName);
+    auto maplevel = new TiledBodyCreator(map, world, layerName);
+    maplevel->initData();
+}
+
+void TiledBodyCreator::initData()
+{
+    auto layerGroup = _map->getObjectGroup(_layerName);
     cocos2d::ValueVector physicObjects = layerGroup->getObjects();
     
     // static bodies
@@ -44,25 +54,32 @@ void TiledBodyCreator::initMapLevel(cocos2d::TMXTiledMap *map, b2World *world, s
     
     for (cocos2d::Value objectValue : physicObjects) {
         auto object = objectValue.asValueMap();
-        if (object["type"].asString() == "object") {
+        
+        // object in tiledmap
+        if (object["type"].asString() == "object")
+        {
             objectsList.push_back(objectValue);
-        } else if (object["type"].asString() == "joint") {
+        }
+        
+        // joint in tiledmap
+        else if (object["type"].asString() == "joint")
+        {
             jointList.push_back(objectValue);
         }
     }
     
     // execute object list
-    executeObjectList(map, world, objectsList, categorybits, maskbits);
+    initObjectList(objectsList);
     
     // execute joint list
-    executeJointList(world, jointList);
+    initJointList(jointList);
     
     // clear
     objectsList.clear();
     jointList.clear();
 }
 
-void TiledBodyCreator::executeObjectList(cocos2d::TMXTiledMap *map, b2World *world, ValueVector objectList, uint16 categorybits, uint16 maskbits)
+void TiledBodyCreator::initObjectList(ValueVector objectList)
 {
     if (objectList.size() <= 0) {
         return;
@@ -77,27 +94,38 @@ void TiledBodyCreator::executeObjectList(cocos2d::TMXTiledMap *map, b2World *wor
         auto object = objectValue.asValueMap();
         // only for auto create body
         if (object["autocreate"].asBool()) {
-            if (object["bodyType"].asString() == "DynamicBody") {
+            
+            // dynamic body
+            if (object["bodyType"].asString() == "DynamicBody")
+            {
                 dynamicBodyList.push_back(objectValue);
-            } else if (object["bodyType"].asString() == "StaticBody" || object["bodyType"].asString() == "") {
+            }
+            
+            // static body
+            else if (object["bodyType"].asString() == "StaticBody" || object["bodyType"].asString() == "")
+            {
                 staticBodyList.push_back(objectValue);
-            } else if (object["bodyType"].asString() == "KinematicBody") {
+            }
+            
+            // kinematic body
+            else if (object["bodyType"].asString() == "KinematicBody")
+            {
                 kinematicBodyList.push_back(objectValue);
             }
         }
     }
     
     // create auto staticbodies
-    createStaticBodies(map, world, staticBodyList, categorybits, maskbits);
+    createStaticBodies(staticBodyList);
     
     // create auto dynamic bodies
-    createDynamicBodies(map, world, dynamicBodyList, categorybits, maskbits, b2_dynamicBody);
+    createDynamicBodies(dynamicBodyList, b2_dynamicBody);
     
     // create auto kinematic bodies
-    createDynamicBodies(map, world, kinematicBodyList, categorybits, maskbits, b2_kinematicBody);
+    createDynamicBodies(kinematicBodyList, b2_kinematicBody);
 }
 
-void TiledBodyCreator::executeJointList(b2World *world, ValueVector jointList)
+void TiledBodyCreator::initJointList(ValueVector jointList)
 {
     if (jointList.size() <= 0) {
         return;
@@ -106,6 +134,7 @@ void TiledBodyCreator::executeJointList(b2World *world, ValueVector jointList)
     bool enableLimit;
     bool enableMotor;
 
+    // read option of joint
     for (cocos2d::Value objectValue : jointList)
     {
         Joint2Body* joint = new Joint2Body();
@@ -155,7 +184,7 @@ void TiledBodyCreator::executeJointList(b2World *world, ValueVector jointList)
                 joint->bodyA = (b2Body*)itr1->second;
                 joint->bodyB = (b2Body*)itr2->second;
                 // find out 2 body to joint
-                createJoint(world, joint);
+                createJoint(joint);
             }
         }
     }
@@ -163,7 +192,7 @@ void TiledBodyCreator::executeJointList(b2World *world, ValueVector jointList)
     mapBodyList.clear();
 }
 
-void TiledBodyCreator::createJoint(b2World *world, Joint2Body *joint)
+void TiledBodyCreator::createJoint(Joint2Body *joint)
 {
     switch (joint->jointType) {
         case  e_revoluteJoint:
@@ -187,7 +216,7 @@ void TiledBodyCreator::createJoint(b2World *world, Joint2Body *joint)
                 revoluteJointDef.maxMotorTorque = joint->maxMotorTorque;
                 revoluteJointDef.motorSpeed = joint->motorSpeed;
             }
-            world->CreateJoint(&revoluteJointDef);
+            _world->CreateJoint(&revoluteJointDef);
             
             break;
         }
@@ -202,7 +231,7 @@ void TiledBodyCreator::createJoint(b2World *world, Joint2Body *joint)
             weldJointDef.localAnchorB = joint->localAnchorB;
             weldJointDef.collideConnected = joint->collideConnected;
             
-            world->CreateJoint(&weldJointDef);
+            _world->CreateJoint(&weldJointDef);
             break;
         }
         default:
@@ -210,12 +239,7 @@ void TiledBodyCreator::createJoint(b2World *world, Joint2Body *joint)
     }
 }
 
-std::vector<ConveyorBelt> TiledBodyCreator::getListConveyorBelt()
-{
-    return listConveyorBelt;
-}
-
-void TiledBodyCreator::createStaticBodies(cocos2d::TMXTiledMap *map, b2World *world,  ValueVector staticBodyList, uint16 categorybits, uint16 maskbits)
+void TiledBodyCreator::createStaticBodies(ValueVector staticBodyList)
 {
     listConveyorBelt.clear();
     if (staticBodyList.size() <= 0) {
@@ -224,15 +248,9 @@ void TiledBodyCreator::createStaticBodies(cocos2d::TMXTiledMap *map, b2World *wo
     
     for(cocos2d::Value objectValue : staticBodyList)
     {
-        b2Fixture* platform;
-        bool isConveyorBelts = objectValue.asValueMap()["isConveyorBelt"].asBool();
-        float conveyorSpeed = objectValue.asValueMap()["conveyorBeltSpeed"].asFloat();
-        float friction = objectValue.asValueMap()["friction"].asFloat();
-        bool isMaskBits = objectValue.asValueMap()["isMaskBits"].asBool();
-        bool isElectric = objectValue.asValueMap()["isElectric"].asBool();
-        uint16 _maskbits = (uint16)objectValue.asValueMap()["maskbits"].asFloat();
+        b2Fixture* barrierStatic;
         std::string spriteName = objectValue.asValueMap()["spriteName"].asString();
-        
+
         // create fixture shape
         auto fixtureShape = createFixture(objectValue.asValueMap());
         if(fixtureShape != NULL) {
@@ -243,32 +261,87 @@ void TiledBodyCreator::createStaticBodies(cocos2d::TMXTiledMap *map, b2World *wo
             if (pos.x != 0 && pos.y != 0) {
                 bd.position.Set(pos.x, pos.y);
             }
-            // create body
-            b2Body* staticBody = world->CreateBody(&bd);
-            if (isElectric) {
-                CCLOG("isElectric");
-                fixtureShape->fixture.filter.categoryBits = CATEGORY_ELECTRICITY;
-                fixtureShape->fixture.filter.maskBits = MASK_ELECTRICITY;
-            } else {
-                fixtureShape->fixture.filter.categoryBits = categorybits;
-                if (isMaskBits) {
-                    fixtureShape->fixture.filter.maskBits = _maskbits;
+            
+            //---------------//
+            //  BARRIER TYPE //
+            //---------------//
+            switch (getBarrierType(objectValue)) {
+                
+                case BARRIER_TYPE::ELECTRICITY :
+                {
+                    CCLOG("ELECTRICITY");
+                    fixtureShape->fixture.filter.categoryBits = CATEGORY_BARRIER_ELECTRICITY;
+                    fixtureShape->fixture.filter.maskBits = MASK_BARRIER_ELECTRICITY;
+                    break;
                 }
-                else fixtureShape->fixture.filter.maskBits = maskbits;
+                    
+                case BARRIER_TYPE::HEXGRID :
+                {
+                    CCLOG("HEXGRID");
+                    fixtureShape->fixture.filter.categoryBits = CATEGORY_BARRIER;
+                    fixtureShape->fixture.filter.maskBits = MASK_HEXGRID;
+                    break;
+                }
+                
+                case BARRIER_TYPE::UNKNOWN :
+                {
+                    fixtureShape->fixture.filter.categoryBits = CATEGORY_BARRIER;
+                    fixtureShape->fixture.filter.maskBits = MASK_BARRIER;
+                    break;
+                }
+                default:
+                    break;
             }
             
-            platform = staticBody->CreateFixture(&fixtureShape->fixture);
-            if (isConveyorBelts) {
-                ConveyorBelt cb;
-                cb.fixture = platform;
-                cb.tangentSpeed = conveyorSpeed;
-                cb.friction = friction;
-                listConveyorBelt.push_back(cb);
+            // create body
+            b2Body* staticBody = _world->CreateBody(&bd);
+            barrierStatic = staticBody->CreateFixture(&fixtureShape->fixture);
+            
+            switch (getBarrierType(objectValue)) {
+                case BARRIER_TYPE::CONVEYOR :
+                {
+                    CCLOG("CONVEYOR");
+                    // conveyor option
+                    float conveyorSpeed = objectValue.asValueMap()["conveyorBeltSpeed"].asFloat();
+                    float friction = objectValue.asValueMap()["friction"].asFloat();
+                    ConveyorBelt cb;
+                    cb.fixture = barrierStatic;
+                    cb.tangentSpeed = conveyorSpeed;
+                    cb.friction = friction;
+                    listConveyorBelt.push_back(cb);
+                    break;
+                }
+                case BARRIER_TYPE::ELECTRICITY :
+                {
+                    electricityFixture = barrierStatic;
+                    
+                    // electricity
+                    Rect rect = Rect(objectValue.asValueMap()["x"].asFloat(), objectValue.asValueMap()["y"].asFloat(), objectValue.asValueMap()["width"].asFloat(), objectValue.asValueMap()["height"].asFloat());
+                    CCLOG("rect %f %f %f %f", rect.origin.x, rect.origin.y, rect.size.width, rect.size
+                                  .height);
+                    std::string name = "electricity.gif";
+                    name = FileUtils::getInstance()->fullPathForFilename(name.c_str());
+                    GifBase *gif = InstantGif::create(name.c_str());//InstantGif ：While playing, while parsing
+                    if(gif == NULL)
+                    {
+                        CCLOG("%s","create gif failed");
+                        break ;
+                    } else {
+                        gif->setScale(rect.size.width / gif->getContentSize().width, rect.size.height / gif->getContentSize().height);
+                        gif->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
+                        gif->setPosition(rect.origin);
+                        _map->addChild(gif);
+                    }
+
+                    break;
+                }
+                default:
+                    break;
             }
             
             // create sprite for polygon
             if (spriteName != "") {
-                createSpriteBody(map, staticBody, fixtureShape, spriteName, fixtureShape->fixture.shape->GetType());
+                createSpriteBody(staticBody, fixtureShape, spriteName, fixtureShape->fixture.shape->GetType());
             }
             
             // insert to map
@@ -280,7 +353,7 @@ void TiledBodyCreator::createStaticBodies(cocos2d::TMXTiledMap *map, b2World *wo
     staticBodyList.clear();
 }
 
-void TiledBodyCreator::createDynamicBodies(cocos2d::TMXTiledMap *map, b2World *world,  ValueVector dynamicBodyList, uint16 categorybits, uint16 maskbits, b2BodyType type)
+void TiledBodyCreator::createDynamicBodies(ValueVector dynamicBodyList, b2BodyType type)
 {
     if (dynamicBodyList.size() <= 0) {
         return;
@@ -289,12 +362,13 @@ void TiledBodyCreator::createDynamicBodies(cocos2d::TMXTiledMap *map, b2World *w
     for (cocos2d::Value objectValue : dynamicBodyList) {
         
         // create fixture shape
-        auto fixtureShape = createFixture(objectValue.asValueMap());
+        
         float density = objectValue.asValueMap()["density"].asFloat();
         float angle = objectValue.asValueMap()["angle"].asFloat();
         float angularVelocity = objectValue.asValueMap()["angularVelocity"].asFloat();
         std::string spriteName = objectValue.asValueMap()["spriteName"].asString();
-
+        
+        auto fixtureShape = createFixture(objectValue.asValueMap());
         if (fixtureShape != NULL) {
             
             // create body def
@@ -305,17 +379,17 @@ void TiledBodyCreator::createDynamicBodies(cocos2d::TMXTiledMap *map, b2World *w
                 bd.position.Set(pos.x, pos.y);
             }
             bd.angle = CC_DEGREES_TO_RADIANS( angle );
-            b2Body* dynamicBody = world->CreateBody(&bd);
+            b2Body* dynamicBody = _world->CreateBody(&bd);
             
             // fixturedef
-            fixtureShape->fixture.filter.categoryBits = categorybits;
-            fixtureShape->fixture.filter.maskBits = maskbits;
+            fixtureShape->fixture.filter.categoryBits = CATEGORY_BARRIER;
+            fixtureShape->fixture.filter.maskBits = MASK_BARRIER;
             fixtureShape->fixture.density = density;
             dynamicBody->CreateFixture(&fixtureShape->fixture);
             dynamicBody->SetAngularVelocity(angularVelocity);
             
             // create sprite for polygon, circle, rect
-            createSpriteBody(map, dynamicBody, fixtureShape, spriteName, fixtureShape->fixture.shape->GetType());
+            createSpriteBody(dynamicBody, fixtureShape, spriteName, fixtureShape->fixture.shape->GetType());
             
             // insert to map
             mapBodyList.insert(std::pair<std::string, b2Body*>(objectValue.asValueMap()["name"].asString(), dynamicBody));
@@ -326,31 +400,31 @@ void TiledBodyCreator::createDynamicBodies(cocos2d::TMXTiledMap *map, b2World *w
     dynamicBodyList.clear();
 }
 
-void TiledBodyCreator::createSpriteBody(cocos2d::TMXTiledMap *map, b2Body *body, FixtureDef* fixtureShape, std::string spriteName, b2Shape::Type type)
+void TiledBodyCreator::createSpriteBody(b2Body *body, FixtureDef* fixtureShape, std::string spriteName, b2Shape::Type type)
 {
     switch (type) {
         case b2Shape::e_polygon:
         {
-            Rect bodyRectangle = ExecuteShapePhysic::getBodyRectangle(map->getMapSize(), body);
+            Rect bodyRectangle = ExecuteShapePhysic::getBodyRectangle(_map->getMapSize(), body);
             float anchorX = body->GetPosition().x * PTM_RATIO - bodyRectangle.origin.x;
-            float anchorY = bodyRectangle.size.height - (map->getMapSize().height - bodyRectangle.origin.y - body->GetPosition().y * PTM_RATIO);
+            float anchorY = bodyRectangle.size.height - (_map->getMapSize().height - bodyRectangle.origin.y - body->GetPosition().y * PTM_RATIO);
             Vec2 anchorPoint = Vec2(anchorX / bodyRectangle.size.width, anchorY / bodyRectangle.size.height);
             auto dynamicSprite = Sprite::create(spriteName , bodyRectangle);
             dynamicSprite->setAnchorPoint(anchorPoint);
             body->SetUserData(dynamicSprite);
-            map->addChild(dynamicSprite);
+            _map->addChild(dynamicSprite);
             break;
         }
         case b2Shape::e_circle:
         {
             Vec2 position = Vec2(body->GetPosition().x * PTM_RATIO, body->GetPosition().y * PTM_RATIO);
             float radius = fixtureShape->fixture.shape->m_radius * PTM_RATIO;
-            Rect bodyRectangle = Rect(position.x, position.y, radius*2, radius*2);
             auto dynamicSprite = Sprite::create(spriteName);
             dynamicSprite->setPosition(Vec2(position));
             dynamicSprite->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+            dynamicSprite->setScale(radius*2/dynamicSprite->getContentSize().width);
             body->SetUserData(dynamicSprite);
-            map->addChild(dynamicSprite);
+            _map->addChild(dynamicSprite);
             break;
         }
         case b2Shape::e_chain:
@@ -462,7 +536,6 @@ FixtureDef* TiledBodyCreator::createPolygon(ValueMap object)
     return fix;
 }
 
-
 FixtureDef* TiledBodyCreator::createPolyline(ValueMap object)
 {
     ValueVector pointsVector = object["polylinePoints"].asValueVector();
@@ -516,21 +589,43 @@ FixtureDef* TiledBodyCreator::createRect(ValueMap object)
     return fix;
 }
 
-std::vector<Rect> TiledBodyCreator::getRectListObjects(cocos2d::TMXTiledMap *map, std::string objectsName, std::string layerName)
+BARRIER_TYPE TiledBodyCreator::getBarrierType(cocos2d::Value objectValue)
 {
-    std::vector<Rect> listRect;
-    auto layerGrid = map->getLayer(layerName);
-    if (layerGrid) {
-        int zorder = layerGrid->getProperty("zorder").asInt();
-        map->reorderChild(layerGrid, zorder>0?zorder:100);
+    BARRIER_TYPE type;
+
+    std::string nameType = objectValue.asValueMap()["barrierType"].asString();
+
+    // hex grid: no for touch
+    if ( nameType == "hexgrid" )
+    {
+        type = BARRIER_TYPE::HEXGRID;
     }
-    auto layerGroup = map->getObjectGroup(objectsName);
-    cocos2d::ValueVector collisionObjects = layerGroup->getObjects();
     
-    for (cocos2d::Value objectValue : collisionObjects) {
-        auto object = objectValue.asValueMap();
-        Rect pos = Rect(object["x"].asFloat(), object["y"].asFloat(), object["width"].asFloat(), object["height"].asFloat());
-        listRect.push_back(pos);
+    // conveyor belt
+    else if ( nameType == "conveyor" )
+    {
+        type = BARRIER_TYPE::CONVEYOR;
     }
-    return listRect;
+    
+    // electricity
+    else if ( nameType == "electricity" )
+    {
+        type = BARRIER_TYPE::ELECTRICITY;
+    }
+    
+    else
+    {
+        type = BARRIER_TYPE::UNKNOWN;
+    }
+    return type;
+}
+
+std::vector<ConveyorBelt> TiledBodyCreator::getListConveyorBelt()
+{
+    return listConveyorBelt;
+}
+
+b2Fixture* TiledBodyCreator::getElectricityFixture()
+{
+    return electricityFixture;
 }

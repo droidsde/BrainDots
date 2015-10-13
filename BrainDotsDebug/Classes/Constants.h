@@ -58,23 +58,23 @@ const int   NUM_EXPLOSION_CIRCLE = 60;
 const int   EXPLOSION_CIRCLE_RADIUS = 5;
 const float OUTSIDE = 500;
 
-// category definiti
+// category definition
 const short CATEGORY_BALL = 0x0001;
 const short CATEGORY_PLATFORM = 0x0002;
-const short CATEGORY_BARRAGE = 0x0004;
+const short CATEGORY_BARRIER = 0x0004;
 const short CATEGORY_WALL1 = 0x0008;
 const short CATEGORY_WALL2 = 0x0010;
 const short CATEGORY_EXPLOSION = 0x0020;
-const short CATEGORY_ELECTRICITY = 0x0040;
+const short CATEGORY_BARRIER_ELECTRICITY = 0x0040;
 
-// maskbit definiti
+// maskbit definition
 const short MASK_BALL = -1;
-const short MASK_PLATFORM = CATEGORY_BALL | CATEGORY_BARRAGE | CATEGORY_PLATFORM | CATEGORY_WALL2;
-const short MASK_BARRAGE = CATEGORY_BALL | CATEGORY_BARRAGE | CATEGORY_PLATFORM | CATEGORY_WALL2 | CATEGORY_WALL1;
-const short MASK_WALL1 = CATEGORY_BALL | CATEGORY_BARRAGE;
-const short MASK_WALL2 = CATEGORY_BALL | CATEGORY_BARRAGE | CATEGORY_PLATFORM;
-const short MASK_EXPLOSION = 0;
-const short MASK_ELECTRICITY = CATEGORY_BALL;
+const short MASK_PLATFORM = CATEGORY_BALL | CATEGORY_BARRIER | CATEGORY_PLATFORM | CATEGORY_WALL2;
+const short MASK_BARRIER = CATEGORY_BALL | CATEGORY_BARRIER | CATEGORY_PLATFORM | CATEGORY_WALL2 | CATEGORY_WALL1;
+const short MASK_WALL1 = CATEGORY_BALL | CATEGORY_BARRIER;
+const short MASK_WALL2 = CATEGORY_BALL | CATEGORY_BARRIER | CATEGORY_PLATFORM;
+const short MASK_HEXGRID = 0;
+const short MASK_BARRIER_ELECTRICITY = CATEGORY_BALL;
 
 template <typename T>
 std::string to_string(T value)
@@ -93,6 +93,17 @@ typedef enum class game_state
     GAME,
     OVER,
 }GAME_STATE;
+
+typedef enum class barrier_type
+{
+    DEFAULT_RECTANGLE = 0,
+    DEFAULT_CIRCLE,
+    ELECTRICITY,
+    CONVEYOR,
+    HEXGRID,
+    UNKNOWN,
+        
+}BARRIER_TYPE;
     
 enum ZORDER_MENU
 {
@@ -124,10 +135,11 @@ enum TAG_MENU_ITEM
 };
 
 enum TAG_PENCIL_ITEM
-    {
-        BUY_BUTTON = 0,
-        SELECT_BUTTON,
-    };
+{
+    BUY_BUTTON = 0,
+    SELECT_BUTTON,
+};
+
 enum TAG_SETTING_ITEM
 {
     MUSIC = 0,

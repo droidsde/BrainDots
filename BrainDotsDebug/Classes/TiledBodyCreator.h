@@ -12,6 +12,7 @@
 #include <cocos2d.h>
 #include <Box2D/Box2D.h>
 #include "SceneManager.h"
+#include "TexturePolygon.h"
 
 USING_NS_CC;
 class GameScene;
@@ -68,42 +69,49 @@ class TiledBodyCreator
 {
 public:
     
-    TiledBodyCreator();
+    TiledBodyCreator(TMXTiledMap* map, b2World* world, std::string layerName);
     ~TiledBodyCreator();
     
-    // init map
-    static void initMapLevel(TMXTiledMap* map, b2World* world, std::string layerName, uint16 categorybits, uint16 maskbits);
+    // create map level
+    static void createMapLevel(TMXTiledMap* map, b2World* world, std::string layerName);
     
-    // execute 2 lists
-    static void executeObjectList(cocos2d::TMXTiledMap *map, b2World *world, ValueVector objectList, uint16 categorybits, uint16 maskbits);
-    static void executeJointList(b2World *world, ValueVector jointList);
+    // init data
+    void initData();
+    
+    // init object list
+    void initObjectList(ValueVector objectList);
+    //init joint list
+    void initJointList(ValueVector jointList);
+    // create joints
+    void createJoint(Joint2Body* joint);
     
     // create fixture from tmx file
-    static FixtureDef* createFixture(ValueMap object);
-    static FixtureDef* createPolygon(ValueMap object);
-    static FixtureDef* createPolyline(ValueMap object);
-    static FixtureDef* createCircle(ValueMap object);
-    static FixtureDef* createRect(ValueMap object);
+    FixtureDef* createFixture(ValueMap object);
+    FixtureDef* createPolygon(ValueMap object);
+    FixtureDef* createPolyline(ValueMap object);
+    FixtureDef* createCircle(ValueMap object);
+    FixtureDef* createRect(ValueMap object);
     
     // get position body
-    static b2Vec2 getPositionBody(ValueMap object);
+    b2Vec2 getPositionBody(ValueMap object);
     
     // static body
-    static void createStaticBodies(cocos2d::TMXTiledMap *map,b2World *world, ValueVector staticBodyList, uint16 categorybits, uint16 maskbits);
+    void createStaticBodies(ValueVector staticBodyList);
     
-    // dynamic body
-    static void createDynamicBodies(cocos2d::TMXTiledMap *map, b2World *world, ValueVector dynamicBodyList, uint16 categorybits, uint16 maskbits, b2BodyType type);
+    // dynamic body & kinematic body
+    void createDynamicBodies(ValueVector dynamicBodyList, b2BodyType type);
     
-    static void createSpriteBody(cocos2d::TMXTiledMap *map, b2Body* body, FixtureDef* fixtureShape, std::string spriteName,  b2Shape::Type type);
+    void createSpriteBody(b2Body* body, FixtureDef* fixtureShape, std::string spriteName,  b2Shape::Type type);
     
-    // create joints
-    static void createJoint(b2World* world, Joint2Body* joint);
-    
-    // get list hex objects
-    static std::vector<Rect> getRectListObjects(TMXTiledMap* map,std::string objectsName, std::string layerName);
-    
-    // get list conveyor belts
+    BARRIER_TYPE getBarrierType(cocos2d::Value objectValue);
     static std::vector<ConveyorBelt> getListConveyorBelt();
+    static b2Fixture* getElectricityFixture();
+private:
+    
+    TMXTiledMap* _map;
+    b2World* _world;
+    std::string _layerName;
+    std::map<std::string , b2Body*> mapBodyList;
 };
 
 

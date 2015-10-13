@@ -20,7 +20,7 @@
 #if(CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 #include "clipper.hpp"
 #endif
-#include "textpoly.h"
+#include "TexturePolygon.h"
 
 USING_NS_CC;
 using namespace cocos2d::ui;
@@ -161,6 +161,7 @@ private:
     b2Fixture* _ballBFixture;
     b2Fixture* _wallFixture1[4];
     b2Fixture* _wallFixture2[4];
+    b2Fixture* electricictyFixture;
 
     //test
     b2Fixture* mPlatform;

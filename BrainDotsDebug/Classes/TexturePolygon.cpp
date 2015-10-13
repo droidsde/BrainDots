@@ -6,31 +6,31 @@
 //
 //
 
-#include "textpoly.h"
+#include "TexturePolygon.h"
 #include "poly2tri.h"
 #define PTM_RATIO 32
 
-TexPoly::TexPoly()
+TexturePolygon::TexturePolygon()
 : mTexture(nullptr)
 {
     mColor = Color4F(1.f, 1.f, 1.f, 1.f);
 }
 
-TexPoly::~TexPoly()
+TexturePolygon::~TexturePolygon()
 {
     CC_SAFE_RELEASE(mTexture);
 }
 
-TexPoly *TexPoly::create(const CCPointVector &points, const std::string &filename, b2World *world)
+TexturePolygon *TexturePolygon::create(const PointVector &points, const std::string &filename, b2Body* body)
 {
-    CCPointVector empty;
-    return create(points, empty, filename, world);
+    PointVector empty;
+    return create(points, empty, filename, body);
 }
 
-TexPoly *TexPoly::create(const CCPointVector &points, const CCPointVector &hole, const std::string &filename, b2World *world)
+TexturePolygon *TexturePolygon::create(const PointVector &points, const PointVector &hole, const std::string &filename, b2Body* body)
 {
-    TexPoly *ptr = new TexPoly();
-    if (ptr && ptr->init(points, hole, filename, world)) {
+    TexturePolygon *ptr = new TexturePolygon();
+    if (ptr && ptr->init(points, hole, filename, body)) {
         ptr->autorelease();
         return ptr;
     }
@@ -38,7 +38,7 @@ TexPoly *TexPoly::create(const CCPointVector &points, const CCPointVector &hole,
     return nullptr;
 }
 
-bool TexPoly::init(const CCPointVector &points, const CCPointVector &hole, const std::string &filename, b2World *world)
+bool TexturePolygon::init(const PointVector &points, const PointVector &hole, const std::string &filename, b2Body* body)
 {
     if (filename.length() == 0) {
         CCLOGERROR("ERROR: Invalid texture filename (empty string)");
@@ -85,11 +85,12 @@ bool TexPoly::init(const CCPointVector &points, const CCPointVector &hole, const
     /**
      * STEP 5: create the Box2D body
      */
-    b2BodyDef bd;
-    bd.type = b2_dynamicBody;
-    bd.position = b2Vec2_zero;
-    bd.userData = this;
-    b2Body *body = world->CreateBody(&bd);
+//    b2BodyDef bd;
+//    bd.type = b2_dynamicBody;
+//    bd.position = b2Vec2_zero;
+//    bd.userData = this;
+//    b2Body *body = world->CreateBody(&bd);
+    body->SetUserData(this);
     
     /**
      * STEP 6: Create the fixtures
@@ -122,11 +123,6 @@ bool TexPoly::init(const CCPointVector &points, const CCPointVector &hole, const
         shape.Set(v, 3);
         body->CreateFixture(&fd);
     }
-    int count = 0;
-    for (b2Fixture* f = body->GetFixtureList(); f; f = f->GetNext()) {
-        count++;
-    }
-    CCLOG("count %d", count);
     
     /**
      * STEP 7: Configure the shader program
@@ -158,17 +154,17 @@ bool TexPoly::init(const CCPointVector &points, const CCPointVector &hole, const
 }
 
 
-void TexPoly::draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t flags)
+void TexturePolygon::draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t flags)
 {
     if (! isVisible()) return;
     
     _customCommand.init(_globalZOrder);
-    _customCommand.func = CC_CALLBACK_0(TexPoly::onDraw, this, transform, flags);
+    _customCommand.func = CC_CALLBACK_0(TexturePolygon::onDraw, this, transform, flags);
     renderer->addCommand(&_customCommand);
     
 }
 
-void TexPoly::onDraw(const cocos2d::Mat4 &transform, uint32_t flags)
+void TexturePolygon::onDraw(const cocos2d::Mat4 &transform, uint32_t flags)
 {
     /// Setup the OpenGL shader
     CC_NODE_DRAW_SETUP();
@@ -192,12 +188,12 @@ void TexPoly::onDraw(const cocos2d::Mat4 &transform, uint32_t flags)
     CC_INCREMENT_GL_DRAWS(1);
 }
 
-void TexPoly::setColor(const Color4F &color)
+void TexturePolygon::setColor(const Color4F &color)
 {
     mColor = color;
 }
 
-template <class T> void TexPoly::freeContainer(T &cntr)
+template <class T> void TexturePolygon::freeContainer(T &cntr)
 {
     for (typename T::iterator it = cntr.begin(); it != cntr.end(); ++it)
         delete * it;

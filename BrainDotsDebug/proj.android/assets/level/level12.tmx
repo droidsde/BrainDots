@@ -756,10 +756,10 @@
   <object id="10" name="conveyor" type="object" x="469.667" y="342.333" width="430.667" height="41.3333">
    <properties>
     <property name="autocreate" value="true"/>
+    <property name="barrierType" value="conveyor"/>
     <property name="bodyType" value="StaticBody"/>
     <property name="conveyorBeltSpeed" value="100"/>
     <property name="friction" value="3.0"/>
-    <property name="isConveyorBelt" value="true"/>
     <property name="spriteName" value="tileset.png"/>
    </properties>
   </object>

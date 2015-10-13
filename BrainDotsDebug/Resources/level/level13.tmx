@@ -741,20 +741,20 @@
   <object id="11" name="conveyor1" type="object" x="2" y="365.333" width="488" height="37.3333">
    <properties>
     <property name="autocreate" value="true"/>
+    <property name="barrierType" value="conveyor"/>
     <property name="bodyType" value="StaticBody"/>
     <property name="conveyorBeltSpeed" value="100"/>
     <property name="friction" value="10.0"/>
-    <property name="isConveyorBelt" value="true"/>
     <property name="spriteName" value="tileset.png"/>
    </properties>
   </object>
   <object id="12" name="conveyor2" type="object" x="913.333" y="362.667" width="452" height="41.3333">
    <properties>
     <property name="autocreate" value="true"/>
+    <property name="barrierType" value="conveyor"/>
     <property name="bodyType" value="StaticBody"/>
     <property name="conveyorBeltSpeed" value="-200"/>
     <property name="friction" value="10.0"/>
-    <property name="isConveyorBelt" value="true"/>
     <property name="spriteName" value="tileset.png"/>
    </properties>
   </object>

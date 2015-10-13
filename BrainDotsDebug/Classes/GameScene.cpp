@@ -100,18 +100,18 @@ bool GameScene::init()
     
     /// Example of a concave polygon with hole
     int p[] = {80,200,112,120,160,72,256,88,336,120,368,248,352,296,272,312,256,248,192,216,160,232,112,280,64,248};
-    CCPointVector path;
+    PointVector path;
     for (int i = 0; i < 24; i += 2)
         path.push_back(Point(p[i],p[i+1]));
     
     int h[] = {144,168,192,120,272,136,320,200,288,232,240,168,192,184};
-    CCPointVector hole;
+    PointVector hole;
     for (int i = 0; i < 14; i += 2)
         hole.push_back(Point(h[i],h[i+1]));
     
     /// Create the polygon and add it to the layer
-    auto test = TexPoly::create(path, hole, "pattern.png", world);
-    map->addChild(test);
+//    auto test = TexturePolygon::create(path, hole, "pattern.png");
+//    map->addChild(test);
     
     return true;
 }
@@ -295,10 +295,16 @@ void GameScene::initMapLevel(int level)
         this->addChild(map, ZORDER_GAME::ZORDER_MAPLEVEL);
         
         // auto create physics objects
-        tiledmap = new TiledBodyCreator();
-        tiledmap->initMapLevel(map, world, "braindots", CATEGORY_BARRAGE, MASK_BARRAGE);
-        listConveyorBelt = tiledmap->getListConveyorBelt();
-        _ballContactListener->setListConveyorBelt(listConveyorBelt);
+        tiledmap->createMapLevel(map, world, "braindots");
+        // for conveyor
+        if (tiledmap->getListConveyorBelt().size() > 0) {
+            listConveyorBelt = tiledmap->getListConveyorBelt();
+            _ballContactListener->setListConveyorBelt(listConveyorBelt);
+        }
+        // for electricity
+        if (tiledmap->getElectricityFixture()) {
+            electricictyFixture = tiledmap->getElectricityFixture();
+        }
         
         // get ball group
         auto group = map->getObjectGroup("braindots");
@@ -317,24 +323,6 @@ void GameScene::initMapLevel(int level)
         float xB = ballB_map["x"].asFloat();
         float yB = ballB_map["y"].asFloat();
         posballB = Vec2(xB, yB);
-        
-        // electricity
-//        auto electricityObject = group->getObject("electricity");
-//        Rect rect = Rect(electricityObject["x"].asFloat(), electricityObject["y"].asFloat(), electricityObject["width"].asFloat(), electricityObject["height"].asFloat());
-//        CCLOG("rect %f %f %f %f", rect.origin.x, rect.origin.y, rect.size.width, rect.size
-//              .height);
-//        std::string name = "electricity.gif";
-//        name = FileUtils::getInstance()->fullPathForFilename(name.c_str());
-//        GifBase *gif = InstantGif::create(name.c_str());//InstantGif ：While playing, while parsing
-//        if(gif == NULL)
-//        {
-//            CCLOG("%s","create gif failed");
-//            return ;
-//        }
-//        gif->setScale(rect.size.width / gif->getContentSize().width, rect.size.height / gif->getContentSize().height);
-//        gif->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
-//        gif->setPosition(rect.origin);
-//        map->addChild(gif);
         
         // draw node
         drawnode = DrawNode::create();
@@ -535,6 +523,36 @@ void GameScene::update(float dt) {
                 }
                 isFail = true;
             }
+        }
+        
+        // contact with electricity
+        if (contact.fixtureA == electricictyFixture && contact.fixtureB == _ballAFixture) {
+            collisionFailA = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
+            if (std::find(toDestroy.begin(), toDestroy.end(), bodyB) == toDestroy.end()) {
+                toDestroy.push_back(bodyB);
+            }
+            isFail = true;
+        }
+        else if (contact.fixtureA == electricictyFixture && contact.fixtureB == _ballBFixture) {
+            collisionFailB = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
+            if (std::find(toDestroy.begin(), toDestroy.end(), bodyB) == toDestroy.end()) {
+                toDestroy.push_back(bodyB);
+            }
+            isFail = true;
+        }
+        else if (contact.fixtureA == _ballAFixture && contact.fixtureB ==  electricictyFixture) {
+            collisionFailA = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
+            if (std::find(toDestroy.begin(), toDestroy.end(), bodyA) == toDestroy.end()) {
+                toDestroy.push_back(bodyA);
+            }
+            isFail = true;
+        }
+        else if (contact.fixtureA == _ballBFixture && contact.fixtureB ==  electricictyFixture) {
+            collisionFailB = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
+            if (std::find(toDestroy.begin(), toDestroy.end(), bodyA) == toDestroy.end()) {
+                toDestroy.push_back(bodyA);
+            }
+            isFail = true;
         }
         
         // contact platform with wall2
@@ -897,7 +915,7 @@ void GameScene::explosionBall(b2Body *ball)
             fd.friction = 0;
             fd.restitution = 0.99f;
             fd.filter.categoryBits = CATEGORY_EXPLOSION;
-            fd.filter.maskBits = MASK_EXPLOSION;
+            fd.filter.maskBits = MASK_HEXGRID;
             body->CreateFixture(&fd);
             
         }

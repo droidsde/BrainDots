@@ -101,6 +101,9 @@ typedef enum class barrier_type
     ELECTRICITY,
     CONVEYOR,
     HEXGRID,
+    SWITCH,
+    POLYGON,
+    POLYGON_HOLE,
     UNKNOWN,
         
 }BARRIER_TYPE;

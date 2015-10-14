@@ -12,6 +12,7 @@ USING_NS_CC;
 
 std::vector<ConveyorBelt> listConveyorBelt;
 b2Fixture* electricityFixture;
+b2Fixture* switchFixture;
 
 typedef enum {
     POLYGON_FIXTURE,
@@ -250,18 +251,19 @@ void TiledBodyCreator::createStaticBodies(ValueVector staticBodyList)
     {
         b2Fixture* barrierStatic;
         std::string spriteName = objectValue.asValueMap()["spriteName"].asString();
-
+        // create bodedef
+        b2BodyDef bd;
+        bd.type = b2_staticBody;
+        b2Vec2 pos = getPositionBody(objectValue.asValueMap());
+        if (pos.x != 0 && pos.y != 0) {
+            bd.position.Set(pos.x, pos.y);
+        }
+        // create body
+        b2Body* staticBody = _world->CreateBody(&bd);
+        
         // create fixture shape
         auto fixtureShape = createFixture(objectValue.asValueMap());
         if(fixtureShape != NULL) {
-            // create bodedef
-            b2BodyDef bd;
-            bd.type = b2_staticBody;
-            b2Vec2 pos = getPositionBody(objectValue.asValueMap());
-            if (pos.x != 0 && pos.y != 0) {
-                bd.position.Set(pos.x, pos.y);
-            }
-            
             //---------------//
             //  BARRIER TYPE //
             //---------------//
@@ -292,15 +294,12 @@ void TiledBodyCreator::createStaticBodies(ValueVector staticBodyList)
                 default:
                     break;
             }
-            
-            // create body
-            b2Body* staticBody = _world->CreateBody(&bd);
+            // create fixture for body
             barrierStatic = staticBody->CreateFixture(&fixtureShape->fixture);
             
             switch (getBarrierType(objectValue)) {
                 case BARRIER_TYPE::CONVEYOR :
                 {
-                    CCLOG("CONVEYOR");
                     // conveyor option
                     float conveyorSpeed = objectValue.asValueMap()["conveyorBeltSpeed"].asFloat();
                     float friction = objectValue.asValueMap()["friction"].asFloat();
@@ -311,14 +310,13 @@ void TiledBodyCreator::createStaticBodies(ValueVector staticBodyList)
                     listConveyorBelt.push_back(cb);
                     break;
                 }
+                    
                 case BARRIER_TYPE::ELECTRICITY :
                 {
                     electricityFixture = barrierStatic;
                     
                     // electricity
                     Rect rect = Rect(objectValue.asValueMap()["x"].asFloat(), objectValue.asValueMap()["y"].asFloat(), objectValue.asValueMap()["width"].asFloat(), objectValue.asValueMap()["height"].asFloat());
-                    CCLOG("rect %f %f %f %f", rect.origin.x, rect.origin.y, rect.size.width, rect.size
-                                  .height);
                     std::string name = "electricity.gif";
                     name = FileUtils::getInstance()->fullPathForFilename(name.c_str());
                     GifBase *gif = InstantGif::create(name.c_str());//InstantGif ：While playing, while parsing
@@ -328,9 +326,10 @@ void TiledBodyCreator::createStaticBodies(ValueVector staticBodyList)
                         break ;
                     } else {
                         gif->setScale(rect.size.width / gif->getContentSize().width, rect.size.height / gif->getContentSize().height);
-                        gif->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
+                        gif->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
                         gif->setPosition(rect.origin);
                         _map->addChild(gif);
+                        staticBody->SetUserData(gif);
                     }
 
                     break;
@@ -348,6 +347,7 @@ void TiledBodyCreator::createStaticBodies(ValueVector staticBodyList)
             mapBodyList.insert(std::pair<std::string, b2Body*>(objectValue.asValueMap()["name"].asString(), staticBody));
         } else {
             CCLOG("Error when get objects");
+            this->createPolygonTexture(objectValue.asValueMap(), spriteName, staticBody);
         }
     }
     staticBodyList.clear();
@@ -368,33 +368,36 @@ void TiledBodyCreator::createDynamicBodies(ValueVector dynamicBodyList, b2BodyTy
         float angularVelocity = objectValue.asValueMap()["angularVelocity"].asFloat();
         std::string spriteName = objectValue.asValueMap()["spriteName"].asString();
         
+        // create body def
+        b2BodyDef bd;
+        bd.type = type;
+        b2Vec2 pos = getPositionBody(objectValue.asValueMap());
+        if (pos.x != 0 && pos.y != 0) {
+            bd.position.Set(pos.x, pos.y);
+        }
+        bd.angle = CC_DEGREES_TO_RADIANS( angle );
+        b2Body* dynamicBody = _world->CreateBody(&bd);
+        
         auto fixtureShape = createFixture(objectValue.asValueMap());
         if (fixtureShape != NULL) {
-            
-            // create body def
-            b2BodyDef bd;
-            bd.type = type;
-            b2Vec2 pos = getPositionBody(objectValue.asValueMap());
-            if (pos.x != 0 && pos.y != 0) {
-                bd.position.Set(pos.x, pos.y);
-            }
-            bd.angle = CC_DEGREES_TO_RADIANS( angle );
-            b2Body* dynamicBody = _world->CreateBody(&bd);
-            
+
             // fixturedef
             fixtureShape->fixture.filter.categoryBits = CATEGORY_BARRIER;
             fixtureShape->fixture.filter.maskBits = MASK_BARRIER;
             fixtureShape->fixture.density = density;
             dynamicBody->CreateFixture(&fixtureShape->fixture);
             dynamicBody->SetAngularVelocity(angularVelocity);
-            
+
             // create sprite for polygon, circle, rect
-            createSpriteBody(dynamicBody, fixtureShape, spriteName, fixtureShape->fixture.shape->GetType());
+            if (spriteName != "") {
+                createSpriteBody(dynamicBody, fixtureShape, spriteName, fixtureShape->fixture.shape->GetType());
+            }
             
             // insert to map
             mapBodyList.insert(std::pair<std::string, b2Body*>(objectValue.asValueMap()["name"].asString(), dynamicBody));
         } else {
             CCLOG("Error when get objects");
+            this->createPolygonTexture(objectValue.asValueMap(), spriteName, dynamicBody);
         }
     }
     dynamicBodyList.clear();
@@ -406,15 +409,14 @@ void TiledBodyCreator::createSpriteBody(b2Body *body, FixtureDef* fixtureShape, 
         case b2Shape::e_polygon:
         {
             Rect bodyRectangle = ExecuteShapePhysic::getBodyRectangle(_map->getMapSize(), body);
-            float anchorX = body->GetPosition().x * PTM_RATIO - bodyRectangle.origin.x;
-            float anchorY = bodyRectangle.size.height - (_map->getMapSize().height - bodyRectangle.origin.y - body->GetPosition().y * PTM_RATIO);
-            Vec2 anchorPoint = Vec2(anchorX / bodyRectangle.size.width, anchorY / bodyRectangle.size.height);
-            auto dynamicSprite = Sprite::create(spriteName , bodyRectangle);
-            dynamicSprite->setAnchorPoint(anchorPoint);
+            auto dynamicSprite = Sprite::create(spriteName);
+            dynamicSprite->setScale(bodyRectangle.size.width / dynamicSprite->getContentSize().width, bodyRectangle.size.height / dynamicSprite->getContentSize().height);
+            dynamicSprite->setPosition(Vec2(body->GetPosition().x * PTM_RATIO, body->GetPosition().y * PTM_RATIO));
             body->SetUserData(dynamicSprite);
             _map->addChild(dynamicSprite);
             break;
         }
+            
         case b2Shape::e_circle:
         {
             Vec2 position = Vec2(body->GetPosition().x * PTM_RATIO, body->GetPosition().y * PTM_RATIO);
@@ -427,6 +429,7 @@ void TiledBodyCreator::createSpriteBody(b2Body *body, FixtureDef* fixtureShape, 
             _map->addChild(dynamicSprite);
             break;
         }
+            
         case b2Shape::e_chain:
         {
             break;
@@ -488,7 +491,8 @@ FixtureDef* TiledBodyCreator::createFixture(ValueMap object)
     {
         if(propObj.first == "points") {
             fixtureType = POLYGON_FIXTURE;
-        } else if(propObj.first == "polylinePoints") {
+        }
+        else if(propObj.first == "polylinePoints") {
             fixtureType = POLYLINE_FIXTURE;
         }
     }
@@ -496,9 +500,11 @@ FixtureDef* TiledBodyCreator::createFixture(ValueMap object)
         fixtureType = CIRCLE_FIXTURE;
     }
     
-    if(fixtureType == POLYGON_FIXTURE) {
-        return createPolygon(object);
-    } else if(fixtureType == POLYLINE_FIXTURE) {
+    if (fixtureType == POLYGON_FIXTURE)
+    {
+        return nullptr;
+    }
+    else if(fixtureType == POLYLINE_FIXTURE) {
         return createPolyline(object);
     } else if(fixtureType == CIRCLE_FIXTURE) {
         return createCircle(object);
@@ -508,32 +514,52 @@ FixtureDef* TiledBodyCreator::createFixture(ValueMap object)
     else return nullptr;
 }
 
-FixtureDef* TiledBodyCreator::createPolygon(ValueMap object)
+PointVector TiledBodyCreator::initPolygonTexture(ValueMap object)
 {
+    PointVector listPoint;
     ValueVector pointsVector = object["points"].asValueVector();
-    auto position = Vec2(object["x"].asFloat() / PTM_RATIO, object["y"].asFloat() / PTM_RATIO);
     
-    b2PolygonShape *polyshape = new b2PolygonShape();
-    b2Vec2 vertices[b2_maxPolygonVertices];
-    int vindex = 0;
-    
-    if(pointsVector.size() > b2_maxPolygonVertices) {
-        CCLOG("Skipping TMX polygon at x=%d,y=%d for exceeding %d vertices", object["x"].asInt(), object["y"].asInt(), b2_maxPolygonVertices);
-        return NULL;
+    if (pointsVector.size() <= 0) {
+        return listPoint;
     }
-    
-    auto fix = new FixtureDef();
     
     for(Value point : pointsVector) {
-        vertices[vindex].x = (point.asValueMap()["x"].asFloat() / PTM_RATIO );
-        vertices[vindex].y = (-point.asValueMap()["y"].asFloat() / PTM_RATIO );
-        vindex++;
+        float x = point.asValueMap()["x"].asFloat();
+        float y = -point.asValueMap()["y"].asFloat();
+        listPoint.push_back(Point(x, y));
     }
     
-    polyshape->Set(vertices, vindex);
-    fix->fixture.shape = polyshape;
+    return listPoint;
+}
+
+void TiledBodyCreator::createPolygonTexture(ValueMap object, std::string fileName, b2Body* body)
+{
+    if (object["autocreate"].asBool() == false) {
+        return;
+    }
     
-    return fix;
+    int fixtureType = UNKNOWN_FIXTURE;
+    for(auto propObj : object)
+    {
+        if(propObj.first == "points") {
+            fixtureType = POLYGON_FIXTURE;
+        }
+    }
+    if (fixtureType == UNKNOWN_FIXTURE) {
+        return;
+    }
+    else if (fixtureType == POLYGON_FIXTURE)
+    {
+        PointVector listPoint = this->initPolygonTexture(object);
+        if (listPoint.size() > 0) {
+            for (int i=0; i < listPoint.size(); i++) {
+                CCLOG("%f %f", listPoint[i].x, listPoint[i].y);
+            }
+            
+            TexturePolygon* tp = TexturePolygon::create(listPoint, fileName, body);
+            _map->addChild(tp);
+        }
+    }
 }
 
 FixtureDef* TiledBodyCreator::createPolyline(ValueMap object)
@@ -628,4 +654,9 @@ std::vector<ConveyorBelt> TiledBodyCreator::getListConveyorBelt()
 b2Fixture* TiledBodyCreator::getElectricityFixture()
 {
     return electricityFixture;
+}
+
+b2Fixture* TiledBodyCreator::getSwitchFixture()
+{
+    return switchFixture;
 }

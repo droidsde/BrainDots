@@ -129,6 +129,7 @@ bool TexturePolygon::init(const PointVector &points, const PointVector &hole, co
      */
     /// Enable texture repeat
     cocos2d::Texture2D::TexParams params = {GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT};
+//    cocos2d::Texture2D::TexParams params = {GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE};
     mTexture->setTexParameters(params);
     if ( !mTexture || !mTexture->hasPremultipliedAlpha() ) {
         _blendFunc.src = GL_SRC_ALPHA;

@@ -14,6 +14,14 @@
 #include "SceneManager.h"
 #include "TexturePolygon.h"
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#include "PhysicObject/SwitchObject.h"
+#include "PhysicObject/ElectricityObject.h"
+#else
+#include "SwitchObject.h"
+#include "ElectricityObject.h"
+#endif
+
 USING_NS_CC;
 class GameScene;
 class FixtureDef
@@ -87,10 +95,12 @@ public:
     
     // create fixture from tmx file
     FixtureDef* createFixture(ValueMap object);
-    FixtureDef* createPolygon(ValueMap object);
     FixtureDef* createPolyline(ValueMap object);
     FixtureDef* createCircle(ValueMap object);
     FixtureDef* createRect(ValueMap object);
+    
+    PointVector initPolygonTexture(ValueMap object);
+    void createPolygonTexture(ValueMap object, std::string fileName, b2Body* body);
     
     // get position body
     b2Vec2 getPositionBody(ValueMap object);
@@ -106,6 +116,8 @@ public:
     BARRIER_TYPE getBarrierType(cocos2d::Value objectValue);
     static std::vector<ConveyorBelt> getListConveyorBelt();
     static b2Fixture* getElectricityFixture();
+    static b2Fixture* getSwitchFixture();
+    
 private:
     
     TMXTiledMap* _map;

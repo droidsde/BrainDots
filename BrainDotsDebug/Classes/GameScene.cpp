@@ -927,7 +927,7 @@ void GameScene::animationSuccess(Vec2 point)
 	srand((int)time(0));
 
 	for (int i = 0; i < NUM_EXPLOSION_CIRCLE; ++i) {
-		int rand_angle = rand() % 20;
+		int rand_angle = rand() % 3;
 		float rand_scale = (float)(rand()%10)/10;
 		int rand_add_space = rand()%100;
 		float rand_delay = (float)(rand()%10)/100;
@@ -939,10 +939,11 @@ void GameScene::animationSuccess(Vec2 point)
 
 		// animation
 		Vec2 dest = Vec2(point.x + BASE_EXPLOSION_SPACE * sinf(rad) + rand_add_space, point.y + BASE_EXPLOSION_SPACE * cosf(rad) + rand_add_space);
-		auto move = MoveTo::create(1.0f, dest);
-		auto zoomOut = ScaleTo::create(1.0f, rand_scale);
-		auto rotate = RotateBy::create(1.3, rand() % 180);
+		auto move = MoveTo::create(0.7f, dest);
+		auto zoomOut = ScaleTo::create(0.8f, rand_scale);
+		auto rotate = RotateBy::create(1.0, 360);
 		auto spawn1 = Spawn::create(move, zoomOut, rotate, NULL);
+        
 		auto delay = DelayTime::create(0.3 + rand_delay);
 		auto fadeout = FadeOut::create(0.3f);
 		auto zoomIn = ScaleTo::create(0.3, 0);

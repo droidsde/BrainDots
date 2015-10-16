@@ -16,10 +16,8 @@
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 #include "PhysicObject/SwitchObject.h"
-#include "PhysicObject/ElectricityObject.h"
 #else
 #include "SwitchObject.h"
-#include "ElectricityObject.h"
 #endif
 
 USING_NS_CC;
@@ -111,7 +109,7 @@ public:
     // dynamic body & kinematic body
     void createDynamicBodies(ValueVector dynamicBodyList, b2BodyType type);
     
-    void createSpriteBody(b2Body* body, FixtureDef* fixtureShape, std::string spriteName,  b2Shape::Type type);
+    void createSpriteBody(b2Body* body, b2Fixture* fixture, std::string spriteName, Value objectValue);
     
     BARRIER_TYPE getBarrierType(cocos2d::Value objectValue);
     static std::vector<ConveyorBelt> getListConveyorBelt();

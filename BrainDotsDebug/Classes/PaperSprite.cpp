@@ -117,3 +117,36 @@ void PaperSprite::touchEvent(cocos2d::Touch *touch)
         _callback->release();
     }
 }
+
+void PaperSprite::setShaderGray()
+{
+    this->setGLProgram(new GLProgram());
+    // create shader
+    m_Shader = this->getGLProgram();
+    m_Shader->retain();
+    
+    // init shader
+    m_Shader->initWithFilenames("shaders/grayscale.vsh", "shaders/grayscale.fsh");
+    m_Shader->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_POSITION, GLProgram::VERTEX_ATTRIB_POSITION);
+    m_Shader->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_COLOR, GLProgram::VERTEX_ATTRIB_COLOR);
+    m_Shader->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_TEX_COORD, GLProgram::VERTEX_ATTRIB_TEX_COORD);
+    
+    m_Shader->link();
+    m_Shader->updateUniforms();
+    m_grayRate = 0.0f;
+    
+    this->changeColorGray();
+}
+
+void PaperSprite::changeColorGray()
+{
+    if (m_grayRate > 0.0f) {
+        m_grayRate -= 0.1f;
+        this->runAction(Sequence::create(DelayTime::create(0.5f), CallFunc::create(CC_CALLBACK_0(PaperSprite::changeColorGray, this)), NULL));
+    } else {
+        m_grayRate = 0.0f;
+    }
+    
+    m_Shader->updateUniforms();
+    m_Shader->setUniformLocationWith1f(m_Shader->getUniformLocationForName("u_Rate"), m_grayRate);
+}

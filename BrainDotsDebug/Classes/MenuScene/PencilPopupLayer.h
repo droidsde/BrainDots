@@ -11,7 +11,6 @@
 
 #include <cocos2d.h>
 #include "BasePopupLayer.h"
-#include "BlendFuncButton.h"
 #include "SceneManager.h"
 
 USING_NS_CC;
@@ -35,7 +34,7 @@ private:
     float widthLayoutPencil;
 
     ListView* listViewPencils;
-    Vector<BlendFuncButton*> listPencils;
+    Vector<Button*> listPencils;
     
     // scale item
     void scaleItems(float curPosX);

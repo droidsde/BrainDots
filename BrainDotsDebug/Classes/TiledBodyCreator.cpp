@@ -298,6 +298,7 @@ void TiledBodyCreator::createStaticBodies(ValueVector staticBodyList)
             barrierStatic = staticBody->CreateFixture(&fixtureShape->fixture);
             
             switch (getBarrierType(objectValue)) {
+                    
                 case BARRIER_TYPE::CONVEYOR :
                 {
                     // conveyor option
@@ -340,7 +341,7 @@ void TiledBodyCreator::createStaticBodies(ValueVector staticBodyList)
             
             // create sprite for polygon
             if (spriteName != "") {
-                createSpriteBody(staticBody, fixtureShape, spriteName, fixtureShape->fixture.shape->GetType());
+                createSpriteBody(staticBody, barrierStatic, spriteName, objectValue);
             }
             
             // insert to map
@@ -362,7 +363,7 @@ void TiledBodyCreator::createDynamicBodies(ValueVector dynamicBodyList, b2BodyTy
     for (cocos2d::Value objectValue : dynamicBodyList) {
         
         // create fixture shape
-        
+        b2Fixture* barrierDynamic;
         float density = objectValue.asValueMap()["density"].asFloat();
         float angle = objectValue.asValueMap()["angle"].asFloat();
         float angularVelocity = objectValue.asValueMap()["angularVelocity"].asFloat();
@@ -380,17 +381,17 @@ void TiledBodyCreator::createDynamicBodies(ValueVector dynamicBodyList, b2BodyTy
         
         auto fixtureShape = createFixture(objectValue.asValueMap());
         if (fixtureShape != NULL) {
-
+            
             // fixturedef
             fixtureShape->fixture.filter.categoryBits = CATEGORY_BARRIER;
             fixtureShape->fixture.filter.maskBits = MASK_BARRIER;
             fixtureShape->fixture.density = density;
-            dynamicBody->CreateFixture(&fixtureShape->fixture);
+            barrierDynamic = dynamicBody->CreateFixture(&fixtureShape->fixture);
             dynamicBody->SetAngularVelocity(angularVelocity);
 
             // create sprite for polygon, circle, rect
             if (spriteName != "") {
-                createSpriteBody(dynamicBody, fixtureShape, spriteName, fixtureShape->fixture.shape->GetType());
+                createSpriteBody(dynamicBody, barrierDynamic, spriteName, objectValue);
             }
             
             // insert to map
@@ -403,24 +404,45 @@ void TiledBodyCreator::createDynamicBodies(ValueVector dynamicBodyList, b2BodyTy
     dynamicBodyList.clear();
 }
 
-void TiledBodyCreator::createSpriteBody(b2Body *body, FixtureDef* fixtureShape, std::string spriteName, b2Shape::Type type)
+void TiledBodyCreator::createSpriteBody(b2Body *body, b2Fixture* fixture, std::string spriteName, Value objectValue)
 {
-    switch (type) {
+    
+    switch (fixture->GetType()) {
         case b2Shape::e_polygon:
         {
             Rect bodyRectangle = ExecuteShapePhysic::getBodyRectangle(_map->getMapSize(), body);
-            auto dynamicSprite = Sprite::create(spriteName);
-            dynamicSprite->setScale(bodyRectangle.size.width / dynamicSprite->getContentSize().width, bodyRectangle.size.height / dynamicSprite->getContentSize().height);
-            dynamicSprite->setPosition(Vec2(body->GetPosition().x * PTM_RATIO, body->GetPosition().y * PTM_RATIO));
-            body->SetUserData(dynamicSprite);
-            _map->addChild(dynamicSprite);
+            
+            switch (getBarrierType(objectValue)) {
+                case BARRIER_TYPE::SWITCH :
+                {
+                    switchFixture = fixture;
+                    // switch object
+                    SwitchObject* dynamicSprite = SwitchObject::create(spriteName, false, body);
+                    dynamicSprite->setScale(bodyRectangle.size.width / dynamicSprite->getContentSize().width, bodyRectangle.size.height / dynamicSprite->getContentSize().height);
+                    dynamicSprite->setPosition(Vec2(body->GetPosition().x * PTM_RATIO, body->GetPosition().y * PTM_RATIO));
+                    body->SetUserData(dynamicSprite);
+                    _map->addChild(dynamicSprite);
+                    break;
+                }
+                    
+                default:
+                {
+                    auto dynamicSprite = Sprite::create(spriteName);
+                    dynamicSprite->setScale(bodyRectangle.size.width / dynamicSprite->getContentSize().width, bodyRectangle.size.height / dynamicSprite->getContentSize().height);
+                    dynamicSprite->setPosition(Vec2(body->GetPosition().x * PTM_RATIO, body->GetPosition().y * PTM_RATIO));
+                    body->SetUserData(dynamicSprite);
+                    _map->addChild(dynamicSprite);
+                    break;
+                }
+            }
+            
             break;
         }
             
         case b2Shape::e_circle:
         {
             Vec2 position = Vec2(body->GetPosition().x * PTM_RATIO, body->GetPosition().y * PTM_RATIO);
-            float radius = fixtureShape->fixture.shape->m_radius * PTM_RATIO;
+            float radius = fixture->GetShape()->m_radius * PTM_RATIO;
             auto dynamicSprite = Sprite::create(spriteName);
             dynamicSprite->setPosition(Vec2(position));
             dynamicSprite->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
@@ -637,6 +659,12 @@ BARRIER_TYPE TiledBodyCreator::getBarrierType(cocos2d::Value objectValue)
     else if ( nameType == "electricity" )
     {
         type = BARRIER_TYPE::ELECTRICITY;
+    }
+    
+    // switch
+    else if ( nameType == "switch" )
+    {
+        type = BARRIER_TYPE::SWITCH;
     }
     
     else

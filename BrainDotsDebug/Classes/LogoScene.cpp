@@ -45,7 +45,7 @@ void LogoScene::addLogo()
 {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
+    
     auto logo = Sprite::create("logo.png");
     logo->setPosition(origin.x + visibleSize.width/2 , origin.y + visibleSize.height/2 );
     float scaleX = visibleSize.width / logo->getContentSize().width;
@@ -65,7 +65,7 @@ void LogoScene::loadResources()
 void LogoScene::loadImage(cocos2d::Texture2D *texture)
 {
 //    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("tetrisSpriteSheet.plist",texture);
-    
+
 //    this->loadSounds();
     
 //    this->startGame();

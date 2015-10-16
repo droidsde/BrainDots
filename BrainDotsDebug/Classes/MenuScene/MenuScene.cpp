@@ -225,7 +225,8 @@ void MenuScene::reloadData() {
             frameGray->setBackGroundColor(Color3B::GRAY);
             frameGray->setBackGroundColorOpacity(150);
             frameGray->setPosition(Vec2::ZERO);
-            stage->addChild(frameGray);
+//            stage->addChild(frameGray);
+            stage->setBright(false);
             auto lockIcon = Sprite::create("lock_icon_256x256.png");
             lockIcon->setPosition(stickerSize/2);
             stage->addChild(lockIcon);

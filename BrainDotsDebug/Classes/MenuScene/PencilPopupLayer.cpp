@@ -92,7 +92,7 @@ void PencilPopupLayer::reloadData()
     for (int i = 0; i < PENCIL_MAX; i++) {
         // container
         Layout* mainLayout = Layout::create();
-        auto pencil = BlendFuncButton::create("pencil1.png");
+        auto pencil = Button::create("pencil1.png");
         sizePencil = pencil->getContentSize();
     
         if ( i == 0 || i == PENCIL_MAX-1) {
@@ -115,11 +115,7 @@ void PencilPopupLayer::reloadData()
         pencil->setTitleFontName("arial.ttf");
         
         if (i >= SceneManager::getInstance()->getCurUnlockPencil()) {
-            BlendFunc blend;
-            blend.src = GL_ONE_MINUS_DST_COLOR;
-            blend.dst = GL_ONE_MINUS_SRC_COLOR;
-            pencil->setBlendFunc(blend);
-            pencil->setColor(Color3B::GRAY);
+            pencil->setBright(false);
             
             // add lock
             auto lock = Sprite::create("lock_icon_64x64.png");

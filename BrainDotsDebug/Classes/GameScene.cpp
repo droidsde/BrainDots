@@ -305,6 +305,10 @@ void GameScene::initMapLevel(int level)
         if (tiledmap->getElectricityFixture()) {
             electricictyFixture = tiledmap->getElectricityFixture();
         }
+        // for switch
+        if (tiledmap->getSwitchFixture()) {
+            switchFixture = tiledmap->getSwitchFixture();
+        }
         
         // get ball group
         auto group = map->getObjectGroup("braindots");
@@ -482,6 +486,7 @@ void GameScene::update(float dt) {
     
     std::vector<b2Body *>toStatic;
     std::vector<b2Body *>toDestroy;
+    std::vector<b2Body *>toRemoveElectric;
     std::vector<BallContact>::iterator pos;
     for (pos = _ballContactListener->_contacts.begin(); pos != _ballContactListener->_contacts.end(); ++pos)
     {
@@ -529,6 +534,7 @@ void GameScene::update(float dt) {
         if (contact.fixtureA == electricictyFixture && contact.fixtureB == _ballAFixture) {
             collisionFailA = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
             if (std::find(toDestroy.begin(), toDestroy.end(), bodyB) == toDestroy.end()) {
+                CCLOG("contact electricity");
                 toDestroy.push_back(bodyB);
             }
             isFail = true;
@@ -536,6 +542,7 @@ void GameScene::update(float dt) {
         else if (contact.fixtureA == electricictyFixture && contact.fixtureB == _ballBFixture) {
             collisionFailB = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
             if (std::find(toDestroy.begin(), toDestroy.end(), bodyB) == toDestroy.end()) {
+                CCLOG("contact electricity");
                 toDestroy.push_back(bodyB);
             }
             isFail = true;
@@ -543,6 +550,7 @@ void GameScene::update(float dt) {
         else if (contact.fixtureA == _ballAFixture && contact.fixtureB ==  electricictyFixture) {
             collisionFailA = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
             if (std::find(toDestroy.begin(), toDestroy.end(), bodyA) == toDestroy.end()) {
+                CCLOG("contact electricity");
                 toDestroy.push_back(bodyA);
             }
             isFail = true;
@@ -550,9 +558,44 @@ void GameScene::update(float dt) {
         else if (contact.fixtureA == _ballBFixture && contact.fixtureB ==  electricictyFixture) {
             collisionFailB = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
             if (std::find(toDestroy.begin(), toDestroy.end(), bodyA) == toDestroy.end()) {
+                CCLOG("contact electricity");
                 toDestroy.push_back(bodyA);
             }
             isFail = true;
+        }
+        
+        // collision switch
+        if (contact.fixtureA == switchFixture && (contact.fixtureB == _ballAFixture || contact.fixtureB == _ballBFixture))
+        {
+            if (bodyA->GetUserData() != NULL)
+            {
+                CCLOG("contact with switch");
+                if (std::find(toRemoveElectric.begin(), toRemoveElectric.end(), bodyA) == toRemoveElectric.end()) {
+                    toRemoveElectric.push_back(bodyA);
+                }
+                if (electricictyFixture!=NULL) {
+                    if (std::find(toDestroy.begin(), toDestroy.end(), electricictyFixture->GetBody()) == toDestroy.end()) {
+                        toDestroy.push_back(electricictyFixture->GetBody());
+                        CCLOG("remove electricity");
+                    }
+                }
+            }
+        }
+        else if (contact.fixtureB == switchFixture && (contact.fixtureA == _ballAFixture || contact.fixtureA == _ballBFixture))
+        {
+            if (bodyB->GetUserData() != NULL)
+            {
+                CCLOG("contact with switch");
+                if (std::find(toRemoveElectric.begin(), toRemoveElectric.end(), bodyB) == toRemoveElectric.end()) {
+                    toRemoveElectric.push_back(bodyB);
+                }
+                if (electricictyFixture!=NULL) {
+                    if (std::find(toDestroy.begin(), toDestroy.end(), electricictyFixture->GetBody()) == toDestroy.end()) {
+                        toDestroy.push_back(electricictyFixture->GetBody());
+                        CCLOG("remove electricity");
+                    }
+                }
+            }
         }
         
         // contact platform with wall2
@@ -585,6 +628,26 @@ void GameScene::update(float dt) {
         }
     }
     
+    // move switch
+    std::vector<b2Body *>::iterator pos4;
+    for (pos4 = toRemoveElectric.begin(); pos4 != toRemoveElectric.end(); ++pos4) {
+        b2Body* body = *pos4;
+        if (body->GetUserData() != NULL) {
+            SwitchObject* sprite = (SwitchObject*) body->GetUserData();
+            if (!sprite->getTurnOff()) {
+                sprite->moveDown(sprite->getContentSize().height);
+                sprite->setTurnOff(true);
+                
+                ParticleSystemQuad* firework = ParticleSystemQuad::create("firework.plist");
+                firework->setPosition(Vec2(electricictyFixture->GetBody()->GetPosition().x * PTM_RATIO, electricictyFixture->GetBody()->GetPosition().y * PTM_RATIO));
+                firework->setAutoRemoveOnFinish(true);
+                map->addChild(firework);
+                electricictyFixture = NULL;
+            }
+        }
+    }
+    
+    // stop 2 ball when collision
     std::vector<b2Body *>::iterator pos2;
     for(pos2 = toStatic.begin(); pos2 != toStatic.end(); ++pos2) {
         b2Body *body = *pos2;
@@ -598,11 +661,12 @@ void GameScene::update(float dt) {
     for(pos3 = toDestroy.begin(); pos3 != toDestroy.end(); ++pos3) {
         b2Body *body = *pos3;
         if (body->GetUserData() != NULL) {
-            Sprite *sprite = (Sprite *) body->GetUserData();
+            auto sprite = (Node *) body->GetUserData();
             map->removeChild(sprite, true);
         }
         world->DestroyBody(body);
     }
+    toDestroy.clear();
 }
 
 bool GameScene::onTouchBegan(Touch* touch, Event* event) {

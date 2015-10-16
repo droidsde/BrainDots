@@ -20,7 +20,7 @@ public:
     PaperSprite(bool isScale, bool isCallbackFunction);
     ~PaperSprite();
     
-    static PaperSprite* create(std::string filename, bool isFromPlist = false, bool isScale = false, bool isCallbackFunction = false);
+    static PaperSprite* create(std::string filename, bool isFromPlist, bool isScale = false, bool isCallbackFunction = false);
     
     CC_SYNTHESIZE(bool, enableTouch, EnableTouch);
     void initOptions();
@@ -33,10 +33,19 @@ public:
     
     void setCallbackFunction(std::function<void(void)> callback);
     
+    // function gray
+    void setShaderGray();
+    
+    void changeColorGray();
+    
 private:
     bool isScale;
     Sequence* _callback;
     std::function<void(void)> _callbackFunction;
     bool isCallbackFunction;
+    
+    // gray color
+    GLProgram* m_Shader;
+    float m_grayRate;
 };
 #endif /* defined(__BrainDotsDebug__PaperSprite__) */

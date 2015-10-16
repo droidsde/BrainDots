@@ -162,6 +162,7 @@ private:
     b2Fixture* _wallFixture1[4];
     b2Fixture* _wallFixture2[4];
     b2Fixture* electricictyFixture;
+    b2Fixture* switchFixture;
 
     //test
     b2Fixture* mPlatform;

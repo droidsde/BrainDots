@@ -12,6 +12,8 @@
 #include <cocos2d.h>
 #include "BasePopupLayer.h"
 #include "SettingPopupLayer.h"
+#include "InfoPopupLayer.h"
+#include "NotiPopupLayer.h"
 
 USING_NS_CC;
 using namespace cocos2d::ui;

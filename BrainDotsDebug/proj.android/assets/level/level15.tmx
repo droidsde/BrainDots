@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="38" height="21" tilewidth="36" tileheight="36" nextobjectid="8">
  <tileset firstgid="1" name="tileset" tilewidth="36" tileheight="36">
-  <image source="tileset_36x36.png" width="36" height="36"/>
+  <image source="tileset1.png" width="38" height="38"/>
  </tileset>
  <layer name="barrage" width="38" height="21">
   <data encoding="base64" compression="gzip">

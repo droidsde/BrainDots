@@ -29,6 +29,8 @@
 #define OPEN_LAYER_LANGUAGE             "openLayerLanguage"
 #define EXIT_LAYER_SETTING              "exitLayerSetting"
 #define EXIT_LAYER_MENU                 "exitLayerMenu"
+#define EXIT_LAYER_INFO                 "exitLayerInfo"
+#define EXIT_LAYER_NOTI                 "exitLayerNoti"
 
 #define LEVEL_MAX						10
 #define LEVEL_DEFAULT_UNLOCKED          1

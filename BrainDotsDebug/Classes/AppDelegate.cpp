@@ -1,6 +1,7 @@
 #include "AppDelegate.h"
 #include "GLViewUtil.h"
 #include "SceneManager.h"
+#include "PluginFacebook/PluginFacebook.h"
 
 USING_NS_CC;
 
@@ -31,6 +32,9 @@ static int register_all_packages()
 }
 
 bool AppDelegate::applicationDidFinishLaunching() {
+    
+    sdkbox::PluginFacebook::init();
+    
     // initialize path resource
     std::vector<std::string> paths;
     paths.push_back("fonts");

@@ -39,6 +39,10 @@ void LogoScene::transferData()
         CC_SAFE_DELETE_ARRAY(fileData);
     }
 #endif
+    
+    //download image of information
+    ClientRequest* cl = new ClientRequest();
+    cl->sendRequest("http://placeimg.com/640/480/any", "notification.png");
 }
 
 void LogoScene::addLogo()

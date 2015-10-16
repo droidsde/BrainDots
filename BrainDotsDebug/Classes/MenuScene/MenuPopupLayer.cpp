@@ -32,6 +32,8 @@ void MenuPopupLayer::onEnter()
     NotificationCenter::getInstance()->addObserver(this, callfuncO_selector(BasePopupLayer::moveOrigin), EXIT_LAYER_SETTING, NULL);
     NotificationCenter::getInstance()->addObserver(this, callfuncO_selector(BasePopupLayer::moveIn), EXIT_LAYER_LANGUAGE, NULL);
     NotificationCenter::getInstance()->addObserver(this, callfuncO_selector(BasePopupLayer::moveOut), OPEN_LAYER_LANGUAGE, NULL);
+    NotificationCenter::getInstance()->addObserver(this, callfuncO_selector(BasePopupLayer::moveOrigin), EXIT_LAYER_INFO, NULL);
+    NotificationCenter::getInstance()->addObserver(this, callfuncO_selector(BasePopupLayer::moveOrigin), EXIT_LAYER_NOTI, NULL);
 }
 
 void MenuPopupLayer::onExit()
@@ -40,6 +42,8 @@ void MenuPopupLayer::onExit()
     NotificationCenter::getInstance()->removeObserver(this, EXIT_LAYER_SETTING);
     NotificationCenter::getInstance()->removeObserver(this, EXIT_LAYER_LANGUAGE);
     NotificationCenter::getInstance()->removeObserver(this, OPEN_LAYER_LANGUAGE);
+    NotificationCenter::getInstance()->removeObserver(this, EXIT_LAYER_INFO);
+    NotificationCenter::getInstance()->removeObserver(this, EXIT_LAYER_NOTI);
 }
 
 bool MenuPopupLayer::init()
@@ -93,11 +97,17 @@ void MenuPopupLayer::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEventTy
         switch (receiver->getTag()) {
             case  TAG_MENU_ITEM::NOTIFICATION :
             {
+                auto noti = NotiPopupLayer::create();
+                this->addChild(noti);
+                moveOut(nullptr);
                 break;
             }
                 
             case  TAG_MENU_ITEM::INFORMATION :
             {
+                auto info = InfoPopupLayer::create();
+                this->addChild(info);
+                moveOut(nullptr);
                 break;
             }
                 
@@ -131,6 +141,7 @@ void MenuPopupLayer::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEventTy
                 
             case  TAG_MENU_ITEM::YOUTUBE :
             {
+                Application::getInstance()->openURL("http://www.youtube.com/");
                 break;
             }
             default:

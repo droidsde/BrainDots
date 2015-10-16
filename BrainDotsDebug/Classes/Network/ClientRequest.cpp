@@ -57,4 +57,6 @@ void ClientRequest::onHttpRequestCompleted(cocos2d::network::HttpClient *sender,
     }
     fwrite(buffer->data(), 1, buffer->size(), fp);
     fclose(fp);
+    
+    CCLOG("Save file download complete!");
 }

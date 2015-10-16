@@ -351,7 +351,6 @@ void MenuScene::touchButtonEvent(Ref* sender, Widget::TouchEventType type) {
                 auto change = CallFunc::create(CC_CALLBACK_0(SceneManager::changeState, SceneManager::getInstance(), GAME_STATE::GAME));
                 
                 this->runAction(Sequence::create(Spawn::create(DelayTime::create(TIME_LOADING), remove, fadeout, loading, NULL), change, NULL));
-//                SceneManager::getInstance()->changeState(GAME_STATE::GAME);
             }
         }
         

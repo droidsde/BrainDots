@@ -11,6 +11,7 @@
 
 #include <cocos2d.h>
 #include "SceneManager.h"
+#include "ClientRequest.h"
 
 USING_NS_CC;
 

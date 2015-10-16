@@ -110,6 +110,23 @@ void SharePopupLayer::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEventT
             
             case TAG_POPUP_SHARE::TAG_FACEBOOK :
             {
+                std::string fileShare;
+                if (SceneManager::getInstance()->checkFileExist(FileUtils::getInstance()->getWritablePath()+this->filename)) {
+                    fileShare = FileUtils::getInstance()->getWritablePath()+this->filename;
+                } else {
+                    fileShare = "share_image.png";
+                }
+                
+                // share photo
+                FBPlugin* fb = new FBPlugin();
+                if (!fb->checkLogin()) {
+                    fb->fbLogin();
+                    fb->fbSharePhoto(fileShare, "Let's play game!");
+                }
+                else {
+                    fb->fbSharePhoto(fileShare, "Let's play game!");
+                }
+                
                 break;
             }
             

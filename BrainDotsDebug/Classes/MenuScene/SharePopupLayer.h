@@ -12,6 +12,7 @@
 #include <cocos2d.h>
 #include "BasePopupLayer.h"
 #include "SceneManager.h"
+#include "FBPlugin.h"
 
 USING_NS_CC;
 using namespace cocos2d::ui;

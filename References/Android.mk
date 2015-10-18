@@ -13,6 +13,9 @@ LOCAL_MODULE_FILENAME := libcocos2dcpp
 
 LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/AppDelegate.cpp \
+                   ../../Classes/B2DebugDraw/B2DebugDrawLayer.cpp \
+                   ../../Classes/B2DebugDraw/GLES-Render.cpp \
+                   ../../Classes/Clipper/clipper.cpp \
                    ../../Classes/Gif/Bitmap.cpp \
                    ../../Classes/Gif/CacheGif.cpp \
                    ../../Classes/Gif/GifBase.cpp \
@@ -36,15 +39,16 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/MenuScene/MenuScene.cpp \
                    ../../Classes/BallContactListener.cpp \
                    ../../Classes/ExecuteShapePhysic.cpp \
-                   ../../Classes/GLESDebugDraw.cpp \
                    ../../Classes/TiledBodyCreator.cpp \
                    ../../Classes/GameScene.cpp \
                    ../../Classes/LogoScene.cpp \
                    ../../Classes/PaperSprite.cpp \
                    ../../Classes/BlendFuncButton.cpp \
+                   ../../Classes/textpoly.cpp \
                    ../../Classes/SceneManager.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes
+
 # _COCOS_HEADER_ANDROID_BEGIN
 # _COCOS_HEADER_ANDROID_END
 

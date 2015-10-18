@@ -12,7 +12,12 @@
 #include <cocos2d.h>
 #include "BasePopupLayer.h"
 #include "SceneManager.h"
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#include "Network/FBPlugin.h"
+#endif
+#if(CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 #include "FBPlugin.h"
+#endif
 
 USING_NS_CC;
 using namespace cocos2d::ui;

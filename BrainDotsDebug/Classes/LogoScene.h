@@ -11,7 +11,12 @@
 
 #include <cocos2d.h>
 #include "SceneManager.h"
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#include "Network/ClientRequest.h"
+#endif
+#if(CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 #include "ClientRequest.h"
+#endif
 
 USING_NS_CC;
 

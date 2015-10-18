@@ -12,8 +12,15 @@
 #include <cocos2d.h>
 #include "BasePopupLayer.h"
 #include "SettingPopupLayer.h"
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#include "MenuItems/InfoPopupLayer.h"
+#include "MenuItems/NotiPopupLayer.h"
+#endif
+#if(CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 #include "InfoPopupLayer.h"
 #include "NotiPopupLayer.h"
+#endif
 
 USING_NS_CC;
 using namespace cocos2d::ui;

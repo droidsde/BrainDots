@@ -577,8 +577,8 @@ void TiledBodyCreator::createPolygonTexture(ValueMap object, std::string fileNam
             for (int i=0; i < listPoint.size(); i++) {
                 CCLOG("%f %f", listPoint[i].x, listPoint[i].y);
             }
-            
-            TexturePolygon* tp = TexturePolygon::create(listPoint, fileName, body);
+            CCLOG("fileName %s", fileName.c_str());
+            TexturePolygon* tp = TexturePolygon::create(listPoint, "tileset_36x36.png", body);
             _map->addChild(tp);
         }
     }

@@ -9,8 +9,8 @@ bin/
 gen/
 obj/
 assets/
-local.properties
-project.properties
+BrainDotsDebug/proj.android/local.properties
+BrainDotsDebug/proj.android/project.properties
 BrainDotsDebug/proj.android/libs/
 BrainDotsDebug/proj.android/jni/Android.mk
 

@@ -23,6 +23,7 @@ SceneManager::SceneManager()
     curLanguage = UserDefault::getInstance()->getStringForKey("language", "English");
     curUnlockPencil = UserDefault::getInstance()->getIntegerForKey("unlockpencil", PENCIL_DEFAULT_UNLOCK);
     curUsePencil = UserDefault::getInstance()->getIntegerForKey("usepencil", 0);
+    curCoin = UserDefault::getInstance()->getIntegerForKey("coin", DEFAULT_COIN);
 }
 
 SceneManager::~SceneManager()
@@ -127,6 +128,12 @@ void SceneManager::saveUsePencil(int index)
 {
     UserDefault::getInstance()->setIntegerForKey("usepencil", index);
     setCurUsePencil(index);
+}
+
+void SceneManager::saveCoin(int coin)
+{
+    UserDefault::getInstance()->setIntegerForKey("coin", coin);
+    setCurCoin(coin);
 }
 
 void SceneManager::loadListLanguage(std::string jsonFile)

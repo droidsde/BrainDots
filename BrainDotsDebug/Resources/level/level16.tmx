@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="36" height="20" tilewidth="38" tileheight="38" nextobjectid="16">
- <tileset firstgid="1" name="hex" tilewidth="38" tileheight="38">
+ <tileset firstgid="1" name="hex" tilewidth="38" tileheight="38" tilecount="70">
   <image source="hex1.png" width="380" height="266"/>
  </tileset>
- <tileset firstgid="71" name="barrage" tilewidth="38" tileheight="38">
-  <image source="tileset1.png" width="38" height="38"/>
+ <tileset firstgid="71" name="base" tilewidth="38" tileheight="38" tilecount="1">
+  <image source="tileset_38x38.png" width="38" height="38"/>
  </tileset>
  <objectgroup name="braindots">
   <object id="2" name="ballA" type="ball" x="322.667" y="135">

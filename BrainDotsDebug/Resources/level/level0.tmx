@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="36" height="20" tilewidth="38" tileheight="38" nextobjectid="9">
- <tileset firstgid="1" name="base" tilewidth="38" tileheight="38">
-  <image source="tileset1.png" width="38" height="38"/>
+ <tileset firstgid="1" name="base" tilewidth="38" tileheight="38" tilecount="1">
+  <image source="tileset_38x38.png" width="38" height="38"/>
  </tileset>
  <layer name="barrage" width="36" height="20">
   <data encoding="base64" compression="gzip">
@@ -19,9 +19,10 @@
     <property name="autocreate" value="false"/>
    </properties>
   </object>
-  <object id="4" name="ground" type="object" x="0" y="686.667" width="1368" height="72">
+  <object id="4" name="ground" type="object" x="0" y="682.667" width="1368" height="80">
    <properties>
     <property name="autocreate" value="true"/>
+    <property name="bodyType" value="StaticBody"/>
    </properties>
   </object>
  </objectgroup>

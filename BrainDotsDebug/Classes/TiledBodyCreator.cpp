@@ -348,7 +348,8 @@ void TiledBodyCreator::createStaticBodies(ValueVector staticBodyList)
             mapBodyList.insert(std::pair<std::string, b2Body*>(objectValue.asValueMap()["name"].asString(), staticBody));
         } else {
             CCLOG("Error when get objects");
-            this->createPolygonTexture(objectValue.asValueMap(), spriteName, staticBody);
+            if (spriteName != "")
+                this->createPolygonTexture(objectValue.asValueMap(), spriteName, staticBody);
         }
     }
     staticBodyList.clear();
@@ -398,7 +399,8 @@ void TiledBodyCreator::createDynamicBodies(ValueVector dynamicBodyList, b2BodyTy
             mapBodyList.insert(std::pair<std::string, b2Body*>(objectValue.asValueMap()["name"].asString(), dynamicBody));
         } else {
             CCLOG("Error when get objects");
-            this->createPolygonTexture(objectValue.asValueMap(), spriteName, dynamicBody);
+            if (spriteName != "")
+                this->createPolygonTexture(objectValue.asValueMap(), spriteName, dynamicBody);
         }
     }
     dynamicBodyList.clear();
@@ -522,11 +524,9 @@ FixtureDef* TiledBodyCreator::createFixture(ValueMap object)
         fixtureType = CIRCLE_FIXTURE;
     }
     
-    if (fixtureType == POLYGON_FIXTURE)
-    {
+    if (fixtureType == POLYGON_FIXTURE) {
         return nullptr;
-    }
-    else if(fixtureType == POLYLINE_FIXTURE) {
+    } else if(fixtureType == POLYLINE_FIXTURE) {
         return createPolyline(object);
     } else if(fixtureType == CIRCLE_FIXTURE) {
         return createCircle(object);
@@ -578,7 +578,7 @@ void TiledBodyCreator::createPolygonTexture(ValueMap object, std::string fileNam
                 CCLOG("%f %f", listPoint[i].x, listPoint[i].y);
             }
             CCLOG("fileName %s", fileName.c_str());
-            TexturePolygon* tp = TexturePolygon::create(listPoint, "tileset_36x36.png", body);
+            TexturePolygon* tp = TexturePolygon::create(listPoint, fileName, body);
             _map->addChild(tp);
         }
     }

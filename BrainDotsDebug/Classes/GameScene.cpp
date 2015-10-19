@@ -1148,8 +1148,14 @@ void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
     });
     captureSprite->runAction(Sequence::create(ScaleTo::create(0.5f, sizePaper.width*0.9/visibleSize.width), DelayTime::create(0.2f), addtick, nullptr));
     
-    // add next button
+    // show text success or fail
+    auto titleText = Text::create("", "arial.ttf", 80);
+    titleText->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
+    titleText->setPosition(Vec2(visibleSize.width/2, this->getChildByTag(TAG_GAME::TAG_BUTTON_BACK)->getPositionY()));
+    this->addChild(titleText);
+    
     if (isSuccess) {
+        // add next button
         auto nextButton = Button::create("next_button.png");
         nextButton->setScale(0.5f);
         nextButton->setPosition(Vec2(visibleSize.width - PADDING, PADDING));
@@ -1159,6 +1165,14 @@ void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
         nextButton->setAnchorPoint(Vec2::ANCHOR_BOTTOM_RIGHT);
         nextButton->setTouchEnabled(true);
         nextButton->addTouchEventListener(CC_CALLBACK_2(GameScene::touchButtonEvent, this));
+        
+        // set string text
+        titleText->setString("Stage Clear!");
+        titleText->setColor(Color3B(26, 217, 244));
+    } else {
+        // set string text
+        titleText->setString("Game Over!");
+        titleText->setColor(Color3B(240,68,94));
     }
 }
 

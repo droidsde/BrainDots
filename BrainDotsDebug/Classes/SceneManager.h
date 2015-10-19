@@ -45,6 +45,7 @@ public:
     CC_SYNTHESIZE(std::string, curLanguage, CurLanguage);
     CC_SYNTHESIZE(int, curUnlockPencil, CurUnlockPencil);
     CC_SYNTHESIZE(int, curUsePencil, CurUsePencil);
+    CC_SYNTHESIZE(int, curCoin, CurCoin);
     
     void changeState(GAME_STATE = GAME_STATE::LOGO);
     void loadingScene(Layer*);
@@ -52,6 +53,7 @@ public:
     void saveLanguage();
     void saveUnlockPencil(int index);
     void saveUsePencil(int pencil);
+    void saveCoin(int coin);
     
     // load list language
     void loadListLanguage(std::string jsonFile);

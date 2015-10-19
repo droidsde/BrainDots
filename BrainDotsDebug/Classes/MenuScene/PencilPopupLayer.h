@@ -32,6 +32,7 @@ private:
     Size sizeListView;
     Size sizePencil;
     float widthLayoutPencil;
+    Text* curTextCoin;
 
     ListView* listViewPencils;
     Vector<Button*> listPencils;

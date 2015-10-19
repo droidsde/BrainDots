@@ -46,6 +46,7 @@
 #define MAX_SCALE_PENCIL                2.2
 #define MIN_SCALE_PENCIL                1.0
 #define PENCIL_DEFAULT_UNLOCK           5
+#define DEFAULT_COIN                    100
 #ifndef DEGTORAD
 #define DEGTORAD 0.0174532925199432957f
 #define RADTODEG 57.295779513082320876f

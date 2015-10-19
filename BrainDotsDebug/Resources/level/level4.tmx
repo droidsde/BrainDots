@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="38" height="21" tilewidth="36" tileheight="36" nextobjectid="5">
- <tileset firstgid="1" name="triangle" tilewidth="36" tileheight="36" tilecount="50">
-  <image source="triangle_36x36.png" width="360" height="180"/>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="36" height="20" tilewidth="38" tileheight="38" nextobjectid="5">
+ <tileset firstgid="1" name="base" tilewidth="38" tileheight="38" tilecount="1">
+  <image source="tileset_38x38.png" width="38" height="38"/>
  </tileset>
  <objectgroup name="braindots">
-  <object id="1" name="ballA" type="ball" x="318" y="469">
+  <object id="1" name="ballA" type="ball" x="318" y="504">
    <properties>
     <property name="autocreate" value="false"/>
    </properties>
   </object>
-  <object id="2" name="ballB" type="ball" x="1080" y="649">
+  <object id="2" name="ballB" type="ball" x="1080" y="661">
    <properties>
     <property name="autocreate" value="false"/>
    </properties>
@@ -24,14 +24,14 @@
    <properties>
     <property name="autocreate" value="true"/>
     <property name="bodyType" value="StaticBody"/>
-    <property name="spriteName" value="tileset_36x36.png"/>
+    <property name="spriteName" value="tileset_32x32.png"/>
    </properties>
-   <polygon points="0,0 -502,2 -500,176 178,176"/>
+   <polygon points="-5.33333,26.6667 -500.667,27.3333 -500,181.333 264.667,180"/>
   </object>
  </objectgroup>
- <layer name="barrier" width="38" height="21">
+ <layer name="barrier" width="36" height="20">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC+3ROxKCQBBF0YkAjRBNADEAPwSI4P4X552yZgNNBwTvVp38zXQISimllFLbqg0aZMhR4ICj867B4I4SJ1Q44+K8620wh/+ftbiiw815V3q/xQNPvDA670rvt/hgwYqv865+R9Lt4h2mHUm3i3f4AXFaEGh4DAAA
+   H4sIAAAAAAAAA+3DMQ0AAAwDoNa/6Z77pgASEgAAOPU9vQedVkALAAA=
   </data>
  </layer>
 </map>

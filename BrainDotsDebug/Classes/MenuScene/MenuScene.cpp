@@ -411,6 +411,7 @@ void MenuScene::pageViewEvent(cocos2d::Ref *pSender, PageView::EventType type)
         {
             PageView* pageView = dynamic_cast<PageView*>(pSender);
             curPage = (int)pageView->getCurPageIndex() + 1;
+            CCLOG("curPage %d", curPage);
         }
             break;
             
@@ -448,6 +449,7 @@ void MenuScene::openStage(int i)
 {
     float curPos = listview->getInnerContainer()->getPositionX();
     float exactPos = -(stickerSize.width + LIST_BIG_ITEM_MARGIN) * i;
+    pageview->scrollToPage(i);
     if (curPos > (exactPos + DELTA_TRANSLATE) || curPos < (exactPos - DELTA_TRANSLATE)) {
         listview->getInnerContainer()->runAction(MoveTo::create(0.3f, Vec2(exactPos, 0)));
     }
@@ -473,7 +475,8 @@ void MenuScene::showStages(int i)
     float exactPos = -(stickerSize.width + LIST_BIG_ITEM_MARGIN) * i;
     
     if (curPos > (exactPos + DELTA_TRANSLATE) || curPos < (exactPos - DELTA_TRANSLATE)) {
-        listview->getInnerContainer()->runAction(MoveTo::create(0.3f, Vec2(exactPos, 0)));
+//        listview->getInnerContainer()->runAction(MoveTo::create(0.3f, Vec2(exactPos, 0)));
+        listview->getInnerContainer()->setPositionX(exactPos);
     }
 }
 

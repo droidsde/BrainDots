@@ -68,10 +68,10 @@ bool InfoPopupLayer::init()
     layoutTable->addChild(layoutName);
     
     // coin count
-    createLayoutItem(Vec2(title->getPositionX(), posY - listviewSize.height/4), "coin_64x64.png", to_string(100));
+    createLayoutItem(Vec2(title->getPositionX(), posY - listviewSize.height/4), "coin_64x64.png", to_string(SceneManager::getInstance()->getCurCoin()));
     
     // level done
-    createLayoutItem(Vec2(title->getPositionX(), posY - 2 * listviewSize.height/4), "mini_tick.png", "17/60");
+    createLayoutItem(Vec2(title->getPositionX(), posY - 2 * listviewSize.height/4), "mini_tick.png", to_string(SceneManager::getInstance()->getCurMaxLevel()) + "/" + to_string(LEVEL_MAX*6));
     
     // replay count
     createLayoutItem(Vec2(title->getPositionX(), posY - 3 * listviewSize.height/4), "replay.png", "123/233");

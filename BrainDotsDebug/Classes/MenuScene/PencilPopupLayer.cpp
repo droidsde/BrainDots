@@ -33,11 +33,25 @@ bool PencilPopupLayer::init()
     sizeListView = Size(sizeLayout.width *4/5, sizeLayout.height*2 / 3);
     
     // title
-    auto title = Text::create("Choose pencil", "arial.ttf", 60);
+    auto title = Text::create("Choose a pencil", "arial.ttf", 60);
     title->setPosition(Vec2(sizeLayout.width/2, sizeLayout.height - PADDING));
     title->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
     title->setColor(Color3B::RED);
     layoutTable->addChild(title);
+    
+    //coin image
+    auto coinImg = Sprite::create("coin_64x64.png");
+    coinImg->setPosition(Vec2(PADDING_MENU_HEADER_ITEM, title->getPositionY() - title->getContentSize().height/2));
+    coinImg->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    layoutTable->addChild(coinImg);
+    
+    //text current coin
+    curTextCoin = Text::create("", "arial.ttf", 50);
+    curTextCoin->setColor(Color3B::RED);
+    curTextCoin->setString(to_string(SceneManager::getInstance()->getCurCoin()));
+    curTextCoin->setPosition(Vec2(coinImg->getPositionX() + coinImg->getContentSize().width + PADDING, coinImg->getPositionY()));
+    curTextCoin->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    layoutTable->addChild(curTextCoin);
     
     // add listview horizontal
     listViewPencils = ListView::create();

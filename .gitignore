@@ -1,28 +1,19 @@
 .DS_Store
 *.swp
-*~.nib	
+*~.nib
+*.zip	
 
-BrainDots/proj.android/bin/*
-BrainDots/proj.android/gen/*
-BrainDots/proj.android/obj/*
-BrainDots/proj.android/libs/*
-BrainDots/proj.android/jni/Android.mk
-BrainDots/proj.ios_mac/BrainDots.xcodeproj/project.pbxproj
-BrainDots/proj.ios_mac/BrainDots.xcodeproj/project.xcworkspace/xcuserdata/Hoang.xcuserdatad/UserInterfaceState.xcuserstate
-BrainDotsDebug/proj.android/bin/*
-BrainDotsDebug/proj.android/gen/*
-BrainDotsDebug/proj.android/obj/*
-BrainDotsDebug/proj.android/libs/*
+# Android
+*.apk
+bin/
+gen/
+obj/
+assets/
+local.properties
+project.properties
+BrainDotsDebug/proj.android/libs/
 BrainDotsDebug/proj.android/jni/Android.mk
-BrainDotsDebug/proj.android/project.properties
-BrainDotsDebug/proj.ios_mac/BrainDotsDebug.xcodeproj/project.pbxproj
-BrainDotsDebug/proj.ios_mac/BrainDotsDebug.xcodeproj/project.xcworkspace/xcuserdata/Hoang.xcuserdatad/UserInterfaceState.xcuserstate
-TexturePolygon/proj.android/bin/*
-TexturePolygon/proj.android/gen/*
-TexturePolygon/proj.android/obj/*
-TexturePolygon/proj.android/libs/*
-TexturePolygon/proj.ios_mac/TexturePolygon.xcodeproj/project.pbxproj
-TexturePolygon/proj.ios_mac/TexturePolygon.xcodeproj/project.xcworkspace/xcuserdata/Hoang.xcuserdatad/UserInterfaceState.xcuserstate
+
 # Xcode
 #
 # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
@@ -39,7 +30,15 @@ DerivedData
 !default.mode2v3
 *.perspectivev3
 !default.perspectivev3
+*.xcworkspace
+!default.xcworkspace
 xcuserdata
+profile
+*.moved-aside
+DerivedData
+.idea/
+# Pods - for those of you who use CocoaPods
+Pods
 
 ## Other
 *.xccheckout

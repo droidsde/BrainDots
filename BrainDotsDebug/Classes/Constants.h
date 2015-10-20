@@ -224,6 +224,36 @@ struct compare_level
     }
 };
 
+    class FixtureDef
+    {
+    public:
+        FixtureDef()
+        : next(nullptr) {}
+        
+        ~FixtureDef() {
+            delete next;
+            delete fixture.shape;
+        }
+        
+        FixtureDef *next;
+        b2FixtureDef fixture;
+        int callbackData;
+    };
+    
+    class BodyDef
+    {
+    public:
+        BodyDef()
+        : fixtures(nullptr) {}
+        
+        ~BodyDef() {
+            if (fixtures)
+                delete fixtures;
+        }
+        
+        FixtureDef *fixtures;
+        cocos2d::Point anchorPoint;
+    };
 class ConveyorBelt
 {
 public:

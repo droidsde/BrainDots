@@ -85,7 +85,7 @@ void MenuScene::addHeaderLayer()
     title->setTouchEnabled(true);
     title->setTitleText("Brain Dots");
     title->setTitleFontSize(80);
-    title->setTitleFontName("arial.ttf");
+    title->setTitleFontName("fonts/arial.ttf");
     title->setTitleColor(Color3B::ORANGE);
     title->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     title->setPosition(Vec2(PADDING_MENU_HEADER_ITEM, headerSize.height/2));
@@ -195,7 +195,7 @@ void MenuScene::reloadData() {
 		stage->setTitleText(StringUtils::format("Stage %d",i+1));
 		stage->setTitleColor(Color3B::RED);
 		stage->setTitleFontSize(100);
-		stage->setTitleFontName("arial.ttf");
+		stage->setTitleFontName("fonts/arial.ttf");
 		stage->setTouchEnabled(true);
         stage->setZoomScale(0);
 		stage->setTag(i);
@@ -203,7 +203,7 @@ void MenuScene::reloadData() {
 				CC_CALLBACK_2(MenuScene::touchButtonEvent, this));
         
         // text
-        Text* text = Text::create(" 6 / 6", "arial.ttf", 60);
+        Text* text = Text::create(" 6 / 6", "fonts/arial.ttf", 60);
         text->setColor(Color3B::RED);
         text->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
         text->setPosition(Vec2(stage->getPositionX(), stage->getPositionY() - stickerSize.height/2));
@@ -271,7 +271,7 @@ void MenuScene::addPageView()
                 level->setAnchorPoint(Vec2::ANCHOR_TOP_RIGHT);
                 level->setTitleColor(Color3B::RED);
                 level->setTitleFontSize(60);
-                level->setTitleFontName("arial.ttf");
+                level->setTitleFontName("fonts/arial.ttf");
                 level->setTouchEnabled(true);
                 level->setTag(TAG_MENU::TAG_LEVEL_CHOOSE + index);
                 level->addTouchEventListener(
@@ -411,7 +411,6 @@ void MenuScene::pageViewEvent(cocos2d::Ref *pSender, PageView::EventType type)
         {
             PageView* pageView = dynamic_cast<PageView*>(pSender);
             curPage = (int)pageView->getCurPageIndex() + 1;
-            CCLOG("curPage %d", curPage);
         }
             break;
             

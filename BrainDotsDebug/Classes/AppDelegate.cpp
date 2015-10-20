@@ -45,6 +45,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     paths.push_back("level");
     paths.push_back("particle");
     paths.push_back("shaders");
+    paths.push_back("physicseditor");
     paths.push_back("/mnt/sdcard/");
     paths.push_back("internal_dir/");
     paths.push_back(cocos2d::FileUtils::getInstance()->getWritablePath());

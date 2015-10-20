@@ -331,6 +331,29 @@ void GameScene::initMapLevel(int level)
         // draw node
         drawnode = DrawNode::create();
         map->addChild(drawnode, 200);
+        
+        // draw test
+        // load physics shapes
+        GB2ShapeCache::getInstance()->addShapesWithFile("physicshapes.plist");
+        Sprite *sprite = Sprite::create("kingkong1.png");
+        
+        sprite->setPosition(visibleSize/2);
+        
+        map->addChild(sprite);
+        
+        b2BodyDef bodyDef;
+        bodyDef.type = b2_staticBody;
+        
+        bodyDef.position.Set(visibleSize.width/2/PTM_RATIO, visibleSize.height/2/PTM_RATIO);
+        bodyDef.userData = sprite;
+        b2Body *body = world->CreateBody(&bodyDef);
+
+        // add the fixture definitions to the body
+
+        GB2ShapeCache *sc = GB2ShapeCache::getInstance();
+        sc->addFixturesToBody(body, "kingkong1");
+        sprite->setAnchorPoint(sc->getAnchorPointForShape("kingkong1"));
+        
     }
 }
 

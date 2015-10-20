@@ -22,36 +22,6 @@
 
 USING_NS_CC;
 class GameScene;
-class FixtureDef
-{
-public:
-    FixtureDef()
-    : next(nullptr) {}
-    
-    ~FixtureDef() {
-        delete next;
-        delete fixture.shape;
-    }
-    
-    FixtureDef *next;
-    b2FixtureDef fixture;
-    int callbackData;
-};
-
-class BodyDef
-{
-public:
-    BodyDef()
-    : fixtures(nullptr) {}
-    
-    ~BodyDef() {
-        if (fixtures)
-            delete fixtures;
-    }
-    
-    FixtureDef *fixtures;
-    Point anchorPoint;
-};
 
 class Joint2Body
 {

@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="36" height="20" tilewidth="38" tileheight="38" nextobjectid="17">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="36" height="20" tilewidth="38" tileheight="38" nextobjectid="19">
  <tileset firstgid="1" name="base" tilewidth="38" tileheight="38" tilecount="1">
   <image source="tileset_38x38.png" width="38" height="38"/>
+ </tileset>
+ <tileset firstgid="2" name="kingkong" tilewidth="38" tileheight="38" tilecount="80">
+  <image source="../physicseditor/kingkong1.png" width="323" height="400"/>
+ </tileset>
+ <tileset firstgid="82" name="t-rex" tilewidth="38" tileheight="38" tilecount="130">
+  <image source="../physicseditor/dinosaur1.png" width="530" height="388"/>
  </tileset>
  <layer name="barrage" width="36" height="20">
   <data encoding="base64" compression="gzip">
@@ -9,12 +15,12 @@
   </data>
  </layer>
  <objectgroup name="braindots">
-  <object id="2" name="ballA" type="ball" x="434.667" y="324">
+  <object id="2" name="ballA" type="ball" x="468" y="281">
    <properties>
     <property name="autocreate" value="false"/>
    </properties>
   </object>
-  <object id="3" name="ballB" type="ball" x="925.333" y="325.333">
+  <object id="3" name="ballB" type="ball" x="928" y="280.666">
    <properties>
     <property name="autocreate" value="false"/>
    </properties>
@@ -25,5 +31,31 @@
     <property name="bodyType" value="StaticBody"/>
    </properties>
   </object>
+  <object id="17" name="kingkong" type="object" x="229.333" y="306.667" width="304" height="377.333">
+   <properties>
+    <property name="autocreate" value="true"/>
+    <property name="barrierType" value="physicseditor"/>
+    <property name="bodyType" value="StaticBody"/>
+    <property name="spriteName" value="kingkong1"/>
+   </properties>
+  </object>
+  <object id="18" name="t-rex" type="object" x="877.333" y="306.667" width="489.333" height="376">
+   <properties>
+    <property name="autocreate" value="true"/>
+    <property name="barrierType" value="physicseditor"/>
+    <property name="bodyType" value="StaticBody"/>
+    <property name="spriteName" value="dinosaur1"/>
+   </properties>
+  </object>
  </objectgroup>
+ <layer name="Non-shown1" width="36" height="20" visible="0">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3OyS6DYRTG8UZLlaLmudQ8z2Np1TxPF8ASYUu4AVfAHku0taM17GiLlbqh/iVdSZy+kq+JxPckv+T7cp685xgMevTo0fO3kgIjTEhFGsxIhyUJ+zawKcwzkAkrspCNHNiQq8H+LWxjJ/6/iz2hn4d8FKAQRShGCUo1uOcr+ziIfx/iSOiWoRwVqIQdVaiGQ6N7vudYmNWgFnWoRwMa0YTmJN0jpQWtaEM7OtCJLnQrvnGC01/sPBNmPehFH/oxgEEMYVjx/XNcJOhc4grX8Ao9J0YwChfcGIMH44r3+ODHjdC5xR0CCAq9CUxiCtOYwSzmMK94zz0e8IgnofeMF4SEzgIWsYRlrGAVa1hXvCeMCF7xhvcfeh+I4lPx3f+cGC57TtZACwAA
+  </data>
+ </layer>
+ <layer name="Non-shown2" width="36" height="20" visible="0">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3OZzcWYACAYb/RlpCsbEVRZtlkk1FREqGsiuy9IvMPdf2J58t73vuc6/sdExMtWrRokVcsccSTQCJJJJPCA1J5SBrpgX8yeEQmj8kimxxyyeMJ+RRQGPiniGJKKKWMpzyjnAqe84JKqgL/vOQV1dRQSx31NPCaNzTSRHPgnxZaaaOdDjp5Sxfd9NBLH/2BfwYYZIh3DDPCKGO85wMfGWci8M8nPjPJF6b4yjQzfGOWOeb5HvjnBwssssQyK/zkF79ZZY0/rAf+2WCTLbbZYZc99jngkCOOOQn8c8oZ5/zlgkv+ccU1N9xyx33gn0joP7FaXO5ACwAA
+  </data>
+ </layer>
 </map>

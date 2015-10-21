@@ -93,44 +93,51 @@ class GameScene : public cocos2d::LayerColor
 {
 public:
     
+    // game constructor
     GameScene();
     ~GameScene();
 
+    // init all components
     static cocos2d::Scene* createScene();
     virtual bool init();
     
     CREATE_FUNC(GameScene);
     
+    // touch components
     virtual bool onTouchBegan(Touch* touch, Event* event);
     virtual void onTouchMoved(Touch* touch, Event* event);
     virtual void onTouchEnded(Touch* touch, Event* event);
+    void touchButtonEvent(Ref* sender, Widget::TouchEventType type);
     
+    // draw grids
     void drawGrids();
+    
+    // physic components
     void initPhysics();
     void initMapLevel(int level);
     void initPhysicObjects();
     void initWall(b2Body* body, b2Fixture* _wallFixture[],float outside, uint16 categorybits, uint16 maskbits);
     void initBalls();
     
-    // adds a new sprite at a given coordinate
-    void update(float dt);
+    // execute touch and body
     void addRectangleBetweenPointsToBody(b2Body* body, Vec2 start, Vec2 end);
     Vec2 checkInsideBox2d(Vec2 start, Vec2 end);
     Vec2 checkInsideBox2dByRayCats(Vec2 start, Vec2 end);
     std::vector<Vec2> getListPointsIn2Point(Vec2 start, Vec2 end);
-    void backMenu();
-    void touchButtonEvent(Ref* sender, Widget::TouchEventType type);
-    void animationSuccess(Vec2 collisionPoint);
-    void animationFail(Vec2 collisionPoint, std::string explosionName);
+    
+    // game components
     void endGame();
     void removeAllObjects();
+    void backMenu();
     
-    // function test
+    // animation gameover
+    void animationSuccess(Vec2 collisionPoint);
+    void animationFail(Vec2 collisionPoint, std::string explosionName);
     void explosionBall(b2Body* ball);
     void explosionRing(std::string name, Vec2 point);
-    void revoluteJoint();
-    void weldJoint();
-    void conveyorBelts();
+    
+    // update game
+    void update(float dt);
     
 private:
     // size and pos screen
@@ -164,27 +171,23 @@ private:
     b2Fixture* _wallFixture2[4];
     b2Fixture* electricictyFixture;
     b2Fixture* switchFixture;
-
-    //test
-    b2Fixture* mPlatform;
     
     // contacts physics
     BallContactListener* _ballContactListener;
+    
+    // touch variable
     Vec2 collisionPoint = Vec2::ZERO;
     Vec2 collisionFailA = Vec2::ZERO;
     Vec2 collisionFailB = Vec2::ZERO;
     Vec2 posballA, posballB;
-    
-    // touch variable
     Vec2 posErrorDraw;
     bool isErrorDraw = false;
     std::vector<Vec2> platformPoints;
     RenderTexture *target;
     Sprite *brush;
-    
     std::vector<ConveyorBelt> listConveyorBelt;
     
-    // on enter, onexit
+    // capture end games
     std::string filenameCapture;
     void afterCaptured(bool succeed, const std::string& outputFile);
     void showShareLayer(std::string filename);

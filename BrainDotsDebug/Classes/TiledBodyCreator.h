@@ -20,6 +20,8 @@
 #include "SwitchObject.h"
 #endif
 
+#include "GB2ShapeCache-x.h"
+
 USING_NS_CC;
 class GameScene;
 
@@ -80,6 +82,9 @@ public:
     void createDynamicBodies(ValueVector dynamicBodyList, b2BodyType type);
     
     void createSpriteBody(b2Body* body, b2Fixture* fixture, std::string spriteName, Value objectValue);
+    
+    // create physicseditor
+    void createPhysicseditor(b2Body* body, std::string shapeName);
     
     BARRIER_TYPE getBarrierType(cocos2d::Value objectValue);
     static std::vector<ConveyorBelt> getListConveyorBelt();

@@ -1,5 +1,8 @@
 #include "GameScene.h"
 
+//////////////////////
+// CONTRUCTOR
+//////////////////////
 GameScene::GameScene()
 {
     map = nullptr;
@@ -14,15 +17,18 @@ GameScene::GameScene()
 
 GameScene::~GameScene()
 {
-    map = nullptr;
-    drawnode = nullptr;
-    delete tiledmap;
-    tiledmap = nullptr;
-    brush = nullptr;
-    delete world;
-    world = nullptr;
-    delete _ballContactListener;
-    CC_SAFE_RELEASE(target);
+//    drawnode = nullptr;
+//    brush = nullptr;
+//    CC_SAFE_RELEASE(target);
+//    target = nullptr;
+//    map = nullptr;
+//    delete tiledmap;
+//    tiledmap = nullptr;
+//    
+//    delete _ballContactListener;
+//    _ballContactListener = nullptr;
+//    delete world;
+//    world = nullptr;
 }
 
 Scene* GameScene::createScene()
@@ -33,17 +39,19 @@ Scene* GameScene::createScene()
     return scene;
 }
 
-// on "init" you need to initialize your instance
+
+///////////////////////////
+// INIT ALL COMPONENT
+///////////////////////////
 bool GameScene::init()
 {
-    
-    //////////////////////////////
-    // 1. super init first
+    // init background white color
     if ( !LayerColor::initWithColor(Color4B(255, 255, 255, 255)) )
     {
         return false;
     }
     
+    // get size and pos screen
     visibleSize = Director::getInstance()->getVisibleSize();
     origin = Director::getInstance()->getVisibleOrigin();
     
@@ -67,6 +75,9 @@ bool GameScene::init()
     replayButton->setTag(TAG_GAME::TAG_BUTTON_REPLAY);
     replayButton->addTouchEventListener(CC_CALLBACK_2(GameScene::touchButtonEvent, this));
     addChild(replayButton, ZORDER_GAME::ZORDER_BUTTON_REPLAY);
+    
+    // load physics shapes cache
+    GB2ShapeCache::getInstance()->addShapesWithFile("physicshapes.plist");
     
     // init physics
     this->initPhysics();
@@ -98,164 +109,20 @@ bool GameScene::init()
     listener->onTouchEnded = CC_CALLBACK_2(GameScene::onTouchEnded, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
     
-    /// Example of a concave polygon with hole
-    int p[] = {80,200,112,120,160,72,256,88,336,120,368,248,352,296,272,312,256,248,192,216,160,232,112,280,64,248};
-    PointVector path;
-    for (int i = 0; i < 24; i += 2)
-        path.push_back(Point(p[i],p[i+1]));
-    
-    int h[] = {144,168,192,120,272,136,320,200,288,232,240,168,192,184};
-    PointVector hole;
-    for (int i = 0; i < 14; i += 2)
-        hole.push_back(Point(h[i],h[i+1]));
-    
-    /// Create the polygon and add it to the layer
-//    auto test = TexturePolygon::create(path, hole, "pattern.png");
-//    map->addChild(test);
-    
     return true;
 }
 
-void GameScene::revoluteJoint()
-{
-    b2BodyDef bodyDef;
-    bodyDef.type = b2_dynamicBody;
-    b2FixtureDef fixtureDef;
-    fixtureDef.density = 10;
-    
-    b2PolygonShape boxShape;
-    boxShape.SetAsBox(5, 1);
-    b2CircleShape circleShape;
-    circleShape.m_radius = 1;
-    
-    bodyDef.position.Set(600 / PTM_RATIO, 600 / PTM_RATIO);
-    fixtureDef.shape = &boxShape;
-    b2Body* m_bodyA = world->CreateBody(&bodyDef);
-    m_bodyA->CreateFixture(&fixtureDef);
-    
-    bodyDef.position.Set(600 / PTM_RATIO, 600 / PTM_RATIO);
-    bodyDef.type = b2_staticBody;
-    fixtureDef.shape = &circleShape;
-    b2Body* m_bodyB = world->CreateBody(&bodyDef);
-    m_bodyB->CreateFixture(&fixtureDef);
-    
-    b2RevoluteJointDef revoluteJointDef;
-    revoluteJointDef.bodyA = m_bodyA;
-    revoluteJointDef.bodyB = m_bodyB;
-    revoluteJointDef.collideConnected = false;
-    revoluteJointDef.localAnchorA.Set(0,0);
-    revoluteJointDef.localAnchorB.Set(0,0);
-    
-//    revoluteJointDef.enableLimit = true;
-    //revoluteJointDef.lowerAngle = -90 * PI / 180;
-    //revoluteJointDef.upperAngle =  90 * PI / 180;
-    
-    revoluteJointDef.enableMotor = true;
-    revoluteJointDef.maxMotorTorque = 150;
-    revoluteJointDef.motorSpeed = 100;
-    
-    world->CreateJoint(&revoluteJointDef );
-    
-}
 
-void GameScene::weldJoint()
-{
-    b2Body* mBodyA, *mBodyB;
-    
-    float posX = visibleSize.width/2;
-    
-    // box A
-    {
-        b2BodyDef bodyDef;
-        bodyDef.type = b2_dynamicBody;
-        bodyDef.position.Set(posX / PTM_RATIO, 600 / PTM_RATIO);
-        bodyDef.angle = 0;
-        
-        b2PolygonShape boxShape;
-        boxShape.SetAsBox(5, 1);
-        
-        b2FixtureDef fixtureDef;
-        fixtureDef.density = 10;
-        fixtureDef.shape = &boxShape;
-        
-        mBodyA = world->CreateBody(&bodyDef);
-        mBodyA->CreateFixture(&fixtureDef);
-    }
-    
-    // box B
-    {
-        b2BodyDef bodyDef;
-        bodyDef.type = b2_dynamicBody;
-        bodyDef.position.Set(posX / PTM_RATIO, 600 / PTM_RATIO);
-        bodyDef.angle = -90 * b2_pi / 180;
-        
-        b2PolygonShape boxShape;
-        boxShape.SetAsBox(5, 1);
-        
-        b2FixtureDef fixtureDef;
-        fixtureDef.density = 10;
-        fixtureDef.shape = &boxShape;
-        
-        mBodyB = world->CreateBody(&bodyDef);
-        mBodyB->CreateFixture(&fixtureDef);
-    }
-    
-    b2WeldJointDef weldJointDef;
-    weldJointDef.referenceAngle = -90 * b2_pi / 180;
-    weldJointDef.bodyA = mBodyA;
-    weldJointDef.bodyB = mBodyB;
-    weldJointDef.localAnchorA.Set(0, 0);
-    weldJointDef.localAnchorB.Set(0, 0);
-    weldJointDef.collideConnected = false;
-    
-    world->CreateJoint(&weldJointDef);
-}
-
-void GameScene::conveyorBelts()
-{
-    // Platform
-    {
-        b2BodyDef bd;
-        bd.position.Set(visibleSize.width/2 / PTM_RATIO, 5.0f);
-        b2Body* body = world->CreateBody(&bd);
-        
-        b2PolygonShape shape;
-        shape.SetAsBox(10.0f, 0.5f);
-        
-        b2FixtureDef fd;
-        fd.shape = &shape;
-        fd.friction = 10.0f;
-        mPlatform = body->CreateFixture(&fd);
-        
-        ConveyorBelt cb;
-        cb.fixture = mPlatform;
-        cb.friction = fd.friction;
-        cb.tangentSpeed = 100;
-        listConveyorBelt.push_back(cb);
-    }
-    
-    // Boxes
-    for (int32 i = 0; i < 5; ++i)
-    {
-        b2BodyDef bd;
-        bd.type = b2_dynamicBody;
-        bd.position.Set(visibleSize.width/2 / PTM_RATIO + 2.0f * i, 7.0f);
-        b2Body* body = world->CreateBody(&bd);
-        
-        b2CircleShape shape;
-        shape.m_radius = 0.5f;
-        body->CreateFixture(&shape, 20.0f);
-        body->SetAngularVelocity(-50);
-    }
-}
-
+///////////////////////////
+// DRAW GRIDS
+///////////////////////////
 void GameScene::drawGrids()
 {
     DrawNode* draw = DrawNode::create();
     this->addChild(draw, ZORDER_GRID);
     
     float lineSize = 0.5;
-    Color4F color = Color4F(0/255, 205/255, 1, 0.2);
+    Color4F color = Color4F(0/255, 205/255, 1, 0.3);
     
     // draw col
     for (int x = 0; x < visibleSize.width; x++) {
@@ -270,6 +137,10 @@ void GameScene::drawGrids()
     }
 }
 
+
+///////////////////////////
+// PHYSIC COMPONENTS
+///////////////////////////
 void GameScene::initPhysics()
 {
     // create physics world box2d
@@ -279,7 +150,7 @@ void GameScene::initPhysics()
     world->SetContinuousPhysics(true);
     
     // Add the box2d debug draw layer
-    addChild(B2DebugDrawLayer::create(world, PTM_RATIO),INT_MAX);
+//    addChild(B2DebugDrawLayer::create(world, PTM_RATIO),INT_MAX);
     
     // add contact
     _ballContactListener = new BallContactListener();
@@ -312,48 +183,30 @@ void GameScene::initMapLevel(int level)
         
         // get ball group
         auto group = map->getObjectGroup("braindots");
-        CCASSERT(NULL != group, "braindots group not found");
-        
-        // ball A
-        auto ballA_map = group->getObject("ballA");
-        CCASSERT(!ballA_map.empty(), "ball A not found");
-        float xA = ballA_map["x"].asFloat();
-        float yA = ballA_map["y"].asFloat();
-        posballA = Vec2(xA, yA);
-        
-        // ball B
-        auto ballB_map = group->getObject("ballB");
-        CCASSERT(!ballB_map.empty(), "ball B not found");
-        float xB = ballB_map["x"].asFloat();
-        float yB = ballB_map["y"].asFloat();
-        posballB = Vec2(xB, yB);
+        if (group != nullptr) {
+            // ball A
+            auto ballA_map = group->getObject("ballA");
+            if (!ballA_map.empty()) {
+                float xA = ballA_map["x"].asFloat();
+                float yA = ballA_map["y"].asFloat();
+                posballA = Vec2(xA, yA);
+            }
+            else CCLOG("ball A not found");
+            
+            // ball B
+            auto ballB_map = group->getObject("ballB");
+            if(!ballB_map.empty()) {
+                float xB = ballB_map["x"].asFloat();
+                float yB = ballB_map["y"].asFloat();
+                posballB = Vec2(xB, yB);
+            } else CCLOG("ball B not found");
+        }
+        else
+            CCLOG("braindots group not found");
         
         // draw node
         drawnode = DrawNode::create();
         map->addChild(drawnode, 200);
-        
-        // draw test
-        // load physics shapes
-        GB2ShapeCache::getInstance()->addShapesWithFile("physicshapes.plist");
-        Sprite *sprite = Sprite::create("kingkong1.png");
-        
-        sprite->setPosition(visibleSize/2);
-        
-        map->addChild(sprite);
-        
-        b2BodyDef bodyDef;
-        bodyDef.type = b2_staticBody;
-        
-        bodyDef.position.Set(visibleSize.width/2/PTM_RATIO, visibleSize.height/2/PTM_RATIO);
-        bodyDef.userData = sprite;
-        b2Body *body = world->CreateBody(&bodyDef);
-
-        // add the fixture definitions to the body
-
-        GB2ShapeCache *sc = GB2ShapeCache::getInstance();
-        sc->addFixturesToBody(body, "kingkong1");
-        sprite->setAnchorPoint(sc->getAnchorPointForShape("kingkong1"));
-        
     }
 }
 
@@ -377,7 +230,6 @@ void GameScene::initPhysicObjects()
     initWall(groundBody, _wallFixture1, BALL_RADIUS, CATEGORY_WALL1, MASK_WALL1);
     initWall(groundBody, _wallFixture2, OUTSIDE, CATEGORY_WALL2, MASK_WALL2);
 }
-
 
 void GameScene::initWall(b2Body *body, b2Fixture* _wallFixture[], float outside, uint16 categorybits, uint16 maskbits)
 {
@@ -459,247 +311,22 @@ void GameScene::initBalls()
     _ballContactListener->setFixtureForBall(_ballAFixture, _ballBFixture);
 }
 
-void GameScene::update(float dt) {
-    
-    int positionIterations = 8;
-    int velocityIterations = 1;
-    if (!isSuccess && !isFail) {
-        world->Step(dt, velocityIterations, positionIterations);
-        
-    } else {
-        ((Button*)this->getChildByTag(TAG_GAME::TAG_BUTTON_BACK))->setTouchEnabled(false);
-        ((Button*)this->getChildByTag(TAG_GAME::TAG_BUTTON_REPLAY))->setTouchEnabled(false);
-        
-        // result success
-        if (isSuccess) {
-            
-            this->animationSuccess(collisionPoint);
-            this->runAction(Sequence::create(DelayTime::create(2.5f), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)),  NULL));
-            
-        } else if (isFail) {
-            // ballA was broken
-            if (collisionFailA != Vec2::ZERO && collisionFailB == Vec2::ZERO) {
-                this->runAction(Sequence::create(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailA, "explosion_red")), DelayTime::create(2), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)), NULL));
-            }
-            // ball B was broken
-            else if (collisionFailB != Vec2::ZERO && collisionFailA == Vec2::ZERO) {
-                this->runAction(Sequence::create(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailB, "explosion_blue")), DelayTime::create(2), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)), NULL));
-            }
-            // ball A and B together were broken
-            else if (collisionFailA != Vec2::ZERO  && collisionFailB != Vec2::ZERO) {
-                this->runAction(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailA, "explosion_red")));
-                this->runAction(Sequence::create(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailB, "explosion_blue")), DelayTime::create(2), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)), NULL));
-            }
-        }
-        
-        // disbale update
-        this->unschedule(schedule_selector(GameScene::update));
-        return;
-    }
-    for (b2Body *body = world->GetBodyList(); body != NULL; body =
-         body->GetNext()) {
-        if (body->GetUserData()) {
-            Sprite *sprite = (Sprite *) body->GetUserData();
-            sprite->setPosition(
-                                Point(body->GetPosition().x * PTM_RATIO,
-                                      body->GetPosition().y * PTM_RATIO));
-            sprite->setRotation(-1 * CC_RADIANS_TO_DEGREES(body->GetAngle()));
-        }
-    }
-    
-    std::vector<b2Body *>toStatic;
-    std::vector<b2Body *>toDestroy;
-    std::vector<b2Body *>toRemoveElectric;
-    std::vector<BallContact>::iterator pos;
-    for (pos = _ballContactListener->_contacts.begin(); pos != _ballContactListener->_contacts.end(); ++pos)
-    {
-        BallContact contact = *pos;
-        b2Body* bodyA = contact.fixtureA->GetBody();
-        b2Body* bodyB = contact.fixtureB->GetBody();
-        
-        // contact ball with wall1
-        for (int i=0; i<4; i++) {
-            if((contact.fixtureA == _ballAFixture && contact.fixtureB == _wallFixture1[i]))
-            {
-                collisionFailA = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
-                if (std::find(toDestroy.begin(), toDestroy.end(), bodyA) == toDestroy.end()) {
-                    toDestroy.push_back(bodyA);
-                }
-                isFail = true;
-            }
-            else if (contact.fixtureA == _ballBFixture && contact.fixtureB == _wallFixture1[i])
-            {
-                collisionFailB = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
-                if (std::find(toDestroy.begin(), toDestroy.end(), bodyA) == toDestroy.end()) {
-                    toDestroy.push_back(bodyA);
-                }
-                isFail = true;
-            }
-            else if  ((contact.fixtureA == _wallFixture1[i] && contact.fixtureB == _ballAFixture))
-            {
-                collisionFailA = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
-                if (std::find(toDestroy.begin(), toDestroy.end(), bodyB) == toDestroy.end()) {
-                    toDestroy.push_back(bodyB);
-                }
-                isFail = true;
-            }
-            else if  (contact.fixtureA == _wallFixture1[i] && contact.fixtureB == _ballBFixture)
-            {
-                collisionFailB = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
-                if (std::find(toDestroy.begin(), toDestroy.end(), bodyB) == toDestroy.end()) {
-                    toDestroy.push_back(bodyB);
-                }
-                isFail = true;
-            }
-        }
-        
-        // contact with electricity
-        if (contact.fixtureA == electricictyFixture && contact.fixtureB == _ballAFixture) {
-            collisionFailA = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
-            if (std::find(toDestroy.begin(), toDestroy.end(), bodyB) == toDestroy.end()) {
-                CCLOG("contact electricity");
-                toDestroy.push_back(bodyB);
-            }
-            isFail = true;
-        }
-        else if (contact.fixtureA == electricictyFixture && contact.fixtureB == _ballBFixture) {
-            collisionFailB = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
-            if (std::find(toDestroy.begin(), toDestroy.end(), bodyB) == toDestroy.end()) {
-                CCLOG("contact electricity");
-                toDestroy.push_back(bodyB);
-            }
-            isFail = true;
-        }
-        else if (contact.fixtureA == _ballAFixture && contact.fixtureB ==  electricictyFixture) {
-            collisionFailA = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
-            if (std::find(toDestroy.begin(), toDestroy.end(), bodyA) == toDestroy.end()) {
-                CCLOG("contact electricity");
-                toDestroy.push_back(bodyA);
-            }
-            isFail = true;
-        }
-        else if (contact.fixtureA == _ballBFixture && contact.fixtureB ==  electricictyFixture) {
-            collisionFailB = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
-            if (std::find(toDestroy.begin(), toDestroy.end(), bodyA) == toDestroy.end()) {
-                CCLOG("contact electricity");
-                toDestroy.push_back(bodyA);
-            }
-            isFail = true;
-        }
-        
-        // collision switch
-        if (contact.fixtureA == switchFixture && (contact.fixtureB == _ballAFixture || contact.fixtureB == _ballBFixture))
-        {
-            if (bodyA->GetUserData() != NULL)
-            {
-                CCLOG("contact with switch");
-                if (std::find(toRemoveElectric.begin(), toRemoveElectric.end(), bodyA) == toRemoveElectric.end()) {
-                    toRemoveElectric.push_back(bodyA);
-                }
-                if (electricictyFixture!=NULL) {
-                    if (std::find(toDestroy.begin(), toDestroy.end(), electricictyFixture->GetBody()) == toDestroy.end()) {
-                        toDestroy.push_back(electricictyFixture->GetBody());
-                        CCLOG("remove electricity");
-                    }
-                }
-            }
-        }
-        else if (contact.fixtureB == switchFixture && (contact.fixtureA == _ballAFixture || contact.fixtureA == _ballBFixture))
-        {
-            if (bodyB->GetUserData() != NULL)
-            {
-                CCLOG("contact with switch");
-                if (std::find(toRemoveElectric.begin(), toRemoveElectric.end(), bodyB) == toRemoveElectric.end()) {
-                    toRemoveElectric.push_back(bodyB);
-                }
-                if (electricictyFixture!=NULL) {
-                    if (std::find(toDestroy.begin(), toDestroy.end(), electricictyFixture->GetBody()) == toDestroy.end()) {
-                        toDestroy.push_back(electricictyFixture->GetBody());
-                        CCLOG("remove electricity");
-                    }
-                }
-            }
-        }
-        
-        // contact platform with wall2
-        for (int i=0; i<4; i++) {
-            if (contact.fixtureA == _wallFixture2[i])
-            {
-                if (std::find(toDestroy.begin(), toDestroy.end(), bodyB) == toDestroy.end()) {
-                    toDestroy.push_back(bodyB);
-                }
-            }
-            else if( contact.fixtureB == _wallFixture2[i])
-            {
-                if (std::find(toDestroy.begin(), toDestroy.end(), bodyA) == toDestroy.end()) {
-                    toDestroy.push_back(bodyA);
-                }
-            }
-        }
-        
-        // contact 2 ball
-        
-        if (bodyA && bodyB && ballA && ballB && bodyA->GetUserData() != NULL && bodyB->GetUserData() != NULL) {
-            if ((bodyA == ballA && bodyB == ballB) || (bodyA == ballB && bodyB == ballA)) {
-                if (bodyA->GetType() == b2_dynamicBody && bodyB->GetType() == b2_dynamicBody) {
-                    toStatic.push_back(bodyA);
-                    toStatic.push_back(bodyB);
-                    collisionPoint = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
-                    isSuccess = true;
-                }
-            }
-        }
-    }
-    
-    // move switch
-    std::vector<b2Body *>::iterator pos4;
-    for (pos4 = toRemoveElectric.begin(); pos4 != toRemoveElectric.end(); ++pos4) {
-        b2Body* body = *pos4;
-        if (body->GetUserData() != NULL) {
-            SwitchObject* sprite = (SwitchObject*) body->GetUserData();
-            if (!sprite->getTurnOff()) {
-                sprite->moveDown(sprite->getContentSize().height);
-                sprite->setTurnOff(true);
-                
-                ParticleSystemQuad* firework = ParticleSystemQuad::create("firework.plist");
-                firework->setPosition(Vec2(electricictyFixture->GetBody()->GetPosition().x * PTM_RATIO, electricictyFixture->GetBody()->GetPosition().y * PTM_RATIO));
-                firework->setAutoRemoveOnFinish(true);
-                map->addChild(firework);
-                electricictyFixture = NULL;
-            }
-        }
-    }
-    
-    // stop 2 ball when collision
-    std::vector<b2Body *>::iterator pos2;
-    for(pos2 = toStatic.begin(); pos2 != toStatic.end(); ++pos2) {
-        b2Body *body = *pos2;
-        if (body->GetType() == b2_dynamicBody) {
-            body->SetType(b2_staticBody);
-        }
-    }
-    
-    // remove body run out
-    std::vector<b2Body *>::iterator pos3;
-    for(pos3 = toDestroy.begin(); pos3 != toDestroy.end(); ++pos3) {
-        b2Body *body = *pos3;
-        if (body->GetUserData() != NULL) {
-            auto sprite = (Node *) body->GetUserData();
-            map->removeChild(sprite, true);
-        }
-        world->DestroyBody(body);
-    }
-    toDestroy.clear();
-}
 
+/////////////////////////////
+// TOUCH COMPONENTS
+/////////////////////////////
 bool GameScene::onTouchBegan(Touch* touch, Event* event) {
-    drawnode->clear();
+    
     isErrorDraw = false;
     posErrorDraw = Vec2::ZERO;
     if (isSuccess || isFail) {
         return false;
     }
     
+    if (drawnode!=nullptr) {
+        drawnode->clear();
+    }
+
     // touch in any physic body
     if (checkInsideBox2d(touch->getLocation(), touch->getLocation()) != Vec2::ZERO)
 //    if (checkDrawingWithOtherBodies(touch->getLocation(), touch->getLocation()) != Vec2::ZERO)
@@ -827,6 +454,39 @@ void GameScene::onTouchEnded(Touch* touch, Event* event) {
     target->clear(0, 0, 0, 0);
 }
 
+void GameScene::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEventType type)
+{
+    auto receiver = (Node*) sender;
+    if (type == ui::Widget::TouchEventType::ENDED)
+    {
+        switch (receiver->getTag()) {
+            case TAG_GAME::TAG_BUTTON_BACK :
+                log("back touch begin");
+                backMenu();
+                log("back touch end");
+                break;
+            case TAG_GAME::TAG_BUTTON_REPLAY:
+                log("replay touch begin");
+//                this->removeAllObjects();
+                SceneManager::getInstance()->changeState(GAME_STATE::GAME);
+                log("replay touch end");
+                break;
+            case TAG_GAME::TAG_BUTTON_NEXT:
+                log("next touch begin");
+//                this->removeAllObjects();
+                SceneManager::getInstance()->setLevelGame(SceneManager::getInstance()->getLevelGame()+1);
+                // check level
+                SceneManager::getInstance()->changeState(GAME_STATE::GAME);
+                log("next touch end");
+                break;
+        }
+    }
+}
+
+
+/////////////////////////////
+// EXECUTE TOUCH AND BODY
+/////////////////////////////
 Vec2 GameScene::checkInsideBox2dByRayCats(cocos2d::Vec2 start, cocos2d::Vec2 end)
 {
     Vec2 result = Vec2::ZERO;
@@ -939,8 +599,12 @@ Vec2 GameScene::checkInsideBox2d(cocos2d::Vec2 start, cocos2d::Vec2 end)
     return result;
 }
 
+
+///////////////////////////////
+// GAME COMPONENTS
+///////////////////////////////
 void GameScene::backMenu() {
-    this->removeAllObjects();
+//    this->removeAllObjects();
     
     auto fadeout = CallFunc::create(CC_CALLBACK_0(Node::setOpacity, this, 0));
     auto loading = CallFunc::create(CC_CALLBACK_0(SceneManager::loadingScene, SceneManager::getInstance(), this));
@@ -949,29 +613,46 @@ void GameScene::backMenu() {
     this->runAction(Sequence::create(Spawn::create(DelayTime::create(TIME_LOADING), fadeout, loading, NULL), change, NULL));
 }
 
-void GameScene::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEventType type)
+void GameScene::endGame()
 {
-    auto receiver = (Node*) sender;
-    if (type == ui::Widget::TouchEventType::ENDED)
-    {
-        switch (receiver->getTag()) {
-            case TAG_GAME::TAG_BUTTON_BACK :
-                backMenu();
-                break;
-            case TAG_GAME::TAG_BUTTON_REPLAY:
-                this->removeAllObjects();
-                SceneManager::getInstance()->changeState(GAME_STATE::GAME);
-                break;
-            case TAG_GAME::TAG_BUTTON_NEXT:
-            	this->removeAllObjects();
-                SceneManager::getInstance()->setLevelGame(SceneManager::getInstance()->getLevelGame()+1);
-                // check level
-                SceneManager::getInstance()->changeState(GAME_STATE::GAME);
-                break;
-        }
+    CCLOG("##GAMESCENE %s", __FUNCTION__);
+    // capture screen
+    if (isSuccess) {
+        filenameCapture = "capture_level_" + to_string(SceneManager::getInstance()->getLevelGame()) + "_success.png";
+        // open game level
+        SceneManager::getInstance()->saveLevel(SceneManager::getInstance()->getLevelGame()+1);
+    } else if (isFail) {
+        filenameCapture = "capture_level_" + to_string(SceneManager::getInstance()->getLevelGame()) + "_fail.png";
     }
+    
+    // remove cache and memory
+    Director::getInstance()->getTextureCache()->removeTextureForKey(filenameCapture);
+    
+    // capturing
+    utils::captureScreen(CC_CALLBACK_2(GameScene::afterCaptured, this), filenameCapture);
+    
 }
 
+void GameScene::removeAllObjects()
+{
+    log("##GAMESCENE %s begin", __FUNCTION__);
+    this->stopAllActions();
+    for (b2Body *body = world->GetBodyList(); body != NULL; body = body->GetNext()) {
+        world->DestroyBody(body);
+    }
+    
+    for(long i = this->getChildrenCount()-1; i > 0; i--){
+        Node* child = this->getChildren().at(i);
+        this->removeChild(child);
+    }
+    
+    log("##GAMESCENE %s end", __FUNCTION__);
+}
+
+
+///////////////////////////////
+// ANIMATION GAMEOVER
+///////////////////////////////
 void GameScene::explosionBall(b2Body *ball)
 {
     float m_blastPower = 1000;
@@ -1086,6 +767,10 @@ void GameScene::explosionRing(std::string name, Vec2 point)
     ring->runAction(Sequence::create(spawn, RemoveSelf::create() , NULL));
 }
 
+
+////////////////////////////////
+// CAPTURE AND SHARE
+////////////////////////////////
 void GameScene::showShareLayer(std::string filename)
 {
     auto baseLayer = SharePopupLayer::create(filename);
@@ -1094,20 +779,27 @@ void GameScene::showShareLayer(std::string filename)
 
 void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
 {
+    log("##GAMESCENE %s", __FUNCTION__);
+    
     ((Button*)this->getChildByTag(TAG_GAME::TAG_BUTTON_BACK))->setTouchEnabled(true);
     ((Button*)this->getChildByTag(TAG_GAME::TAG_BUTTON_REPLAY))->setTouchEnabled(true);
     
     //remove all body physics
     for (b2Body *body = world->GetBodyList(); body != NULL; body = body->GetNext()) {
-        if (body->GetUserData()) {
-            Sprite *sprite = (Sprite *) body->GetUserData();
-            map->removeChild(sprite, true);
+        if (body->GetUserData() != NULL) {
+            Node *sprite = (Node *) body->GetUserData();
+            map->removeChild(sprite);
+            log("remove done");
         }
         world->DestroyBody(body);
     }
+    log("##GAMESCENE %s remove body and sprite done", __FUNCTION__);
+    
     map->removeAllChildrenWithCleanup(true);
-    this->removeChild(map,true);
+    map->removeFromParentAndCleanup(true);
 
+    log("##GAMESCENE %s remove done", __FUNCTION__);
+    
     Sprite* captureSprite;
     if (succeed) {
         captureSprite = Sprite::create(filenameCapture);
@@ -1197,50 +889,238 @@ void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
         titleText->setString("Game Over!");
         titleText->setColor(Color3B(240,68,94));
     }
+    
+    log("after capture done");
 }
 
-void GameScene::endGame()
-{
-    
-    // capture screen
-    if (isSuccess) {
-        filenameCapture = "capture_level_" + to_string(SceneManager::getInstance()->getLevelGame()) + "_success.png";
-        // open game level
-        SceneManager::getInstance()->saveLevel(SceneManager::getInstance()->getLevelGame()+1);
-    } else if (isFail) {
-        filenameCapture = "capture_level_" + to_string(SceneManager::getInstance()->getLevelGame()) + "_fail.png";
-    }
-    
-    // remove cache and memory
-    Director::getInstance()->getTextureCache()->removeTextureForKey(filenameCapture);
-    // remove file screen shoot
-    if(FileUtils::getInstance()->removeFile(FileUtils::getInstance()->getWritablePath() + filenameCapture))
-    {
-        CCLOG("fileRemove %s removed", filenameCapture.c_str());
-    }
-    else {
-        CCLOG("fileRemove %s not exist or error when removing", filenameCapture.c_str());
-    }
 
-    // capturing
-    utils::captureScreen(CC_CALLBACK_2(GameScene::afterCaptured, this), filenameCapture);
+////////////////////////
+// UPADTE GAME
+////////////////////////
+void GameScene::update(float dt) {
     
-}
-
-void GameScene::removeAllObjects()
-{
-    this->stopAllActions();
-    CCLOG("remove all %zd box2d %d", this->getChildrenCount(), world->GetBodyCount());
+    int positionIterations = 8;
+    int velocityIterations = 1;
+    if (!isSuccess && !isFail) {
+        world->Step(dt, velocityIterations, positionIterations);
+        
+    } else {
+        ((Button*)this->getChildByTag(TAG_GAME::TAG_BUTTON_BACK))->setTouchEnabled(false);
+        ((Button*)this->getChildByTag(TAG_GAME::TAG_BUTTON_REPLAY))->setTouchEnabled(false);
+        
+        // result success
+        if (isSuccess) {
+            // animation success
+            this->animationSuccess(collisionPoint);
+            this->runAction(Sequence::create(DelayTime::create(TIME_DELAY_GAMEOVER), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)),  NULL));
+            
+        } else if (isFail) {
+            // ballA was broken
+            if (collisionFailA != Vec2::ZERO && collisionFailB == Vec2::ZERO) {
+                this->runAction(Sequence::create(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailA, "explosion_red")), DelayTime::create(TIME_DELAY_GAMEOVER), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)), NULL));
+            }
+            // ball B was broken
+            else if (collisionFailB != Vec2::ZERO && collisionFailA == Vec2::ZERO) {
+                this->runAction(Sequence::create(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailB, "explosion_blue")), DelayTime::create(TIME_DELAY_GAMEOVER), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)), NULL));
+            }
+            // ball A and B together were broken
+            else if (collisionFailA != Vec2::ZERO  && collisionFailB != Vec2::ZERO) {
+                this->runAction(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailA, "explosion_red")));
+                this->runAction(Sequence::create(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailB, "explosion_blue")), DelayTime::create(TIME_DELAY_GAMEOVER), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)), NULL));
+            }
+        }
+        
+        // disable update
+        this->unschedule(schedule_selector(GameScene::update));
+        return;
+    }
+    // update sprite follow body
     for (b2Body *body = world->GetBodyList(); body != NULL; body =
-             body->GetNext()) {
-            world->DestroyBody(body);
+         body->GetNext()) {
+        if (body->GetUserData()) {
+            Sprite *sprite = (Sprite *) body->GetUserData();
+            sprite->setPosition(
+                                Point(body->GetPosition().x * PTM_RATIO,
+                                      body->GetPosition().y * PTM_RATIO));
+            sprite->setRotation(-1 * CC_RADIANS_TO_DEGREES(body->GetAngle()));
+        }
     }
     
-    for(long i = this->getChildrenCount()-1; i > 0; i--){
-        Node* child = this->getChildren().at(i);
-        this->removeChild(child);
+    std::vector<b2Body *>toStatic;
+    std::vector<b2Body *>toDestroy;
+    std::vector<b2Body *>toRemoveElectric;
+    std::vector<BallContact>::iterator pos;
+    for (pos = _ballContactListener->_contacts.begin(); pos != _ballContactListener->_contacts.end(); ++pos)
+    {
+        BallContact contact = *pos;
+        b2Body* bodyA = contact.fixtureA->GetBody();
+        b2Body* bodyB = contact.fixtureB->GetBody();
+        
+        // contact ball with wall1
+        for (int i=0; i<4; i++) {
+            if((contact.fixtureA == _ballAFixture && contact.fixtureB == _wallFixture1[i]))
+            {
+                collisionFailA = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
+                if (std::find(toDestroy.begin(), toDestroy.end(), bodyA) == toDestroy.end()) {
+                    toDestroy.push_back(bodyA);
+                }
+                isFail = true;
+            }
+            else if (contact.fixtureA == _ballBFixture && contact.fixtureB == _wallFixture1[i])
+            {
+                collisionFailB = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
+                if (std::find(toDestroy.begin(), toDestroy.end(), bodyA) == toDestroy.end()) {
+                    toDestroy.push_back(bodyA);
+                }
+                isFail = true;
+            }
+            else if  ((contact.fixtureA == _wallFixture1[i] && contact.fixtureB == _ballAFixture))
+            {
+                collisionFailA = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
+                if (std::find(toDestroy.begin(), toDestroy.end(), bodyB) == toDestroy.end()) {
+                    toDestroy.push_back(bodyB);
+                }
+                isFail = true;
+            }
+            else if  (contact.fixtureA == _wallFixture1[i] && contact.fixtureB == _ballBFixture)
+            {
+                collisionFailB = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
+                if (std::find(toDestroy.begin(), toDestroy.end(), bodyB) == toDestroy.end()) {
+                    toDestroy.push_back(bodyB);
+                }
+                isFail = true;
+            }
+        }
+        
+        // contact with electricity
+        if (contact.fixtureA == electricictyFixture && contact.fixtureB == _ballAFixture) {
+            collisionFailA = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
+            if (std::find(toDestroy.begin(), toDestroy.end(), bodyB) == toDestroy.end()) {
+                toDestroy.push_back(bodyB);
+            }
+            isFail = true;
+        }
+        else if (contact.fixtureA == electricictyFixture && contact.fixtureB == _ballBFixture) {
+            collisionFailB = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
+            if (std::find(toDestroy.begin(), toDestroy.end(), bodyB) == toDestroy.end()) {
+                toDestroy.push_back(bodyB);
+            }
+            isFail = true;
+        }
+        else if (contact.fixtureA == _ballAFixture && contact.fixtureB ==  electricictyFixture) {
+            collisionFailA = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
+            if (std::find(toDestroy.begin(), toDestroy.end(), bodyA) == toDestroy.end()) {
+                toDestroy.push_back(bodyA);
+            }
+            isFail = true;
+        }
+        else if (contact.fixtureA == _ballBFixture && contact.fixtureB ==  electricictyFixture) {
+            collisionFailB = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
+            if (std::find(toDestroy.begin(), toDestroy.end(), bodyA) == toDestroy.end()) {
+                toDestroy.push_back(bodyA);
+            }
+            isFail = true;
+        }
+        
+        // collision switch
+        if (contact.fixtureA == switchFixture && (contact.fixtureB == _ballAFixture || contact.fixtureB == _ballBFixture))
+        {
+            if (bodyA->GetUserData() != NULL)
+            {
+                if (std::find(toRemoveElectric.begin(), toRemoveElectric.end(), bodyA) == toRemoveElectric.end()) {
+                    toRemoveElectric.push_back(bodyA);
+                }
+                if (electricictyFixture!=NULL) {
+                    if (std::find(toDestroy.begin(), toDestroy.end(), electricictyFixture->GetBody()) == toDestroy.end()) {
+                        toDestroy.push_back(electricictyFixture->GetBody());
+                        log("remove electricity");
+                    }
+                }
+            }
+        }
+        else if (contact.fixtureB == switchFixture && (contact.fixtureA == _ballAFixture || contact.fixtureA == _ballBFixture))
+        {
+            if (bodyB->GetUserData() != NULL)
+            {
+                if (std::find(toRemoveElectric.begin(), toRemoveElectric.end(), bodyB) == toRemoveElectric.end()) {
+                    toRemoveElectric.push_back(bodyB);
+                }
+                if (electricictyFixture!=NULL) {
+                    if (std::find(toDestroy.begin(), toDestroy.end(), electricictyFixture->GetBody()) == toDestroy.end()) {
+                        toDestroy.push_back(electricictyFixture->GetBody());
+                        log("remove electricity");
+                    }
+                }
+            }
+        }
+        
+        // contact platform with wall2
+        for (int i=0; i<4; i++) {
+            if (contact.fixtureA == _wallFixture2[i])
+            {
+                if (std::find(toDestroy.begin(), toDestroy.end(), bodyB) == toDestroy.end()) {
+                    toDestroy.push_back(bodyB);
+                }
+            }
+            else if( contact.fixtureB == _wallFixture2[i])
+            {
+                if (std::find(toDestroy.begin(), toDestroy.end(), bodyA) == toDestroy.end()) {
+                    toDestroy.push_back(bodyA);
+                }
+            }
+        }
+        
+        // contact 2 ball
+        if (bodyA && bodyB && ballA && ballB && bodyA->GetUserData() != NULL && bodyB->GetUserData() != NULL) {
+            if ((bodyA == ballA && bodyB == ballB) || (bodyA == ballB && bodyB == ballA)) {
+                if (bodyA->GetType() == b2_dynamicBody && bodyB->GetType() == b2_dynamicBody) {
+                    toStatic.push_back(bodyA);
+                    toStatic.push_back(bodyB);
+                    collisionPoint = Vec2(contact.collisionPoint.x * PTM_RATIO, contact.collisionPoint.y * PTM_RATIO);
+                    isSuccess = true;
+                }
+            }
+        }
     }
     
-    CCLOG("remove done %zd box2d %d", this->getChildrenCount(), world->GetBodyCount());
+    // move switch
+    std::vector<b2Body *>::iterator pos4;
+    for (pos4 = toRemoveElectric.begin(); pos4 != toRemoveElectric.end(); ++pos4) {
+        b2Body* body = *pos4;
+        if (body->GetUserData() != NULL) {
+            SwitchObject* sprite = (SwitchObject*) body->GetUserData();
+            if (!sprite->getTurnOff()) {
+                sprite->moveDown(sprite->getContentSize().height);
+                sprite->setTurnOff(true);
+                
+                ParticleSystemQuad* firework = ParticleSystemQuad::create("firework.plist");
+                firework->setPosition(Vec2(electricictyFixture->GetBody()->GetPosition().x * PTM_RATIO, electricictyFixture->GetBody()->GetPosition().y * PTM_RATIO));
+                firework->setAutoRemoveOnFinish(true);
+                map->addChild(firework);
+                electricictyFixture = NULL;
+            }
+        }
+    }
+    
+    // stop 2 ball when collision
+    std::vector<b2Body *>::iterator pos2;
+    for(pos2 = toStatic.begin(); pos2 != toStatic.end(); ++pos2) {
+        b2Body *body = *pos2;
+        if (body->GetType() == b2_dynamicBody) {
+            body->SetType(b2_staticBody);
+        }
+    }
+    
+    // remove body run out
+    std::vector<b2Body *>::iterator pos3;
+    for(pos3 = toDestroy.begin(); pos3 != toDestroy.end(); ++pos3) {
+        b2Body *body = *pos3;
+        if (body->GetUserData() != NULL) {
+            auto sprite = (Node *) body->GetUserData();
+            map->removeChild(sprite, true);
+        }
+        world->DestroyBody(body);
+    }
+    toDestroy.clear();
 }
 

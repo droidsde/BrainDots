@@ -349,7 +349,21 @@ void TiledBodyCreator::createStaticBodies(ValueVector staticBodyList)
         } else {
             CCLOG("Error when get objects");
             if (spriteName != "")
-                this->createPolygonTexture(objectValue.asValueMap(), spriteName, staticBody);
+            {
+                switch (this->getBarrierType(objectValue)) {
+                    case BARRIER_TYPE::PHYSICSEDITOR:
+                    {
+                        this->createPhysicseditor(staticBody, spriteName);
+                    }
+                    break;
+                        
+                    default:
+                        this->createPolygonTexture(objectValue.asValueMap(), spriteName, staticBody);
+                        break;
+                }
+                // insert to map
+                mapBodyList.insert(std::pair<std::string, b2Body*>(objectValue.asValueMap()["name"].asString(), staticBody));
+            }
         }
     }
     staticBodyList.clear();
@@ -400,7 +414,21 @@ void TiledBodyCreator::createDynamicBodies(ValueVector dynamicBodyList, b2BodyTy
         } else {
             CCLOG("Error when get objects");
             if (spriteName != "")
-                this->createPolygonTexture(objectValue.asValueMap(), spriteName, dynamicBody);
+            {
+                switch (this->getBarrierType(objectValue)) {
+                    case BARRIER_TYPE::PHYSICSEDITOR:
+                    {
+                        this->createPhysicseditor(dynamicBody, spriteName);
+                    }
+                        break;
+                        
+                    default:
+                        this->createPolygonTexture(objectValue.asValueMap(), spriteName, dynamicBody);
+                        break;
+                }
+                // insert to map
+                mapBodyList.insert(std::pair<std::string, b2Body*>(objectValue.asValueMap()["name"].asString(), dynamicBody));
+            }
         }
     }
     dynamicBodyList.clear();
@@ -471,6 +499,20 @@ void TiledBodyCreator::createSpriteBody(b2Body *body, b2Fixture* fixture, std::s
     }
 }
 
+void TiledBodyCreator::createPhysicseditor(b2Body *body, std::string shapeName)
+{
+    Sprite *sprite = Sprite::create(shapeName + ".png");
+    sprite->setPosition(Vec2(body->GetPosition().x * PTM_RATIO, body->GetPosition().y * PTM_RATIO));
+    _map->addChild(sprite);
+    
+    body->SetUserData(sprite);
+    
+    // add the fixture definitions to the body
+    GB2ShapeCache *sc = GB2ShapeCache::getInstance();
+    sc->addFixturesToBody(body, shapeName);
+    sprite->setAnchorPoint(sc->getAnchorPointForShape(shapeName));
+}
+
 b2Vec2 TiledBodyCreator::getPositionBody(ValueMap object)
 {
     auto position = Vec2(object["x"].asFloat() / PTM_RATIO, object["y"].asFloat() / PTM_RATIO);
@@ -507,6 +549,11 @@ b2Vec2 TiledBodyCreator::getPositionBody(ValueMap object)
 FixtureDef* TiledBodyCreator::createFixture(ValueMap object)
 {
     if (object["autocreate"].asBool() == false) {
+        return nullptr;
+    }
+    
+    // physicseditor
+    if (object["barrierType"].asString() == "physicseditor") {
         return nullptr;
     }
     
@@ -575,11 +622,13 @@ void TiledBodyCreator::createPolygonTexture(ValueMap object, std::string fileNam
         PointVector listPoint = this->initPolygonTexture(object);
         if (listPoint.size() > 0) {
             for (int i=0; i < listPoint.size(); i++) {
-                CCLOG("%f %f", listPoint[i].x, listPoint[i].y);
+                log("%f %f", listPoint[i].x, listPoint[i].y);
             }
-            CCLOG("fileName %s", fileName.c_str());
+            log("fileName %s", fileName.c_str());
             TexturePolygon* tp = TexturePolygon::create(listPoint, fileName, body);
-            _map->addChild(tp);
+            if (tp != NULL) {
+                _map->addChild(tp);
+            }
         }
     }
 }
@@ -665,6 +714,11 @@ BARRIER_TYPE TiledBodyCreator::getBarrierType(cocos2d::Value objectValue)
     else if ( nameType == "switch" )
     {
         type = BARRIER_TYPE::SWITCH;
+    }
+    
+    else if ( nameType == "physicseditor" )
+    {
+        type = BARRIER_TYPE::PHYSICSEDITOR;
     }
     
     else

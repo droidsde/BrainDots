@@ -22,6 +22,7 @@
 #define TIME_TRANSITION_SCENE           0.5
 #define TIME_LOGO_FADE                  1.0
 #define TIME_LOADING                    1.0
+#define TIME_DELAY_GAMEOVER             2.0
 
 #define PAUSE_GAME                      "pauseGame"
 #define RELOAD_LANGUAGE                 "reloadLanguage"
@@ -107,6 +108,7 @@ typedef enum class barrier_type
     SWITCH,
     POLYGON,
     POLYGON_HOLE,
+    PHYSICSEDITOR,
     UNKNOWN,
         
 }BARRIER_TYPE;
@@ -224,36 +226,37 @@ struct compare_level
     }
 };
 
-    class FixtureDef
-    {
-    public:
-        FixtureDef()
-        : next(nullptr) {}
+class FixtureDef
+{
+public:
+    FixtureDef()
+    : next(nullptr) {}
         
-        ~FixtureDef() {
-            delete next;
-            delete fixture.shape;
-        }
+    ~FixtureDef() {
+        delete next;
+        delete fixture.shape;
+    }
         
-        FixtureDef *next;
-        b2FixtureDef fixture;
-        int callbackData;
-    };
+    FixtureDef *next;
+    b2FixtureDef fixture;
+    int callbackData;
+};
     
-    class BodyDef
-    {
-    public:
-        BodyDef()
-        : fixtures(nullptr) {}
+class BodyDef
+{
+public:
+    BodyDef()
+    : fixtures(nullptr) {}
         
-        ~BodyDef() {
-            if (fixtures)
-                delete fixtures;
-        }
+    ~BodyDef() {
+        if (fixtures)
+            delete fixtures;
+    }
         
-        FixtureDef *fixtures;
-        cocos2d::Point anchorPoint;
-    };
+    FixtureDef *fixtures;
+    cocos2d::Point anchorPoint;
+};
+    
 class ConveyorBelt
 {
 public:

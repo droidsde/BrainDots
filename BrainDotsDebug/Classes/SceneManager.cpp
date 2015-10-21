@@ -24,6 +24,7 @@ SceneManager::SceneManager()
     curUnlockPencil = UserDefault::getInstance()->getIntegerForKey("unlockpencil", PENCIL_DEFAULT_UNLOCK);
     curUsePencil = UserDefault::getInstance()->getIntegerForKey("usepencil", 0);
     curCoin = UserDefault::getInstance()->getIntegerForKey("coin", DEFAULT_COIN);
+    gif = NULL;
 }
 
 SceneManager::~SceneManager()
@@ -76,11 +77,10 @@ void SceneManager::changeState(GAME_STATE state)
 
 void SceneManager::nextScene(cocos2d::Scene * scene)
 {
+    log("#SCENEMANAGER %s", __FUNCTION__);
     this->setCurScene(scene);
-    scene->retain();
     TransitionScene* transition = TransitionFade::create(TIME_TRANSITION_SCENE, scene);
     Director::getInstance()->replaceScene(transition);
-    scene->release();
 }
 
 void SceneManager::loadingScene(Layer* scene)
@@ -89,10 +89,10 @@ void SceneManager::loadingScene(Layer* scene)
     std::string name = FILE_FORMAT;
     name = FileUtils::getInstance()->fullPathForFilename(name.c_str());
 
-    GifBase *gif = InstantGif::create(name.c_str());//InstantGif ：While playing, while parsing
+    gif = InstantGif::create(name.c_str());//InstantGif ：While playing, while parsing
     if(gif == NULL)
     {
-        CCLOG("%s","create gif failed");
+        log("%s","create gif failed");
         return ;
     }
     gif->setAnchorPoint(Vec2::ANCHOR_MIDDLE);

@@ -89,16 +89,16 @@ void SceneManager::loadingScene(Layer* scene)
     std::string name = FILE_FORMAT;
     name = FileUtils::getInstance()->fullPathForFilename(name.c_str());
 
-    gif = InstantGif::create(name.c_str());//InstantGif ：While playing, while parsing
-    if(gif == NULL)
-    {
-        log("%s","create gif failed");
-        return ;
-    }
-    gif->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    gif->setPosition(visibleSize.width/2 , visibleSize.height/2);
-    //    gif->setScale(visibleSize.width/ gif->getContentSize().width, visibleSize.height/gif->getContentSize().height);
-    scene->addChild(gif);
+//    gif = InstantGif::create(name.c_str());//InstantGif ：While playing, while parsing
+//    if(gif == NULL)
+//    {
+//        log("%s","create gif failed");
+//        return ;
+//    }
+//    gif->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+//    gif->setPosition(visibleSize.width/2 , visibleSize.height/2);
+//    //    gif->setScale(visibleSize.width/ gif->getContentSize().width, visibleSize.height/gif->getContentSize().height);
+//    scene->addChild(gif);
 }
 
 void SceneManager::saveLevel(int level)

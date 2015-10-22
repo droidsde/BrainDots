@@ -33,7 +33,7 @@ bool LanguagePopupLayer::init()
     listviewSize = Size(layoutSize.width, layoutSize.height * 4/5);
     
     // title
-    auto title = Text::create("Language", "arial.ttf", 60);
+    auto title = Text::create("Language", "fonts/keifont.ttf", 60);
     title->setPosition(Vec2(layoutSize.width/2, layoutSize.height - PADDING));
     title->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
     title->setColor(Color3B::RED);
@@ -75,7 +75,7 @@ void LanguagePopupLayer::reloadData()
         Button* lang1 = Button::create("lang_normal.png");
         lang1->setTitleText(listLanguageName[i * 2]);
         lang1->setTitleFontSize(30);
-        lang1->setTitleFontName("arial.ttf");
+        lang1->setTitleFontName("fonts/keifont.ttf");
         lang1->setTitleColor(Color3B::WHITE);
         lang1->setTouchEnabled(true);
         lang1->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
@@ -88,7 +88,7 @@ void LanguagePopupLayer::reloadData()
         Button* lang2 = Button::create("lang_normal.png");
         lang2->setTitleText(listLanguageName[i * 2 + 1]);
         lang2->setTitleFontSize(30);
-        lang2->setTitleFontName("arial.ttf");
+        lang2->setTitleFontName("fonts/keifont.ttf");
         lang2->setTitleColor(Color3B::WHITE);
         lang2->setTouchEnabled(true);
         lang2->setAnchorPoint(Vec2::ANCHOR_MIDDLE);

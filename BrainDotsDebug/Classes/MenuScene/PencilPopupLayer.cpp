@@ -33,7 +33,7 @@ bool PencilPopupLayer::init()
     sizeListView = Size(sizeLayout.width *4/5, sizeLayout.height*2 / 3);
     
     // title
-    auto title = Text::create("Choose a pencil", "arial.ttf", 60);
+    auto title = Text::create("Choose a pencil", "fonts/keifont.ttf", 60);
     title->setPosition(Vec2(sizeLayout.width/2, sizeLayout.height - PADDING));
     title->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
     title->setColor(Color3B::RED);
@@ -46,7 +46,7 @@ bool PencilPopupLayer::init()
     layoutTable->addChild(coinImg);
     
     //text current coin
-    curTextCoin = Text::create("", "arial.ttf", 50);
+    curTextCoin = Text::create("", "fonts/keifont.ttf", 50);
     curTextCoin->setColor(Color3B::RED);
     curTextCoin->setString(to_string(SceneManager::getInstance()->getCurCoin()));
     curTextCoin->setPosition(Vec2(coinImg->getPositionX() + coinImg->getContentSize().width + PADDING, coinImg->getPositionY()));
@@ -79,7 +79,7 @@ bool PencilPopupLayer::init()
     buyButton->setTitleText("Buy pencil");
     buyButton->setTitleColor(Color3B::WHITE);
     buyButton->setTitleFontSize(40);
-    buyButton->setTitleFontName("arial.ttf");
+    buyButton->setTitleFontName("fonts/keifont.ttf");
     buyButton->setTag(TAG_PENCIL_ITEM::BUY_BUTTON);
     buyButton->addTouchEventListener(CC_CALLBACK_2(PencilPopupLayer::touchButtonEvent, this));
     layoutTable->addChild(buyButton);
@@ -90,7 +90,7 @@ bool PencilPopupLayer::init()
     useButton->setTitleText("Use pencil");
     useButton->setTitleColor(Color3B::WHITE);
     useButton->setTitleFontSize(40);
-    useButton->setTitleFontName("arial.ttf");
+    useButton->setTitleFontName("fonts/keifont.ttf");
     useButton->setTag(TAG_PENCIL_ITEM::SELECT_BUTTON);
     useButton->addTouchEventListener(CC_CALLBACK_2(PencilPopupLayer::touchButtonEvent, this));
     layoutTable->addChild(useButton);
@@ -126,7 +126,7 @@ void PencilPopupLayer::reloadData()
         pencil->setTitleText(StringUtils::format("%d",i+1));
         pencil->setTitleColor(Color3B::BLACK);
         pencil->setTitleFontSize(40);
-        pencil->setTitleFontName("arial.ttf");
+        pencil->setTitleFontName("fonts/keifont.ttf");
         
         if (i >= SceneManager::getInstance()->getCurUnlockPencil()) {
             pencil->setBright(false);

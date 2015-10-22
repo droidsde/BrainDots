@@ -33,7 +33,7 @@ bool InfoPopupLayer::init()
     layoutSize = layoutTable->getContentSize();
     listviewSize = Size(layoutSize.width * 2/3, layoutSize.height * 3/4);
     // title
-    auto title = Text::create("Information", "arial.ttf", 60);
+    auto title = Text::create("Information", "fonts/keifont.ttf", 60);
     title->setPosition(Vec2(layoutSize.width/2, layoutSize.height - PADDING));
     title->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
     title->setColor(Color3B::ORANGE);
@@ -48,7 +48,7 @@ bool InfoPopupLayer::init()
     layoutName->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
     layoutName->setPosition(Vec2(title->getPositionX(), posY));
     
-    TextField* textName = TextField::create("", "arial.ttf", 50);
+    TextField* textName = TextField::create("", "fonts/keifont.ttf", 50);
     textName->setString("Hoang Garu");
     textName->setMaxLengthEnabled(true);
     textName->setMaxLength(20);
@@ -94,7 +94,7 @@ void InfoPopupLayer::createLayoutItem(cocos2d::Vec2 pos, std::string iconFile, s
     layout->addChild(icon);
     
     // text
-    auto textShow = Text::create(text, "arial.ttf", 50);
+    auto textShow = Text::create(text, "fonts/keifont.ttf", 50);
     textShow->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
     textShow->setPosition(Vec2(listviewSize.width - PADDING, layout->getContentSize().height/2));
     textShow->setColor(Color3B::ORANGE);

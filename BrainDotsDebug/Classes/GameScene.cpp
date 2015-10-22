@@ -17,18 +17,18 @@ GameScene::GameScene()
 
 GameScene::~GameScene()
 {
-//    drawnode = nullptr;
-//    brush = nullptr;
-//    CC_SAFE_RELEASE(target);
-//    target = nullptr;
-//    map = nullptr;
-//    delete tiledmap;
-//    tiledmap = nullptr;
-//    
-//    delete _ballContactListener;
-//    _ballContactListener = nullptr;
-//    delete world;
-//    world = nullptr;
+    drawnode = nullptr;
+    brush = nullptr;
+    CC_SAFE_RELEASE(target);
+    target = nullptr;
+    map = nullptr;
+    delete tiledmap;
+    tiledmap = nullptr;
+    
+    delete _ballContactListener;
+    _ballContactListener = nullptr;
+    delete world;
+    world = nullptr;
 }
 
 Scene* GameScene::createScene()
@@ -45,6 +45,7 @@ Scene* GameScene::createScene()
 ///////////////////////////
 bool GameScene::init()
 {
+    log("##GAMESCENE %s", __FUNCTION__);
     // init background white color
     if ( !LayerColor::initWithColor(Color4B(255, 255, 255, 255)) )
     {
@@ -76,6 +77,7 @@ bool GameScene::init()
     replayButton->addTouchEventListener(CC_CALLBACK_2(GameScene::touchButtonEvent, this));
     addChild(replayButton, ZORDER_GAME::ZORDER_BUTTON_REPLAY);
     
+    log("##GAMESCENE %s :button back and replay done", __FUNCTION__);
     // load physics shapes cache
     GB2ShapeCache::getInstance()->addShapesWithFile("physicshapes.plist");
     
@@ -191,7 +193,7 @@ void GameScene::initMapLevel(int level)
                 float yA = ballA_map["y"].asFloat();
                 posballA = Vec2(xA, yA);
             }
-            else CCLOG("ball A not found");
+            else log("##GAMESCENE:%s :ball A not found", __FUNCTION__);
             
             // ball B
             auto ballB_map = group->getObject("ballB");
@@ -199,10 +201,10 @@ void GameScene::initMapLevel(int level)
                 float xB = ballB_map["x"].asFloat();
                 float yB = ballB_map["y"].asFloat();
                 posballB = Vec2(xB, yB);
-            } else CCLOG("ball B not found");
+            } else log("##GAMESCENE:%s :ball B not found", __FUNCTION__);
         }
         else
-            CCLOG("braindots group not found");
+            log("##GAMESCENE:%s :braindots group not found", __FUNCTION__);
         
         // draw node
         drawnode = DrawNode::create();
@@ -449,7 +451,7 @@ void GameScene::onTouchEnded(Touch* touch, Event* event) {
         map->addChild(texture2D);
         newBody->SetUserData(texture2D);
         
-        Director::getInstance()->getTextureCache()->removeTextureForKey(_key);
+//        Director::getInstance()->getTextureCache()->removeTexture(_texture2D);
     }
     target->clear(0, 0, 0, 0);
 }
@@ -461,23 +463,19 @@ void GameScene::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEventType ty
     {
         switch (receiver->getTag()) {
             case TAG_GAME::TAG_BUTTON_BACK :
-                log("back touch begin");
                 backMenu();
-                log("back touch end");
                 break;
+                
             case TAG_GAME::TAG_BUTTON_REPLAY:
-                log("replay touch begin");
-//                this->removeAllObjects();
+                this->removeAllObjects();
                 SceneManager::getInstance()->changeState(GAME_STATE::GAME);
-                log("replay touch end");
                 break;
+                
             case TAG_GAME::TAG_BUTTON_NEXT:
-                log("next touch begin");
-//                this->removeAllObjects();
+                this->removeAllObjects();
                 SceneManager::getInstance()->setLevelGame(SceneManager::getInstance()->getLevelGame()+1);
                 // check level
                 SceneManager::getInstance()->changeState(GAME_STATE::GAME);
-                log("next touch end");
                 break;
         }
     }
@@ -503,7 +501,7 @@ Vec2 GameScene::checkInsideBox2dByRayCats(cocos2d::Vec2 start, cocos2d::Vec2 end
     
     if (callback.m_hit) {
         result = Vec2(callback.m_point.x * PTM_RATIO, callback.m_point.y * PTM_RATIO);
-        CCLOG("ray cast collision %f %f", result.x, result.y);
+        log("##GAMESCENE:%s :ray cast collision %f %f", __FUNCTION__, result.x, result.y);
     }
     
     return result;
@@ -604,7 +602,7 @@ Vec2 GameScene::checkInsideBox2d(cocos2d::Vec2 start, cocos2d::Vec2 end)
 // GAME COMPONENTS
 ///////////////////////////////
 void GameScene::backMenu() {
-//    this->removeAllObjects();
+    this->removeAllObjects();
     
     auto fadeout = CallFunc::create(CC_CALLBACK_0(Node::setOpacity, this, 0));
     auto loading = CallFunc::create(CC_CALLBACK_0(SceneManager::loadingScene, SceneManager::getInstance(), this));
@@ -615,7 +613,7 @@ void GameScene::backMenu() {
 
 void GameScene::endGame()
 {
-    CCLOG("##GAMESCENE %s", __FUNCTION__);
+    log("##GAMESCENE %s", __FUNCTION__);
     // capture screen
     if (isSuccess) {
         filenameCapture = "capture_level_" + to_string(SceneManager::getInstance()->getLevelGame()) + "_success.png";
@@ -626,7 +624,7 @@ void GameScene::endGame()
     }
     
     // remove cache and memory
-    Director::getInstance()->getTextureCache()->removeTextureForKey(filenameCapture);
+//    Director::getInstance()->getTextureCache()->removeTextureForKey(filenameCapture);
     
     // capturing
     utils::captureScreen(CC_CALLBACK_2(GameScene::afterCaptured, this), filenameCapture);
@@ -789,7 +787,7 @@ void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
         if (body->GetUserData() != NULL) {
             Node *sprite = (Node *) body->GetUserData();
             map->removeChild(sprite);
-            log("remove done");
+            log("##GAMESCENE:%s :remove done", __FUNCTION__);
         }
         world->DestroyBody(body);
     }
@@ -836,7 +834,7 @@ void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
     paperSmall->addChild(captureSpriteMini);
     
     //text
-    auto text = Label::createWithTTF("Share image", "arial.ttf", 40);
+    auto text = Label::createWithTTF("Share image", "fonts/keifont.ttf", 40);
     text->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
     text->setColor(Color3B::BLUE);
     text->setPosition(Vec2(captureSpriteMini->getPositionX(), PADDING));
@@ -864,7 +862,7 @@ void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
     captureSprite->runAction(Sequence::create(ScaleTo::create(0.5f, sizePaper.width*0.9/visibleSize.width), DelayTime::create(0.2f), addtick, nullptr));
     
     // show text success or fail
-    auto titleText = Text::create("", "arial.ttf", 80);
+    auto titleText = Text::create("", "fonts/keifont.ttf", 80);
     titleText->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
     titleText->setPosition(Vec2(visibleSize.width/2, this->getChildByTag(TAG_GAME::TAG_BUTTON_BACK)->getPositionY()));
     this->addChild(titleText);
@@ -890,7 +888,7 @@ void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
         titleText->setColor(Color3B(240,68,94));
     }
     
-    log("after capture done");
+    log("##GAMESCENE:%s :done", __FUNCTION__);
 }
 
 
@@ -1033,7 +1031,7 @@ void GameScene::update(float dt) {
                 if (electricictyFixture!=NULL) {
                     if (std::find(toDestroy.begin(), toDestroy.end(), electricictyFixture->GetBody()) == toDestroy.end()) {
                         toDestroy.push_back(electricictyFixture->GetBody());
-                        log("remove electricity");
+                        log("##GAMESCENE:%s :remove electricity", __FUNCTION__);
                     }
                 }
             }
@@ -1048,7 +1046,7 @@ void GameScene::update(float dt) {
                 if (electricictyFixture!=NULL) {
                     if (std::find(toDestroy.begin(), toDestroy.end(), electricictyFixture->GetBody()) == toDestroy.end()) {
                         toDestroy.push_back(electricictyFixture->GetBody());
-                        log("remove electricity");
+                        log("##GAMESCENE:%s :remove electricity", __FUNCTION__);
                     }
                 }
             }

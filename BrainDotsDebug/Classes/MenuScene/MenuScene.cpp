@@ -85,7 +85,7 @@ void MenuScene::addHeaderLayer()
     title->setTouchEnabled(true);
     title->setTitleText("Brain Dots");
     title->setTitleFontSize(80);
-    title->setTitleFontName("fonts/arial.ttf");
+    title->setTitleFontName("fonts/keifont.ttf");
     title->setTitleColor(Color3B::ORANGE);
     title->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     title->setPosition(Vec2(PADDING_MENU_HEADER_ITEM, headerSize.height/2));
@@ -195,7 +195,7 @@ void MenuScene::reloadData() {
 		stage->setTitleText(StringUtils::format("Stage %d",i+1));
 		stage->setTitleColor(Color3B::RED);
 		stage->setTitleFontSize(100);
-		stage->setTitleFontName("fonts/arial.ttf");
+		stage->setTitleFontName("fonts/keifont.ttf");
 		stage->setTouchEnabled(true);
         stage->setZoomScale(0);
 		stage->setTag(i);
@@ -203,7 +203,7 @@ void MenuScene::reloadData() {
 				CC_CALLBACK_2(MenuScene::touchButtonEvent, this));
         
         // text
-        Text* text = Text::create(" 6 / 6", "fonts/arial.ttf", 60);
+        Text* text = Text::create(" 6 / 6", "fonts/keifont.ttf", 60);
         text->setColor(Color3B::RED);
         text->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
         text->setPosition(Vec2(stage->getPositionX(), stage->getPositionY() - stickerSize.height/2));
@@ -252,6 +252,7 @@ void MenuScene::addPageView()
     pageview = PageView::create();
     pageview->setContentSize(bodySize);
     pageview->setPosition(bodySize/2);
+    pageview->setLoopFocus(true);
     pageview->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     pageview->removeAllPages();
     
@@ -271,7 +272,7 @@ void MenuScene::addPageView()
                 level->setAnchorPoint(Vec2::ANCHOR_TOP_RIGHT);
                 level->setTitleColor(Color3B::RED);
                 level->setTitleFontSize(60);
-                level->setTitleFontName("fonts/arial.ttf");
+                level->setTitleFontName("fonts/keifont.ttf");
                 level->setTouchEnabled(true);
                 level->setTag(TAG_MENU::TAG_LEVEL_CHOOSE + index);
                 level->addTouchEventListener(
@@ -376,7 +377,7 @@ void MenuScene::touchButtonEvent(Ref* sender, Widget::TouchEventType type) {
             {
                 std::string fileRemove = "capture_menu.png";
                 // remove cache image
-                Director::getInstance()->getTextureCache()->removeTextureForKey("capture_menu.png");
+//                Director::getInstance()->getTextureCache()->removeTextureForKey("capture_menu.png");
                 // remove file screen shoot
                 if(FileUtils::getInstance()->removeFile(FileUtils::getInstance()->getWritablePath() + fileRemove))
                 {

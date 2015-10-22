@@ -22,9 +22,7 @@ bool LogoScene::init()
     if (!Layer::init()) {
         return false;
     }
-    CCLOG("logoscene before transfer");
     this->transferData();
-    CCLOG("logoscene after transfer");
     this->addLogo();
     return true;
 }

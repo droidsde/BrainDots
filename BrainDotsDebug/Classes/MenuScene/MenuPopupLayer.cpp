@@ -55,7 +55,7 @@ bool MenuPopupLayer::init()
     std::string menuItemName[8] = {"Notification", "Information", "Setting", "No more ads",
     "Support", "Twitter", "Facebook", "Youtube"};
     // title
-    auto title = Text::create("Menu", "arial.ttf", 60);
+    auto title = Text::create("Menu", "fonts/keifont.ttf", 60);
     title->setPosition(Vec2(layoutSize.width/2, layoutSize.height - PADDING));
     title->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
     title->setColor(Color3B::RED);
@@ -78,7 +78,7 @@ bool MenuPopupLayer::init()
             layoutTable->addChild(button);
             
             // text
-            auto text = Text::create(menuItemName[index], "arial.ttf", 30);
+            auto text = Text::create(menuItemName[index], "fonts/keifont.ttf", 30);
             text->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
             text->setColor(Color3B::ORANGE);
             text->setPosition(Vec2(button->getPositionX(), button->getPositionY() - button->getContentSize().height/2 - PADDING));

@@ -33,7 +33,7 @@ bool NotiPopupLayer::init()
     layoutSize = layoutTable->getContentSize();
     
     // title
-    auto title = Text::create("Notification", "arial.ttf", 60);
+    auto title = Text::create("Notification", "fonts/keifont.ttf", 60);
     title->setPosition(Vec2(layoutSize.width/2, layoutSize.height - PADDING));
     title->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
     title->setColor(Color3B::ORANGE);

@@ -49,7 +49,7 @@ bool SettingPopupLayer::init()
     layoutSize = layoutTable->getContentSize();
     listviewSize = Size(layoutSize.width * 2/3, layoutSize.height * 4/5);
     // title
-    auto title = Text::create("Setting", "arial.ttf", 60);
+    auto title = Text::create("Setting", "fonts/keifont.ttf", 60);
     title->setPosition(Vec2(layoutSize.width/2, layoutSize.height - PADDING));
     title->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
     title->setColor(Color3B::RED);
@@ -66,7 +66,7 @@ bool SettingPopupLayer::init()
         layout->setPosition(Vec2(title->getPositionX(), posY - i * listviewSize.height/6));
         
         // text
-        auto text = Text::create(listItemName[i], "arial.ttf", 35);
+        auto text = Text::create(listItemName[i], "fonts/keifont.ttf", 35);
         text->setColor(Color3B::ORANGE);
         text->setPosition(Vec2(PADDING, layout->getContentSize().height / 2));
         text->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -88,8 +88,8 @@ bool SettingPopupLayer::init()
              Sprite::create("switch_on.png"),
              Sprite::create("switch_off.png"),
              Sprite::create("switch_thumb.png"),
-             Label::createWithTTF("", "arial.ttf", 32),
-             Label::createWithTTF("", "arial.ttf", 32)
+             Label::createWithTTF("", "fonts/keifont.ttf", 32),
+             Label::createWithTTF("", "fonts/keifont.ttf", 32)
              );
             toggle->setPosition(Vec2(listviewSize.width - PADDING, layout->getContentSize().height/2));
             toggle->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
@@ -113,7 +113,7 @@ bool SettingPopupLayer::init()
                     break;
             }
         } else if(i==4){
-            languageText = Text::create("English", "arial.ttf", 35);
+            languageText = Text::create("English", "fonts/keifont.ttf", 35);
             languageText->setString(SceneManager::getInstance()->getCurLanguage());
             languageText->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
             languageText->setColor(Color3B::ORANGE);

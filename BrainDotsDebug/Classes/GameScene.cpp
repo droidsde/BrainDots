@@ -19,8 +19,6 @@ GameScene::~GameScene()
 {
     drawnode = nullptr;
     brush = nullptr;
-    CC_SAFE_RELEASE(target);
-    target = nullptr;
     map = nullptr;
     delete tiledmap;
     tiledmap = nullptr;
@@ -59,6 +57,7 @@ bool GameScene::init()
     // draw grid
     this->drawGrids();
     
+    log("##GAMESCENE %s :button back and replay start", __FUNCTION__);
     // button back
     auto backButton = Button::create("back.png");
     backButton->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
@@ -443,7 +442,8 @@ void GameScene::onTouchEnded(Touch* touch, Event* event) {
         
         // draw sprite use render texture
         auto _image = target->newImage();
-        auto _key = to_string((int) time(NULL));
+//        auto _key = to_string((int) time(NULL));
+        auto _key = "drawRender";
         auto _texture2D = Director::getInstance()->getTextureCache()->addImage(_image, _key);
         CC_SAFE_DELETE(_image);
         auto texture2D = Sprite::createWithTexture(_texture2D, bodyRectangle);
@@ -451,7 +451,8 @@ void GameScene::onTouchEnded(Touch* touch, Event* event) {
         map->addChild(texture2D);
         newBody->SetUserData(texture2D);
         
-//        Director::getInstance()->getTextureCache()->removeTexture(_texture2D);
+        Director::getInstance()->getTextureCache()->removeTextureForKey(_key);
+        log("%s",Director::getInstance()->getTextureCache()->getCachedTextureInfo().c_str());
     }
     target->clear(0, 0, 0, 0);
 }
@@ -635,6 +636,9 @@ void GameScene::removeAllObjects()
 {
     log("##GAMESCENE %s begin", __FUNCTION__);
     this->stopAllActions();
+    removeChild(target, true);
+    target->release();
+    target = nullptr;
     for (b2Body *body = world->GetBodyList(); body != NULL; body = body->GetNext()) {
         world->DestroyBody(body);
     }

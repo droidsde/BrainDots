@@ -21,7 +21,7 @@
 
 #define TIME_TRANSITION_SCENE           0.5
 #define TIME_LOGO_FADE                  1.0
-#define TIME_LOADING                    1.0
+#define TIME_LOADING                    0.0
 #define TIME_DELAY_GAMEOVER             2.0
 
 #define PAUSE_GAME                      "pauseGame"

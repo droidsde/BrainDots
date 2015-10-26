@@ -377,7 +377,7 @@ void MenuScene::touchButtonEvent(Ref* sender, Widget::TouchEventType type) {
             {
                 std::string fileRemove = "capture_menu.png";
                 // remove cache image
-//                Director::getInstance()->getTextureCache()->removeTextureForKey("capture_menu.png");
+                Director::getInstance()->getTextureCache()->removeTextureForKey("capture_menu.png");
                 // remove file screen shoot
                 if(FileUtils::getInstance()->removeFile(FileUtils::getInstance()->getWritablePath() + fileRemove))
                 {

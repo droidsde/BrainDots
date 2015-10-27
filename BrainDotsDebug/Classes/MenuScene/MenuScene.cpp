@@ -81,12 +81,10 @@ void MenuScene::addHeaderLayer()
     addChild(headerLayer, ZORDER_MENU::HEADER_LAYER);
     
     // button title
-    auto title = Button::create();
+    auto title = Text::create("Brain Dots", "fonts/keifont.ttf", 80);
     title->setTouchEnabled(true);
-    title->setTitleText("Brain Dots");
-    title->setTitleFontSize(80);
-    title->setTitleFontName("fonts/keifont.ttf");
-    title->setTitleColor(Color3B::ORANGE);
+    title->enableOutline(Color4B::GRAY, 5);
+    title->setColor(Color3B::ORANGE);
     title->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     title->setPosition(Vec2(PADDING_MENU_HEADER_ITEM, headerSize.height/2));
     title->setTag(TAG_MENU::TAG_BUTTON_TITLE);
@@ -192,19 +190,22 @@ void MenuScene::reloadData() {
         
         // stage in sticker
         stage->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-		stage->setTitleText(StringUtils::format("Stage %d",i+1));
-		stage->setTitleColor(Color3B::RED);
-		stage->setTitleFontSize(100);
-		stage->setTitleFontName("fonts/keifont.ttf");
 		stage->setTouchEnabled(true);
         stage->setZoomScale(0);
 		stage->setTag(i);
 		stage->addTouchEventListener(
 				CC_CALLBACK_2(MenuScene::touchButtonEvent, this));
         
+        // stage number text
+        Text* stageNumber = Text::create(StringUtils::format("Stage %d",i+1), "fonts/keifont.ttf", 100);
+        stageNumber->setColor(Color3B::ORANGE);
+        stageNumber->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+        stageNumber->setPosition(stage->getContentSize()/2);
+        stage->addChild(stageNumber);
+        
         // text
         Text* text = Text::create(" 6 / 6", "fonts/keifont.ttf", 60);
-        text->setColor(Color3B::RED);
+        text->setColor(Color3B::ORANGE);
         text->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
         text->setPosition(Vec2(stage->getPositionX(), stage->getPositionY() - stickerSize.height/2));
         layout->addChild(text, ZORDER_MENU::BODY_STICKER_TEXT);
@@ -268,16 +269,19 @@ void MenuScene::addPageView()
             for (int k = 0; k < 3; k++) {
                 Button* level = Button::create("paper7.png");
                 int index = ITEMS_IN_PAGE * i + 3 * j + k;
-                level->setTitleText(to_string(index + 1));
                 level->setAnchorPoint(Vec2::ANCHOR_TOP_RIGHT);
-                level->setTitleColor(Color3B::RED);
-                level->setTitleFontSize(60);
-                level->setTitleFontName("fonts/keifont.ttf");
                 level->setTouchEnabled(true);
                 level->setTag(TAG_MENU::TAG_LEVEL_CHOOSE + index);
                 level->addTouchEventListener(
                                              CC_CALLBACK_2(MenuScene::touchButtonEvent, this));
                 level->setPosition(Vec2( (k+1) * spaceX, (2-j) * spaceY));
+                
+                // level number text
+                Text* levelNumber = Text::create(to_string(index + 1), "fonts/keifont.ttf", 60);
+                levelNumber->setColor(Color3B::ORANGE);
+                levelNumber->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+                levelNumber->setPosition(level->getContentSize()/2);
+                level->addChild(levelNumber);
                 
                 // lock level
                 if (index > SceneManager::getInstance()->getCurMaxLevel()) {

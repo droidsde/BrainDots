@@ -442,8 +442,7 @@ void GameScene::onTouchEnded(Touch* touch, Event* event) {
         
         // draw sprite use render texture
         auto _image = target->newImage();
-//        auto _key = to_string((int) time(NULL));
-        auto _key = "drawRender";
+        auto _key = to_string((int) time(NULL));
         auto _texture2D = Director::getInstance()->getTextureCache()->addImage(_image, _key);
         CC_SAFE_DELETE(_image);
         auto texture2D = Sprite::createWithTexture(_texture2D, bodyRectangle);

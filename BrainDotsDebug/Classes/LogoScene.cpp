@@ -58,21 +58,21 @@ void LogoScene::addLogo()
     logo->setName("logo");
     logo->setOpacity(0);
     this->addChild(logo);
-    logo->runAction(Sequence::create(FadeIn::create(TIME_LOGO_FADE), CallFunc::create(CC_CALLBACK_0(LogoScene::startSplashScreen, this)), nullptr));
+    logo->runAction(Sequence::create(FadeIn::create(TIME_LOGO_FADE), CallFunc::create(CC_CALLBACK_0(LogoScene::loadResources, this)), nullptr));
 }
 
 void LogoScene::loadResources()
 {
-//    Director::getInstance()->getTextureCache()->addImageAsync("tetrisSpriteSheet.png", CC_CALLBACK_1(LogoScene::loadImage, this));
+    Director::getInstance()->getTextureCache()->addImageAsync("braindotsSpriteSheet.png", CC_CALLBACK_1(LogoScene::loadImage, this));
 }
 
 void LogoScene::loadImage(cocos2d::Texture2D *texture)
 {
-//    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("tetrisSpriteSheet.plist",texture);
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("braindotsSpriteSheet.plist",texture);
 
-//    this->loadSounds();
+    this->loadSounds();
     
-//    this->startGame();
+    this->startSplashScreen();
 }
 
 void LogoScene::loadSounds()

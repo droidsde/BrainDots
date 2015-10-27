@@ -41,7 +41,6 @@ bool AppDelegate::applicationDidFinishLaunching() {
     paths.push_back("data");
     paths.push_back("images");
     paths.push_back("sounds");
-    paths.push_back("res");
     paths.push_back("level");
     paths.push_back("particle");
     paths.push_back("shaders");

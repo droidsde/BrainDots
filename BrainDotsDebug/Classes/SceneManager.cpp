@@ -112,6 +112,9 @@ void SceneManager::saveLevel(int level)
 
 void SceneManager::saveLanguage()
 {
+    if (getCurLanguage() == "") {
+        return;
+    }
     UserDefault::getInstance()->setStringForKey("language", getCurLanguage());
 }
 

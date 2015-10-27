@@ -73,36 +73,44 @@ void LanguagePopupLayer::reloadData()
         layout->setContentSize(Size(listviewSize.width, listviewSize.height / 4));
         
         Button* lang1 = Button::create("lang_normal.png");
-        lang1->setTitleText(listLanguageName[i * 2]);
-        lang1->setTitleFontSize(30);
-        lang1->setTitleFontName("fonts/keifont.ttf");
-        lang1->setTitleColor(Color3B::WHITE);
         lang1->setTouchEnabled(true);
         lang1->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
         lang1->setPosition(Vec2(listviewSize.width/3, layout->getContentSize().height/2));
         lang1->setTag(i*2);
         lang1->addTouchEventListener(CC_CALLBACK_2(LanguagePopupLayer::touchButtonEvent, this));
         layout->addChild(lang1);
+        
+        // name language 1
+        Text* nameLang1 = Text::create(listLanguageName[i * 2], "fonts/keifont.ttf", 30);
+        nameLang1->setColor(Color3B::WHITE);
+        nameLang1->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+        nameLang1->setPosition(lang1->getContentSize()/2);
+        nameLang1->setName("name_language");
+        lang1->addChild(nameLang1);
         listButton.pushBack(lang1);
         
         Button* lang2 = Button::create("lang_normal.png");
-        lang2->setTitleText(listLanguageName[i * 2 + 1]);
-        lang2->setTitleFontSize(30);
-        lang2->setTitleFontName("fonts/keifont.ttf");
-        lang2->setTitleColor(Color3B::WHITE);
-        lang2->setTouchEnabled(true);
         lang2->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
         lang2->setPosition(Vec2(listviewSize.width*2/3, layout->getContentSize().height/2));
         lang2->setTag(i*2+1);
         lang2->addTouchEventListener(CC_CALLBACK_2(LanguagePopupLayer::touchButtonEvent, this));
         layout->addChild(lang2);
+        
+        // name language 1
+        Text* nameLang2 = Text::create(listLanguageName[i * 2 + 1], "fonts/keifont.ttf", 30);
+        nameLang2->setColor(Color3B::WHITE);
+        nameLang2->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+        nameLang2->setPosition(lang2->getContentSize()/2);
+        nameLang2->setName("name_language");
+        lang2->addChild(nameLang2);
         listButton.pushBack(lang2);
         
         listView->insertCustomItem(layout, i);
     }
     
     for (int i = 0; i < listButton.size(); i++) {
-        if (listButton.at(i)->getTitleText() == SceneManager::getInstance()->getCurLanguage()) {
+        auto text = (Text*) listButton.at(i)->getChildByName("name_language");
+        if (text->getString() == SceneManager::getInstance()->getCurLanguage()) {
             listButton.at(i)->loadTextureNormal("lang_selected.png");
             break;
         }
@@ -131,7 +139,8 @@ void LanguagePopupLayer::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEve
             listButton.at(i)->loadTextureNormal("lang_normal.png");
         }
         receiver->loadTextureNormal("lang_selected.png");
-        SceneManager::getInstance()->setCurLanguage(receiver->getTitleText());
+        auto text = (Text*) receiver->getChildByName("name_language");
+        SceneManager::getInstance()->setCurLanguage(text->getString());
         SceneManager::getInstance()->saveLanguage();
         NotificationCenter::getInstance()->postNotification(RELOAD_LANGUAGE);
     }

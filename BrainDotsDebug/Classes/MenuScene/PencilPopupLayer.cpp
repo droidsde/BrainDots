@@ -76,24 +76,28 @@ bool PencilPopupLayer::init()
     Button* buyButton = Button::create("lang_normal.png");
     buyButton->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
     buyButton->setPosition(Vec2(sizeLayout.width/3, PADDING_MENU_HEADER_ITEM));
-    buyButton->setTitleText("Buy pencil");
-    buyButton->setTitleColor(Color3B::WHITE);
-    buyButton->setTitleFontSize(40);
-    buyButton->setTitleFontName("fonts/keifont.ttf");
     buyButton->setTag(TAG_PENCIL_ITEM::BUY_BUTTON);
     buyButton->addTouchEventListener(CC_CALLBACK_2(PencilPopupLayer::touchButtonEvent, this));
+    // name buy button
+    Text* nameBuyButton = Text::create("Buy pencil", "fonts/keifont.ttf", 40);
+    nameBuyButton->setColor(Color3B::WHITE);
+    nameBuyButton->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    nameBuyButton->setPosition(buyButton->getContentSize()/2);
+    buyButton->addChild(nameBuyButton);
     layoutTable->addChild(buyButton);
     
     Button* useButton = Button::create("lang_selected.png");
     useButton->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
     useButton->setPosition(Vec2(sizeLayout.width*2/3, PADDING_MENU_HEADER_ITEM));
-    useButton->setTitleText("Use pencil");
-    useButton->setTitleColor(Color3B::WHITE);
-    useButton->setTitleFontSize(40);
-    useButton->setTitleFontName("fonts/keifont.ttf");
     useButton->setTag(TAG_PENCIL_ITEM::SELECT_BUTTON);
     useButton->addTouchEventListener(CC_CALLBACK_2(PencilPopupLayer::touchButtonEvent, this));
     layoutTable->addChild(useButton);
+    // name use button
+    Text* nameUseButton = Text::create("Use pencil", "fonts/keifont.ttf", 40);
+    nameUseButton->setColor(Color3B::WHITE);
+    nameUseButton->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    nameUseButton->setPosition(useButton->getContentSize()/2);
+    useButton->addChild(nameUseButton);
     
     return true;
 }
@@ -123,10 +127,13 @@ void PencilPopupLayer::reloadData()
         
         // pencil sprite
         pencil->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-        pencil->setTitleText(StringUtils::format("%d",i+1));
-        pencil->setTitleColor(Color3B::BLACK);
-        pencil->setTitleFontSize(40);
-        pencil->setTitleFontName("fonts/keifont.ttf");
+
+        // pencil number
+        Text* pencilNumber = Text::create(StringUtils::format("%d",i+1), "fonts/keifont.ttf", 40);
+        pencilNumber->setColor(Color3B::BLACK);
+        pencilNumber->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+        pencilNumber->setPosition(pencil->getContentSize()/2);
+        pencil->addChild(pencilNumber);
         
         if (i >= SceneManager::getInstance()->getCurUnlockPencil()) {
             pencil->setBright(false);

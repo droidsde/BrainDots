@@ -59,7 +59,7 @@ bool GameScene::init()
     
     log("##GAMESCENE %s :button back and replay start", __FUNCTION__);
     // button back
-    auto backButton = Button::create("back.png");
+    auto backButton = Button::create("game_btn_back.png", "", "", TextureResType::PLIST);
     backButton->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
     backButton->setPosition(Vec2(PADDING, visibleSize.height - PADDING));
     backButton->setTouchEnabled(true);
@@ -68,7 +68,7 @@ bool GameScene::init()
     addChild(backButton, ZORDER_GAME::ZORDER_BUTTON_BACK);
     
     // button replay
-    auto replayButton = Button::create("replay.png");
+    auto replayButton = Button::create("game_btn_replay.png", "", "", TextureResType::PLIST);
     replayButton->setAnchorPoint(Vec2::ANCHOR_TOP_RIGHT);
     replayButton->setPosition(Vec2(visibleSize.width - PADDING, visibleSize.height - PADDING));
     replayButton->setTouchEnabled(true);
@@ -98,7 +98,7 @@ bool GameScene::init()
     this->addChild(target, ZORDER_GAME::ZORDER_DRAW_RENDER);
     
     // brush
-    brush = Sprite::create("brush.png");
+    brush = Sprite::create("game_brush_25x25.png");
     brush->retain();
     this->schedule(schedule_selector(GameScene::update));
     
@@ -267,12 +267,12 @@ void GameScene::initWall(b2Body *body, b2Fixture* _wallFixture[], float outside,
 
 void GameScene::initBalls()
 {
-    auto ballASprite = Sprite::create("ball_red.png");
+    auto ballASprite = Sprite::createWithSpriteFrameName("game_ball_red.png");
     map->addChild(ballASprite);
     ballASprite->setPosition(posballA);
     ballASprite->setTag(TAG_BALLA);
     
-    auto ballBSprite = Sprite::create("ball_blue.png");
+    auto ballBSprite = Sprite::createWithSpriteFrameName("game_ball_blue.png");
     map->addChild(ballBSprite);
     ballBSprite->setPosition(posballB);
     ballBSprite->setTag(TAG_BALLB);
@@ -528,11 +528,11 @@ void GameScene::addRectangleBetweenPointsToBody(b2Body* body, Vec2 start,
     if (dist_x < minW) {
         dist_x = start.distance(end);
     } else {
-        if (abs(dist_y) > minH) {
+        if (std::abs(dist_y) > minH) {
             dist_x = start.distance(end);
         }
     }
-    float width = MAX(abs(dist_x) / PTM_RATIO, minW);
+    float width = MAX(std::abs(dist_x) / PTM_RATIO, minW);
     
     boxShape.SetAsBox(width / 2, height / 2, b2Vec2(px, py), angle);
     
@@ -702,7 +702,7 @@ void GameScene::animationSuccess(Vec2 point)
 		float rand_delay = (float)(rand()%10)/100;
 
 		float rad = CC_DEGREES_TO_RADIANS((i/(float)NUM_EXPLOSION_CIRCLE + rand_angle) * 360);
-		auto starSprite = Sprite::create("explosion_yellow.png");
+		auto starSprite = Sprite::createWithSpriteFrameName("game_explosion_yellow.png");
 		starSprite->setScale(0);
 		starSprite->setPosition(point);
 
@@ -723,7 +723,7 @@ void GameScene::animationSuccess(Vec2 point)
 		starSprite->runAction(sequence);
 	}
 
-	this->explosionRing("explosion_yellow_ring.png", point);
+	this->explosionRing("game_explosion_yellow_ring.png", point);
 }
 
 void GameScene::animationFail(cocos2d::Vec2 point, std::string explosionName)
@@ -737,7 +737,7 @@ void GameScene::animationFail(cocos2d::Vec2 point, std::string explosionName)
         float rand_delay = (float)(rand()%10)/100;
         
         float rad = CC_DEGREES_TO_RADIANS((i/(float)NUM_EXPLOSION_CIRCLE + rand_angle) * 360);
-        auto explosionSprite = Sprite::create(explosionName + ".png");
+        auto explosionSprite = Sprite::createWithSpriteFrameName(explosionName + ".png");
         explosionSprite->setScale(rand_scale);
         explosionSprite->setPosition(point);
         
@@ -758,7 +758,7 @@ void GameScene::animationFail(cocos2d::Vec2 point, std::string explosionName)
 
 void GameScene::explosionRing(std::string name, Vec2 point)
 {
-    auto ring = Sprite::create(name);
+    auto ring = Sprite::createWithSpriteFrameName(name);
     ring->setScale(100 / ring->getContentSize().width);
     ring->setPosition(point);
     this->addChild(ring, ZORDER_GAME::ZORDER_ANIMATION);
@@ -805,11 +805,11 @@ void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
     if (succeed) {
         captureSprite = Sprite::create(filenameCapture);
     } else {
-        captureSprite = Sprite::create("share_image.png");
+        captureSprite = Sprite::createWithSpriteFrameName("image_share.png");
     }
 
     // create paper sprite
-    PaperSprite* paperSprite = PaperSprite::create("paper3.png", false, true, true);
+    PaperSprite* paperSprite = PaperSprite::create("menu_img_share_700x457.png", true, true, true);
     paperSprite->setPosition(visibleSize/2);
     paperSprite->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     this->addChild(paperSprite);
@@ -820,7 +820,7 @@ void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
     paperSprite->addChild(captureSprite);
     
     // create paper sprite small to share
-    PaperSprite* paperSmall = PaperSprite::create("paper8.png", false, true, true);
+    PaperSprite* paperSmall = PaperSprite::create("menu_img_share_350x228.png", true, true, true);
     paperSmall->setCallbackFunction(CC_CALLBACK_0(GameScene::showShareLayer, this, filenameCapture));
     paperSmall->setPosition(Vec2(paperSprite->getPositionX() + sizePaper.width/2, paperSprite->getPositionY() - sizePaper.height/2 - PADDING));
     paperSmall->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
@@ -848,12 +848,12 @@ void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
     // create tick
     std::string tickName;
     if (isFail) {
-        tickName = "mini_fail.png";
+        tickName = "image_fail_64x64.png";
     } else if (isSuccess) {
-        tickName = "mini_tick.png";
+        tickName = "image_success_64x64.png";
     }
     
-    auto tick = Sprite::create(tickName);
+    auto tick = Sprite::createWithSpriteFrameName(tickName);
     tick->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     tick->setPosition(Vec2(sizePaper.width - tick->getContentSize().width, sizePaper.height - tick->getContentSize().height));
     tick->retain();
@@ -872,7 +872,7 @@ void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
     
     if (isSuccess) {
         // add next button
-        auto nextButton = Button::create("next_button.png");
+        auto nextButton = Button::create("game_btn_next.png", "", "", TextureResType::PLIST);
         nextButton->setScale(0.5f);
         nextButton->setPosition(Vec2(visibleSize.width - PADDING, PADDING));
         nextButton->setTag(TAG_GAME::TAG_BUTTON_NEXT);
@@ -918,16 +918,16 @@ void GameScene::update(float dt) {
         } else if (isFail) {
             // ballA was broken
             if (collisionFailA != Vec2::ZERO && collisionFailB == Vec2::ZERO) {
-                this->runAction(Sequence::create(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailA, "explosion_red")), DelayTime::create(TIME_DELAY_GAMEOVER), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)), NULL));
+                this->runAction(Sequence::create(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailA, "game_explosion_red")), DelayTime::create(TIME_DELAY_GAMEOVER), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)), NULL));
             }
             // ball B was broken
             else if (collisionFailB != Vec2::ZERO && collisionFailA == Vec2::ZERO) {
-                this->runAction(Sequence::create(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailB, "explosion_blue")), DelayTime::create(TIME_DELAY_GAMEOVER), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)), NULL));
+                this->runAction(Sequence::create(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailB, "game_explosion_blue")), DelayTime::create(TIME_DELAY_GAMEOVER), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)), NULL));
             }
             // ball A and B together were broken
             else if (collisionFailA != Vec2::ZERO  && collisionFailB != Vec2::ZERO) {
-                this->runAction(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailA, "explosion_red")));
-                this->runAction(Sequence::create(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailB, "explosion_blue")), DelayTime::create(TIME_DELAY_GAMEOVER), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)), NULL));
+                this->runAction(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailA, "game_explosion_red")));
+                this->runAction(Sequence::create(CallFunc::create(CC_CALLBACK_0(GameScene::animationFail, this, collisionFailB, "game_explosion_blue")), DelayTime::create(TIME_DELAY_GAMEOVER), CallFunc::create( CC_CALLBACK_0(GameScene::endGame, this)), NULL));
             }
         }
         

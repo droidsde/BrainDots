@@ -84,10 +84,10 @@ bool SettingPopupLayer::init()
         if (i < 4) {
             ControlSwitch* toggle = ControlSwitch::create
             (
-             Sprite::create("switch_mask.png"),
-             Sprite::create("switch_on.png"),
-             Sprite::create("switch_off.png"),
-             Sprite::create("switch_thumb.png"),
+             Sprite::create("menu_switch_mask.png"),
+             Sprite::create("menu_switch_on.png"),
+             Sprite::create("menu_switch_off.png"),
+             Sprite::create("menu_switch_thumb.png"),
              Label::createWithTTF("", "fonts/keifont.ttf", 32),
              Label::createWithTTF("", "fonts/keifont.ttf", 32)
              );

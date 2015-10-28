@@ -34,7 +34,7 @@ bool RecordPopupLayer::init()
     auto title = Text::create("Recording clip", "fonts/keifont.ttf", 60);
     title->setPosition(Vec2(layoutTable->getContentSize().width/2, layoutTable->getContentSize().height - PADDING));
     title->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
-    title->setColor(Color3B::RED);
+    title->setColor(Color3B::ORANGE);
     layoutTable->addChild(title);
     
     return true;

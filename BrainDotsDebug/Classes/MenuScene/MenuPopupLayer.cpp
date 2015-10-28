@@ -51,7 +51,7 @@ bool MenuPopupLayer::init()
     BasePopupLayer::init();
     
     layoutSize = layoutTable->getContentSize();
-    std::string menuItemFile[8] = {"menu_notification_icon.png", "menu_info_icon.png", "menu_setting_icon.png", "menu_blockads_icon.png","menu_support_icon.png", "menu_twitter_icon.png", "menu_facebook_icon.png", "menu_youtube_icon.png"};
+    std::string menuItemFile[8] = {"menu_icon_notification.png", "menu_icon_info.png", "menu_icon_setting.png", "menu_icon_blockads.png","menu_icon_support.png", "menu_icon_twitter.png", "menu_icon_facebook.png", "menu_icon_youtube.png"};
     std::string menuItemName[8] = {"Notification", "Information", "Setting", "No more ads",
     "Support", "Twitter", "Facebook", "Youtube"};
     // title
@@ -70,7 +70,7 @@ bool MenuPopupLayer::init()
             int index = 4 * i + j;
             
             // button
-            auto button = Button::create(menuItemFile[index]);
+            auto button = Button::create(menuItemFile[index], "", "", TextureResType::PLIST);
             button->setPosition(Vec2(posX * (j+1), posY * (2-i)));
             button->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
             button->setTag(index);

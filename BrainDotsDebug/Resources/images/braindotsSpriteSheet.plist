@@ -550,7 +550,7 @@
                 <key>sourceSize</key>
                 <string>{128,128}</string>
             </dict>
-            <key>menu_image_level.png</key>
+            <key>menu_img_level.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{2,1512},{251,163}}</string>
@@ -563,7 +563,7 @@
                 <key>sourceSize</key>
                 <string>{275,179}</string>
             </dict>
-            <key>menu_image_share_350x228.png</key>
+            <key>menu_img_share_350x228.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{2,1282},{350,228}}</string>
@@ -575,19 +575,6 @@
                 <string>{{0,0},{350,228}}</string>
                 <key>sourceSize</key>
                 <string>{350,228}</string>
-            </dict>
-            <key>menu_image_stage.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{2,2},{800,450}}</string>
-                <key>offset</key>
-                <string>{0,0}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{0,0},{800,450}}</string>
-                <key>sourceSize</key>
-                <string>{800,450}</string>
             </dict>
             <key>menu_img_share_700x457.png</key>
             <dict>
@@ -601,6 +588,19 @@
                 <string>{{0,4},{700,449}}</string>
                 <key>sourceSize</key>
                 <string>{700,457}</string>
+            </dict>
+            <key>menu_img_stage.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{2,2},{800,450}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{800,450}}</string>
+                <key>sourceSize</key>
+                <string>{800,450}</string>
             </dict>
             <key>menu_lock_icon_128x128.png</key>
             <dict>
@@ -729,7 +729,7 @@
             <key>size</key>
             <string>{1024,2048}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:fbdea26c2d604bdae1498539144bff4f:d27d5547426efb2be08a8691af081a4e:b52ef475328eff65df524a524cb54bd6$</string>
+            <string>$TexturePacker:SmartUpdate:dba4ca31931aabc62c675ea36a9072f1:a48ebab80e10f780e5c2d313d859d200:b52ef475328eff65df524a524cb54bd6$</string>
             <key>textureFileName</key>
             <string>braindotsSpriteSheet.png</string>
         </dict>

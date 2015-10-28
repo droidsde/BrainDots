@@ -232,9 +232,6 @@
             <filename>images/menu_icon_support.png</filename>
             <filename>images/menu_icon_twitter.png</filename>
             <filename>images/menu_icon_youtube.png</filename>
-            <filename>images/menu_image_level.png</filename>
-            <filename>images/menu_image_share_350x228.png</filename>
-            <filename>images/menu_image_stage.png</filename>
             <filename>images/menu_img_share_700x457.png</filename>
             <filename>images/menu_lock_icon_64x64.png</filename>
             <filename>images/menu_lock_icon_128x128.png</filename>
@@ -245,6 +242,9 @@
             <filename>images/menu_switch_thumb.png</filename>
             <filename>images/scrollbar_horizontal.png</filename>
             <filename>images/scrollbar_vertical.png</filename>
+            <filename>images/menu_img_level.png</filename>
+            <filename>images/menu_img_share_350x228.png</filename>
+            <filename>images/menu_img_stage.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

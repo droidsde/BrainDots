@@ -48,7 +48,7 @@ private:
     Layer *headerLayer, *bodyLayer;
     ListView* listview;
     PageView* pageview;
-    Size stickerSize, miniStickerSize, miniTickSize;
+    Size stageSize, levelSize, successSize;
     int curPage = 1; // 1->10
     int curLevel; // 0 -> (6 * PAGE)-1
     
@@ -68,19 +68,27 @@ private:
 
     void reloadData();
     
+    // capture screen to share
     void capturingScreen(std::string filename);
     void afterCaptured(bool succeed, const std::string& outputFile);
 
+    // touch button in screen: level, title,...
     void touchButtonEvent(Ref* sender, Widget::TouchEventType type);
     
+    // scroll pageview
     void pageViewEvent(Ref* pSender, PageView::EventType type);
     
+    // select listview and scroll
     void selectedItemEvent(Ref *pSender, ListView::EventType type);
     void scrollEvent(Ref* ref, ui::ScrollView::EventType EventType);
     
+    // open a stage
     void openStage(int i);
     
+    // show levels in stage
     void showLevelsInStage(int stage);
+    
+    // show stages
     void showStages(int stage);
 };
 

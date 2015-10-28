@@ -41,10 +41,13 @@ private:
     void scaleItems(float curPosX);
     
     // focus item
-    void autoFocusItemList();
+    void autoFocusItemList(bool isSelectedPencil);
     
     // scroll to index
     void scrollToItem(int index);
+    
+    // select pencil
+    void savePencil(int index);
     
     void selectedItemEvent(Ref *pSender, ListView::EventType type);
     void scrollEvent(Ref* pSender, ui::ScrollView::EventType type);

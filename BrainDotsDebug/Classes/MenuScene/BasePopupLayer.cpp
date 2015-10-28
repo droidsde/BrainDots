@@ -49,7 +49,7 @@ bool BasePopupLayer::init()
     layoutTable->setPosition(posOrigin);
     
     // button exit
-    Button* exit = Button::create("close_button.png");
+    Button* exit = Button::create("menu_btn_close.png", "", "", TextureResType::PLIST);
     exit->setPosition(Vec2(layoutTable->getContentSize().width -  PADDING_MENU_HEADER_ITEM, layoutTable->getContentSize().height - PADDING_MENU_HEADER_ITEM));
     exit->setAnchorPoint(Vec2::ANCHOR_TOP_RIGHT);
     exit->setTouchEnabled(true);
@@ -60,6 +60,7 @@ bool BasePopupLayer::init()
     });
     layoutTable->addChild(exit);
     
+    // touch event
     auto eventListener = EventListenerTouchOneByOne::create();
     eventListener->setSwallowTouches(true);
     eventListener->onTouchBegan = CC_CALLBACK_2(BasePopupLayer::onTouchBegan, this);
@@ -94,7 +95,7 @@ void BasePopupLayer::closeLayer()
 
 cocos2d::ui::Button* BasePopupLayer::createButton(std::string fileName, int tag, Vec2 anchorPoint)
 {
-    auto button = Button::create(fileName);
+    auto button = Button::create(fileName, "", "", TextureResType::PLIST);
     button->setTag(tag);
     button->setTouchEnabled(true);
     button->setAnchorPoint(anchorPoint);

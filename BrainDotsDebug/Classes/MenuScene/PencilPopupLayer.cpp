@@ -36,11 +36,11 @@ bool PencilPopupLayer::init()
     auto title = Text::create("Choose a pencil", "fonts/keifont.ttf", 60);
     title->setPosition(Vec2(sizeLayout.width/2, sizeLayout.height - PADDING));
     title->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
-    title->setColor(Color3B::RED);
+    title->setColor(Color3B::ORANGE);
     layoutTable->addChild(title);
     
     //coin image
-    auto coinImg = Sprite::create("coin_64x64.png");
+    auto coinImg = Sprite::createWithSpriteFrameName("image_coin_64x64.png");
     coinImg->setPosition(Vec2(PADDING_MENU_HEADER_ITEM, title->getPositionY() - title->getContentSize().height/2));
     coinImg->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     layoutTable->addChild(coinImg);
@@ -73,7 +73,7 @@ bool PencilPopupLayer::init()
     reloadData();
     
     // button
-    Button* buyButton = Button::create("lang_normal.png");
+    Button* buyButton = Button::create("menu_btn_lang_normal.png", "", "", TextureResType::PLIST);
     buyButton->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
     buyButton->setPosition(Vec2(sizeLayout.width/3, PADDING_MENU_HEADER_ITEM));
     buyButton->setTag(TAG_PENCIL_ITEM::BUY_BUTTON);
@@ -86,7 +86,7 @@ bool PencilPopupLayer::init()
     buyButton->addChild(nameBuyButton);
     layoutTable->addChild(buyButton);
     
-    Button* useButton = Button::create("lang_selected.png");
+    Button* useButton = Button::create("menu_btn_lang_selected.png", "", "", TextureResType::PLIST); 
     useButton->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
     useButton->setPosition(Vec2(sizeLayout.width*2/3, PADDING_MENU_HEADER_ITEM));
     useButton->setTag(TAG_PENCIL_ITEM::SELECT_BUTTON);
@@ -110,7 +110,7 @@ void PencilPopupLayer::reloadData()
     for (int i = 0; i < PENCIL_MAX; i++) {
         // container
         Layout* mainLayout = Layout::create();
-        auto pencil = Button::create("pencil1.png");
+        auto pencil = Button::create("image_pencil.png", "", "", TextureResType::PLIST);
         sizePencil = pencil->getContentSize();
     
         if ( i == 0 || i == PENCIL_MAX-1) {
@@ -139,7 +139,7 @@ void PencilPopupLayer::reloadData()
             pencil->setBright(false);
             
             // add lock
-            auto lock = Sprite::create("lock_icon_64x64.png");
+            auto lock = Sprite::createWithSpriteFrameName("menu_lock_icon_64x64.png");
             lock->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
             lock->setPosition(sizePencil/2);
             pencil->addChild(lock);
@@ -192,6 +192,8 @@ void PencilPopupLayer::scrollEvent(cocos2d::Ref *pSender, ui::ScrollView::EventT
         }
         // scale item
         this->scaleItems(curPosX);
+    } else {
+        this->autoFocusItemList(false);
     }
 }
 
@@ -243,7 +245,8 @@ void PencilPopupLayer::scaleItems(float curPosX)
     }
 }
 
-void PencilPopupLayer::autoFocusItemList()
+
+void PencilPopupLayer::autoFocusItemList(bool isSelectedPencil)
 {
     float curPosX = listViewPencils->getInnerContainer()->getPositionX();
     int index = (int)(curPosX / widthLayoutPencil);
@@ -253,8 +256,10 @@ void PencilPopupLayer::autoFocusItemList()
     }
     this->scrollToItem(index);
     
-    if (index < SceneManager::getInstance()->getCurUnlockPencil()) {
-        SceneManager::getInstance()->saveUsePencil(index);
+    if (isSelectedPencil) {
+        if (index < SceneManager::getInstance()->getCurUnlockPencil()) {
+            SceneManager::getInstance()->saveUsePencil(index);
+        }
     }
 }
 
@@ -265,13 +270,13 @@ void PencilPopupLayer::touchButtonEvent(cocos2d::Ref *pSender, Widget::TouchEven
         switch (receiver->getTag()) {
             case TAG_PENCIL_ITEM::BUY_BUTTON :
             {
-                this->autoFocusItemList();
+                this->autoFocusItemList(true);
                 break;
             }
                 
             case TAG_PENCIL_ITEM::SELECT_BUTTON :
             {
-                this->autoFocusItemList();
+                this->autoFocusItemList(true);
                 break;
             }
                 

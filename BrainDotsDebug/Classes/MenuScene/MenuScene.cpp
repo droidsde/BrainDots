@@ -25,14 +25,9 @@ bool MenuScene::init() {
 	visibleSize = Director::getInstance()->getVisibleSize();
     
     // prepare
-    auto sprite = Sprite::create("paper2.png");
-    sprite->retain();
-    auto ministicker = Sprite::create("mini_sticker.png");
-    ministicker->retain();
-    stickerSize = sprite->getContentSize();
-    miniStickerSize = ministicker->getContentSize();
-    miniTickSize = Sprite::create("mini_tick.png")->getContentSize();
-    
+    stageSize = Sprite::createWithSpriteFrameName("menu_img_stage.png")->getContentSize();
+    levelSize = Sprite::createWithSpriteFrameName("menu_img_level.png")->getContentSize();
+    successSize = Sprite::createWithSpriteFrameName("image_success_96x96.png")->getContentSize();
     curLevel = SceneManager::getInstance()->getLevelGame();
     curPage = curLevel / ITEMS_IN_PAGE + 1;
     bodySize = Size(visibleSize.width, visibleSize.height * 5 / 6);
@@ -56,7 +51,7 @@ void MenuScene::drawGrids()
     this->addChild(draw);
     
     float lineSize = 0.5;
-    Color4F color = Color4F(0/255, 205/255, 1, 0.2);
+    Color4F color = Color4F(0/255, 205/255, 1, 0.3);
     
     // draw col
     for (int x = 0; x < visibleSize.width; x++) {
@@ -83,7 +78,8 @@ void MenuScene::addHeaderLayer()
     // button title
     auto title = Text::create("Brain Dots", "fonts/keifont.ttf", 80);
     title->setTouchEnabled(true);
-    title->enableOutline(Color4B::GRAY, 5);
+    title->setTouchScaleChangeEnabled(true);
+    title->enableOutline(Color4B::MAGENTA, 1);
     title->setColor(Color3B::ORANGE);
     title->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     title->setPosition(Vec2(PADDING_MENU_HEADER_ITEM, headerSize.height/2));
@@ -92,7 +88,7 @@ void MenuScene::addHeaderLayer()
     headerLayer->addChild(title, ZORDER_MENU::HEADER_TITLE);
     
     // button menu
-    Button* menu = Button::create("menu_icon.png");
+    Button* menu = Button::create("menu_icon_menu.png", "", "", TextureResType::PLIST);
     menu->setTouchEnabled(true);
     menu->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
     menu->setPosition(Vec2(headerSize.width - PADDING_MENU_HEADER_ITEM, headerSize.height/2));
@@ -101,7 +97,7 @@ void MenuScene::addHeaderLayer()
     headerLayer->addChild(menu);
     
     // button share
-    Button* share = Button::create("share_icon.png");
+    Button* share = Button::create("menu_icon_share.png", "", "", TextureResType::PLIST);
     share->setTouchEnabled(true);
     share->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
     share->setPosition(Vec2(menu->getPositionX() - menu->getContentSize().width - PADDING_MENU_HEADER_ITEM, headerSize.height/2));
@@ -110,7 +106,7 @@ void MenuScene::addHeaderLayer()
     headerLayer->addChild(share);
     
     // record video
-    Button* record = Button::create("recordvideo_icon.png");
+    Button* record = Button::create("menu_icon_recordvideo.png", "", "", TextureResType::PLIST);
     record->setTouchEnabled(true);
     record->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
     record->setPosition(Vec2(share->getPositionX() - share->getContentSize().width - PADDING_MENU_HEADER_ITEM, headerSize.height/2));
@@ -119,7 +115,7 @@ void MenuScene::addHeaderLayer()
     headerLayer->addChild(record);
     
     // button pencil
-    Button* pencil = Button::create("pencil_icon.png");
+    Button* pencil = Button::create("menu_icon_pencil.png", "", "", TextureResType::PLIST);
     pencil->setTouchEnabled(true);
     pencil->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
     pencil->setPosition(Vec2(record->getPositionX() - record->getContentSize().width - PADDING_MENU_HEADER_ITEM, headerSize.height/2));
@@ -172,20 +168,20 @@ void MenuScene::reloadData() {
 	for (int i = 0; i < LEVEL_MAX; ++i) {
         // layout include sticker and text
 		Layout* layout = Layout::create();
-        Button* stage = Button::create("paper2.png");
+        Button* stage = Button::create("menu_img_stage.png", "", "", TextureResType::PLIST);
         
         if (i == 0 || i == LEVEL_MAX-1) {
-            layout->setContentSize(Size(stickerSize.width/2+visibleSize.width/2, bodySize.height));
+            layout->setContentSize(Size(stageSize.width/2+visibleSize.width/2, bodySize.height));
             if (i == 0) {
-                stage->setPosition(Vec2(layout->getContentSize().width-stickerSize.width/2, bodySize.height - stickerSize.height/2 - miniTickSize.height/2));
+                stage->setPosition(Vec2(layout->getContentSize().width-stageSize.width/2, bodySize.height - stageSize.height/2 - successSize.height/2));
             } else if (i == LEVEL_MAX-1)
             {
-                stage->setPosition(Vec2(stickerSize.width/2, bodySize.height - stickerSize.height/2 - miniTickSize.height/2));
+                stage->setPosition(Vec2(stageSize.width/2, bodySize.height - stageSize.height/2 - successSize.height/2));
             }
         }
         else {
-            layout->setContentSize(Size(stickerSize.width, bodySize.height));
-            stage->setPosition(Vec2(layout->getContentSize().width/2, bodySize.height - stickerSize.height/2 - miniTickSize.height/2));
+            layout->setContentSize(Size(stageSize.width, bodySize.height));
+            stage->setPosition(Vec2(layout->getContentSize().width/2, bodySize.height - stageSize.height/2 - successSize.height/2));
         }
         
         // stage in sticker
@@ -207,11 +203,11 @@ void MenuScene::reloadData() {
         Text* text = Text::create(" 6 / 6", "fonts/keifont.ttf", 60);
         text->setColor(Color3B::ORANGE);
         text->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
-        text->setPosition(Vec2(stage->getPositionX(), stage->getPositionY() - stickerSize.height/2));
+        text->setPosition(Vec2(stage->getPositionX(), stage->getPositionY() - stageSize.height/2));
         layout->addChild(text, ZORDER_MENU::BODY_STICKER_TEXT);
         
         // add tick and text
-        ImageView* minitick = ImageView::create("mini_tick.png");
+        ImageView* minitick = ImageView::create("image_success_96x96.png", TextureResType::PLIST);
         minitick->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
         minitick->setPosition(Vec2(text->getPositionX() - text->getContentSize().width/2 - PADDING, text->getPositionY() - text->getContentSize().height/2));
         layout->addChild(minitick, ZORDER_MENU::BODY_STICKER_MINI_TICK);
@@ -221,22 +217,22 @@ void MenuScene::reloadData() {
             text->setString(" 0 / 6");
             
             auto frameGray = Layout::create();
-            frameGray->setContentSize(stickerSize);
+            frameGray->setContentSize(stageSize);
             frameGray->setBackGroundColorType(cocos2d::ui::Layout::BackGroundColorType::SOLID);
             frameGray->setBackGroundColor(Color3B::GRAY);
             frameGray->setBackGroundColorOpacity(150);
             frameGray->setPosition(Vec2::ZERO);
 //            stage->addChild(frameGray);
             stage->setBright(false);
-            auto lockIcon = Sprite::create("lock_icon_256x256.png");
-            lockIcon->setPosition(stickerSize/2);
+            auto lockIcon = Sprite::createWithSpriteFrameName("menu_lock_icon_256x256.png");
+            lockIcon->setPosition(stageSize/2);
             stage->addChild(lockIcon);
         } else if (i < maxStage) {
             
             // add tick icon in stage image
-            ImageView* tick = ImageView::create("mini_tick.png");
+            ImageView* tick = ImageView::create("image_success_96x96.png", TextureResType::PLIST);
             tick->setAnchorPoint(Vec2::ANCHOR_TOP_RIGHT);
-            tick->setPosition(Vec2(stickerSize.width - PADDING, stickerSize.height - PADDING));
+            tick->setPosition(Vec2(stageSize.width - PADDING, stageSize.height - PADDING));
             stage->addChild(tick, ZORDER_MENU::BODY_STICKER_TICK);
             
         } else {
@@ -257,8 +253,8 @@ void MenuScene::addPageView()
     pageview->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     pageview->removeAllPages();
     
-    float spaceX = (bodySize.width - 3 * miniStickerSize.width) / 4 + miniStickerSize.width;
-    float spaceY = (bodySize.height - 2 * miniStickerSize.height) / 3 + miniStickerSize.height;
+    float spaceX = (bodySize.width - 3 * levelSize.width) / 4 + levelSize.width;
+    float spaceY = (bodySize.height - 2 * levelSize.height) / 3 + levelSize.height;
     
     for (int i = 0; i < LEVEL_MAX; i++) {
         
@@ -267,7 +263,7 @@ void MenuScene::addPageView()
         
         for (int j = 0; j < 2; j++) {
             for (int k = 0; k < 3; k++) {
-                Button* level = Button::create("paper7.png");
+                Button* level = Button::create("menu_img_level.png", "", "", TextureResType::PLIST);
                 int index = ITEMS_IN_PAGE * i + 3 * j + k;
                 level->setAnchorPoint(Vec2::ANCHOR_TOP_RIGHT);
                 level->setTouchEnabled(true);
@@ -292,13 +288,13 @@ void MenuScene::addPageView()
                     frameGray->setBackGroundColorOpacity(150);
                     frameGray->setPosition(Vec2::ZERO);
                     level->addChild(frameGray);
-                    auto lockIcon = Sprite::create("lock_icon_128x128.png");
+                    auto lockIcon = Sprite::createWithSpriteFrameName("menu_lock_icon_128x128.png");
                     lockIcon->setPosition(level->getContentSize()/2);
                     level->addChild(lockIcon);
                     level->setTouchEnabled(false);
                 } else if (index < SceneManager::getInstance()->getCurMaxLevel()){
                     // add tick icon in stage image
-                    ImageView* tick = ImageView::create("super_mini_tick.png");
+                    ImageView* tick = ImageView::create("image_success_32x32.png", TextureResType::PLIST);
                     tick->setAnchorPoint(Vec2::ANCHOR_TOP_RIGHT);
                     tick->setPosition(Vec2(level->getContentSize().width-tick->getContentSize().width/2-PADDING, level->getContentSize().height-PADDING-tick->getContentSize().height/2));
                     level->addChild(tick, ZORDER_MENU::BODY_STICKER_TICK);
@@ -452,7 +448,7 @@ void MenuScene::scrollEvent(cocos2d::Ref *pSender, ui::ScrollView::EventType typ
 void MenuScene::openStage(int i)
 {
     float curPos = listview->getInnerContainer()->getPositionX();
-    float exactPos = -(stickerSize.width + LIST_BIG_ITEM_MARGIN) * i;
+    float exactPos = -(stageSize.width + LIST_BIG_ITEM_MARGIN) * i;
     pageview->scrollToPage(i);
     if (curPos > (exactPos + DELTA_TRANSLATE) || curPos < (exactPos - DELTA_TRANSLATE)) {
         listview->getInnerContainer()->runAction(MoveTo::create(0.3f, Vec2(exactPos, 0)));
@@ -476,7 +472,7 @@ void MenuScene::showStages(int i)
     listview->setVisible(true);
     pageview->setVisible(false);
     float curPos = listview->getInnerContainer()->getPositionX();
-    float exactPos = -(stickerSize.width + LIST_BIG_ITEM_MARGIN) * i;
+    float exactPos = -(stageSize.width + LIST_BIG_ITEM_MARGIN) * i;
     
     if (curPos > (exactPos + DELTA_TRANSLATE) || curPos < (exactPos - DELTA_TRANSLATE)) {
 //        listview->getInnerContainer()->runAction(MoveTo::create(0.3f, Vec2(exactPos, 0)));

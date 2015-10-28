@@ -72,7 +72,7 @@ void LanguagePopupLayer::reloadData()
         Layout* layout = Layout::create();
         layout->setContentSize(Size(listviewSize.width, listviewSize.height / 4));
         
-        Button* lang1 = Button::create("lang_normal.png");
+        Button* lang1 = Button::create("menu_btn_lang_normal.png", "", "", TextureResType::PLIST);
         lang1->setTouchEnabled(true);
         lang1->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
         lang1->setPosition(Vec2(listviewSize.width/3, layout->getContentSize().height/2));
@@ -89,7 +89,7 @@ void LanguagePopupLayer::reloadData()
         lang1->addChild(nameLang1);
         listButton.pushBack(lang1);
         
-        Button* lang2 = Button::create("lang_normal.png");
+        Button* lang2 = Button::create("menu_btn_lang_normal.png", "", "", TextureResType::PLIST);
         lang2->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
         lang2->setPosition(Vec2(listviewSize.width*2/3, layout->getContentSize().height/2));
         lang2->setTag(i*2+1);
@@ -111,7 +111,7 @@ void LanguagePopupLayer::reloadData()
     for (int i = 0; i < listButton.size(); i++) {
         auto text = (Text*) listButton.at(i)->getChildByName("name_language");
         if (text->getString() == SceneManager::getInstance()->getCurLanguage()) {
-            listButton.at(i)->loadTextureNormal("lang_selected.png");
+            listButton.at(i)->loadTextureNormal("menu_btn_lang_selected.png", TextureResType::PLIST);
             break;
         }
     }
@@ -136,9 +136,9 @@ void LanguagePopupLayer::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEve
     Button* receiver = (Button*)sender;
     if (type == ui::Widget::TouchEventType::ENDED) {
         for (int i = 0; i < listButton.size(); i++) {
-            listButton.at(i)->loadTextureNormal("lang_normal.png");
+            listButton.at(i)->loadTextureNormal("menu_btn_lang_normal.png", TextureResType::PLIST);
         }
-        receiver->loadTextureNormal("lang_selected.png");
+        receiver->loadTextureNormal("menu_btn_lang_selected.png", TextureResType::PLIST);
         auto text = (Text*) receiver->getChildByName("name_language");
         SceneManager::getInstance()->setCurLanguage(text->getString());
         SceneManager::getInstance()->saveLanguage();

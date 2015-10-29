@@ -127,6 +127,7 @@ public:
     
     // game components
     void endGame();
+    void removeTiledMap();
     void removeAllObjects();
     void backMenu();
     

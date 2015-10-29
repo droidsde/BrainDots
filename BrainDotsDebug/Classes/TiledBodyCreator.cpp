@@ -457,7 +457,7 @@ void TiledBodyCreator::createSpriteBody(b2Body *body, b2Fixture* fixture, std::s
                     
                 default:
                 {
-                    auto dynamicSprite = Sprite::createWithSpriteFrameName(spriteName);
+                    auto dynamicSprite = Sprite::create(spriteName);
                     dynamicSprite->setScale(bodyRectangle.size.width / dynamicSprite->getContentSize().width, bodyRectangle.size.height / dynamicSprite->getContentSize().height);
                     dynamicSprite->setPosition(Vec2(body->GetPosition().x * PTM_RATIO, body->GetPosition().y * PTM_RATIO));
                     body->SetUserData(dynamicSprite);
@@ -473,7 +473,7 @@ void TiledBodyCreator::createSpriteBody(b2Body *body, b2Fixture* fixture, std::s
         {
             Vec2 position = Vec2(body->GetPosition().x * PTM_RATIO, body->GetPosition().y * PTM_RATIO);
             float radius = fixture->GetShape()->m_radius * PTM_RATIO;
-            auto dynamicSprite = Sprite::createWithSpriteFrameName(spriteName);
+            auto dynamicSprite = Sprite::create(spriteName);
             dynamicSprite->setPosition(Vec2(position));
             dynamicSprite->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
             dynamicSprite->setScale(radius*2/dynamicSprite->getContentSize().width);

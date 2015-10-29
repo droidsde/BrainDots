@@ -186,6 +186,7 @@ enum TAG_GAME
     TAG_BALLA,
     TAG_BALLB,
     TAG_PAPER_MINI,
+    TAG_PLATFORM
 };
 
 enum ZORDER_GAME

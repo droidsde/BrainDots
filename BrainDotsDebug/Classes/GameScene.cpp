@@ -110,6 +110,7 @@ bool GameScene::init()
     listener->onTouchEnded = CC_CALLBACK_2(GameScene::onTouchEnded, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
     
+    log("size map %zd", map->getChildrenCount());
     return true;
 }
 
@@ -449,9 +450,7 @@ void GameScene::onTouchEnded(Touch* touch, Event* event) {
         texture2D->setAnchorPoint(anchorPoint);
         map->addChild(texture2D);
         newBody->SetUserData(texture2D);
-        
-        Director::getInstance()->getTextureCache()->removeTextureForKey(_key);
-        log("%s",Director::getInstance()->getTextureCache()->getCachedTextureInfo().c_str());
+        texture2D->setTag(TAG_GAME::TAG_PLATFORM);
     }
     target->clear(0, 0, 0, 0);
 }
@@ -615,25 +614,57 @@ void GameScene::endGame()
 {
     log("##GAMESCENE %s", __FUNCTION__);
     // capture screen
-    if (isSuccess) {
-        filenameCapture = "capture_level_" + to_string(SceneManager::getInstance()->getLevelGame()) + "_success.png";
-        // open game level
-        SceneManager::getInstance()->saveLevel(SceneManager::getInstance()->getLevelGame()+1);
-    } else if (isFail) {
-        filenameCapture = "capture_level_" + to_string(SceneManager::getInstance()->getLevelGame()) + "_fail.png";
-    }
+    filenameCapture = "game_share.png";
     
     // remove cache and memory
-//    Director::getInstance()->getTextureCache()->removeTextureForKey(filenameCapture);
+    Director::getInstance()->getTextureCache()->removeTextureForKey(filenameCapture);
     
     // capturing
     utils::captureScreen(CC_CALLBACK_2(GameScene::afterCaptured, this), filenameCapture);
     
 }
 
+void GameScene::removeTiledMap()
+{
+    log("##GAMESCENE %s start %s", __FUNCTION__, Director::getInstance()->getTextureCache()->getCachedTextureInfo().c_str());
+    log("##GAMESCENE %s size map %zd", __FUNCTION__, map->getChildrenCount());
+    
+    //remove all body physics
+//    for (b2Body *body = world->GetBodyList(); body != NULL; body = body->GetNext()) {
+//        if (body->GetUserData() != NULL) {
+//            Node *sprite = (Node *) body->GetUserData();
+//            if (sprite->getTag() == TAG_GAME::TAG_PLATFORM) {
+//                Texture2D* texture = ((Sprite*)sprite)->getTexture();
+//                Director::getInstance()->getTextureCache()->removeTexture(texture);
+//            }
+//            map->removeChild(sprite);
+//        }
+//        world->DestroyBody(body);
+//    }
+    
+    for(long i = map->getChildrenCount()-1; i > 0; i--){
+        Node *sprite = (Node *) map->getChildren().at(i);
+        if (sprite->getTag() == TAG_GAME::TAG_PLATFORM) {
+            Texture2D* texture = ((Sprite*)sprite)->getTexture();
+            Director::getInstance()->getTextureCache()->removeTexture(texture);
+        }
+        map->removeChild(sprite);
+    }
+    
+    log("##GAMESCENE %s size map after remove physic %zd", __FUNCTION__, map->getChildrenCount());
+    map->removeAllChildrenWithCleanup(true);
+    log("##GAMESCENE %s size map after removeall %zd", __FUNCTION__, map->getChildrenCount());
+    map->removeFromParentAndCleanup(true);
+    
+    log("##GAMESCENE %s end %s", __FUNCTION__, Director::getInstance()->getTextureCache()->getCachedTextureInfo().c_str());
+}
+
 void GameScene::removeAllObjects()
 {
-    log("##GAMESCENE %s begin", __FUNCTION__);
+    log("##GAMESCENE %s", __FUNCTION__);
+    if (!isSuccess && !isFail) {
+        this->removeTiledMap();
+    }
     this->stopAllActions();
     removeChild(target, true);
     target->release();
@@ -646,8 +677,6 @@ void GameScene::removeAllObjects()
         Node* child = this->getChildren().at(i);
         this->removeChild(child);
     }
-    
-    log("##GAMESCENE %s end", __FUNCTION__);
 }
 
 
@@ -785,22 +814,8 @@ void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
     ((Button*)this->getChildByTag(TAG_GAME::TAG_BUTTON_BACK))->setTouchEnabled(true);
     ((Button*)this->getChildByTag(TAG_GAME::TAG_BUTTON_REPLAY))->setTouchEnabled(true);
     
-    //remove all body physics
-    for (b2Body *body = world->GetBodyList(); body != NULL; body = body->GetNext()) {
-        if (body->GetUserData() != NULL) {
-            Node *sprite = (Node *) body->GetUserData();
-            map->removeChild(sprite);
-            log("##GAMESCENE:%s :remove done", __FUNCTION__);
-        }
-        world->DestroyBody(body);
-    }
-    log("##GAMESCENE %s remove body and sprite done", __FUNCTION__);
-    
-    map->removeAllChildrenWithCleanup(true);
-    map->removeFromParentAndCleanup(true);
-
-    log("##GAMESCENE %s remove done", __FUNCTION__);
-    
+    // remove tiledmap
+    this->removeTiledMap();
     Sprite* captureSprite;
     if (succeed) {
         captureSprite = Sprite::create(filenameCapture);
@@ -829,8 +844,8 @@ void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
     
     // image
     auto captureSpriteMini = Sprite::createWithTexture(captureSprite->getTexture());
-    float scaleX = sizeSmallPaper.width * 0.9 / visibleSize.width;
-    float scaleY = sizeSmallPaper.height * 0.9 / visibleSize.height;
+    float scaleX = sizeSmallPaper.width * 0.9 / captureSprite->getContentSize().width;
+    float scaleY = sizeSmallPaper.height * 0.9 / captureSprite->getContentSize().height;
     captureSpriteMini->setScale(scaleX, scaleY);
     captureSpriteMini->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
     captureSpriteMini->setPosition(Vec2(sizeSmallPaper.width/2, sizeSmallPaper.height-PADDING));
@@ -862,7 +877,7 @@ void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
         paperSprite->addChild(tick);
         tick->runAction(ScaleTo::create(0.5f, 1.0f));
     });
-    captureSprite->runAction(Sequence::create(ScaleTo::create(0.5f, sizePaper.width*0.9/visibleSize.width), DelayTime::create(0.2f), addtick, nullptr));
+    captureSprite->runAction(Sequence::create(ScaleTo::create(0.5f, sizePaper.width*0.9/captureSprite->getContentSize().width), DelayTime::create(0.2f), addtick, nullptr));
     
     // show text success or fail
     auto titleText = Text::create("", "fonts/keifont.ttf", 80);
@@ -890,8 +905,6 @@ void GameScene::afterCaptured(bool succeed, const std::string &outputFile)
         titleText->setString("Game Over!");
         titleText->setColor(Color3B(240,68,94));
     }
-    
-    log("##GAMESCENE:%s :done", __FUNCTION__);
 }
 
 
@@ -1116,7 +1129,7 @@ void GameScene::update(float dt) {
     std::vector<b2Body *>::iterator pos3;
     for(pos3 = toDestroy.begin(); pos3 != toDestroy.end(); ++pos3) {
         b2Body *body = *pos3;
-        if (body->GetUserData() != NULL) {
+        if (body->GetUserData() != nullptr) {
             auto sprite = (Node *) body->GetUserData();
             map->removeChild(sprite, true);
         }

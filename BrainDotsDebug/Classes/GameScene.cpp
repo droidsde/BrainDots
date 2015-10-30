@@ -17,9 +17,9 @@ GameScene::GameScene()
 
 GameScene::~GameScene()
 {
+    log("##GAMESCENE %s start", __FUNCTION__);
     drawnode = nullptr;
     brush = nullptr;
-    map = nullptr;
     delete tiledmap;
     tiledmap = nullptr;
     
@@ -27,6 +27,7 @@ GameScene::~GameScene()
     _ballContactListener = nullptr;
     delete world;
     world = nullptr;
+    log("##GAMESCENE %s end", __FUNCTION__);
 }
 
 Scene* GameScene::createScene()
@@ -91,8 +92,7 @@ bool GameScene::init()
     this->initBalls();
     
     // init rendertexture and sprite draw
-    target = RenderTexture::create(visibleSize.width, visibleSize.height,
-                                   Texture2D::PixelFormat::RGBA8888);
+    target = RenderTexture::create(visibleSize.width, visibleSize.height, Texture2D::PixelFormat::RGBA8888);
     target->retain();
     target->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
     this->addChild(target, ZORDER_GAME::ZORDER_DRAW_RENDER);
@@ -110,7 +110,7 @@ bool GameScene::init()
     listener->onTouchEnded = CC_CALLBACK_2(GameScene::onTouchEnded, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
     
-    log("size map %zd", map->getChildrenCount());
+    log("##GAMESCENE %s size map %zd", __FUNCTION__, map->getChildrenCount());
     return true;
 }
 
@@ -451,6 +451,7 @@ void GameScene::onTouchEnded(Touch* touch, Event* event) {
         map->addChild(texture2D);
         newBody->SetUserData(texture2D);
         texture2D->setTag(TAG_GAME::TAG_PLATFORM);
+        listNameTexture.push_back(_key);
     }
     target->clear(0, 0, 0, 0);
 }
@@ -462,6 +463,7 @@ void GameScene::touchButtonEvent(cocos2d::Ref *sender, Widget::TouchEventType ty
     {
         switch (receiver->getTag()) {
             case TAG_GAME::TAG_BUTTON_BACK :
+                this->removeAllObjects();
                 backMenu();
                 break;
                 
@@ -601,7 +603,6 @@ Vec2 GameScene::checkInsideBox2d(cocos2d::Vec2 start, cocos2d::Vec2 end)
 // GAME COMPONENTS
 ///////////////////////////////
 void GameScene::backMenu() {
-    this->removeAllObjects();
     
     auto fadeout = CallFunc::create(CC_CALLBACK_0(Node::setOpacity, this, 0));
     auto loading = CallFunc::create(CC_CALLBACK_0(SceneManager::loadingScene, SceneManager::getInstance(), this));
@@ -616,6 +617,11 @@ void GameScene::endGame()
     // capture screen
     filenameCapture = "game_share.png";
     
+    if (isSuccess) {
+        // open game level
+        SceneManager::getInstance()->saveLevel(SceneManager::getInstance()->getLevelGame()+1);
+    }
+    
     // remove cache and memory
     Director::getInstance()->getTextureCache()->removeTextureForKey(filenameCapture);
     
@@ -626,7 +632,7 @@ void GameScene::endGame()
 
 void GameScene::removeTiledMap()
 {
-    log("##GAMESCENE %s start %s", __FUNCTION__, Director::getInstance()->getTextureCache()->getCachedTextureInfo().c_str());
+    log("##GAMESCENE %s start", __FUNCTION__);
     log("##GAMESCENE %s size map %zd", __FUNCTION__, map->getChildrenCount());
     
     //remove all body physics
@@ -644,19 +650,29 @@ void GameScene::removeTiledMap()
     
     for(long i = map->getChildrenCount()-1; i > 0; i--){
         Node *sprite = (Node *) map->getChildren().at(i);
+        log("get node");
         if (sprite->getTag() == TAG_GAME::TAG_PLATFORM) {
+            log("is platform");
             Texture2D* texture = ((Sprite*)sprite)->getTexture();
+            map->removeChild(sprite);
             Director::getInstance()->getTextureCache()->removeTexture(texture);
+            log("remove texture");
         }
-        map->removeChild(sprite);
+//        map->removeChild(sprite);
     }
     
     log("##GAMESCENE %s size map after remove physic %zd", __FUNCTION__, map->getChildrenCount());
-    map->removeAllChildrenWithCleanup(true);
+//    map->removeAllChildrenWithCleanup(false);
     log("##GAMESCENE %s size map after removeall %zd", __FUNCTION__, map->getChildrenCount());
-    map->removeFromParentAndCleanup(true);
+    this->removeChild(map);
+    log("remove map done");
     
-    log("##GAMESCENE %s end %s", __FUNCTION__, Director::getInstance()->getTextureCache()->getCachedTextureInfo().c_str());
+//    for (int i = 0; i < listNameTexture.size(); i++) {
+//        Director::getInstance()->getTextureCache()->removeTextureForKey(listNameTexture.at(i));
+//    }
+    listNameTexture.clear();
+    log("##GAMESCENE %s : %s", __FUNCTION__, Director::getInstance()->getTextureCache()->getCachedTextureInfo().c_str());
+    log("##GAMESCENE %s end", __FUNCTION__);
 }
 
 void GameScene::removeAllObjects()
@@ -673,10 +689,7 @@ void GameScene::removeAllObjects()
         world->DestroyBody(body);
     }
     
-    for(long i = this->getChildrenCount()-1; i > 0; i--){
-        Node* child = this->getChildren().at(i);
-        this->removeChild(child);
-    }
+    this->removeAllChildren();
 }
 
 
@@ -1131,6 +1144,10 @@ void GameScene::update(float dt) {
         b2Body *body = *pos3;
         if (body->GetUserData() != nullptr) {
             auto sprite = (Node *) body->GetUserData();
+            if (sprite->getTag() == TAG_GAME::TAG_PLATFORM) {
+                Texture2D* texture = ((Sprite*)sprite)->getTexture();
+                Director::getInstance()->getTextureCache()->removeTexture(texture);
+            }
             map->removeChild(sprite, true);
         }
         world->DestroyBody(body);

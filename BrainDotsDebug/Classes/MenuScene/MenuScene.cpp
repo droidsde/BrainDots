@@ -32,7 +32,7 @@ bool MenuScene::init() {
     curPage = curLevel / ITEMS_IN_PAGE + 1;
     bodySize = Size(visibleSize.width, visibleSize.height * 5 / 6);
     headerSize = Size(visibleSize.width, visibleSize.height / 6);
-    
+
     // draw grids
     this->drawGrids();
     
@@ -207,7 +207,7 @@ void MenuScene::reloadData() {
         layout->addChild(text, ZORDER_MENU::BODY_STICKER_TEXT);
         
         // add tick and text
-        ImageView* minitick = ImageView::create("image_success_96x96.png", TextureResType::PLIST);
+        ImageView* minitick = ImageView::create("image_success_64x64.png", TextureResType::PLIST);
         minitick->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
         minitick->setPosition(Vec2(text->getPositionX() - text->getContentSize().width/2 - PADDING, text->getPositionY() - text->getContentSize().height/2));
         layout->addChild(minitick, ZORDER_MENU::BODY_STICKER_MINI_TICK);
@@ -230,7 +230,7 @@ void MenuScene::reloadData() {
         } else if (i < maxStage) {
             
             // add tick icon in stage image
-            ImageView* tick = ImageView::create("image_success_96x96.png", TextureResType::PLIST);
+            ImageView* tick = ImageView::create("image_success_64x64.png", TextureResType::PLIST);
             tick->setAnchorPoint(Vec2::ANCHOR_TOP_RIGHT);
             tick->setPosition(Vec2(stageSize.width - PADDING, stageSize.height - PADDING));
             stage->addChild(tick, ZORDER_MENU::BODY_STICKER_TICK);

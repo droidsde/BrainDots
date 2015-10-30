@@ -69,8 +69,6 @@ private:
   
     static SceneManager* _sceneManager;
     
-    GifBase* gif;
-    
     void nextScene(cocos2d::Scene*);
     
     void moveLogoScene();

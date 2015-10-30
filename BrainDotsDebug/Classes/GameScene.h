@@ -188,6 +188,7 @@ private:
     Sprite *brush;
     std::vector<ConveyorBelt> listConveyorBelt;
     
+    std::vector<std::string> listNameTexture;
     // capture end games
     std::string filenameCapture;
     void afterCaptured(bool succeed, const std::string& outputFile);

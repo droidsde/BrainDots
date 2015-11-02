@@ -17,17 +17,15 @@ GameScene::GameScene()
 
 GameScene::~GameScene()
 {
-    log("##GAMESCENE %s start", __FUNCTION__);
-    drawnode = nullptr;
-    brush = nullptr;
-    delete tiledmap;
-    tiledmap = nullptr;
-    
-    delete _ballContactListener;
-    _ballContactListener = nullptr;
-    delete world;
-    world = nullptr;
-    log("##GAMESCENE %s end", __FUNCTION__);
+//    drawnode = nullptr;
+//    brush = nullptr;
+//    delete tiledmap;
+//    tiledmap = nullptr;
+//    
+//    delete _ballContactListener;
+//    _ballContactListener = nullptr;
+//    delete world;
+//    world = nullptr;
 }
 
 Scene* GameScene::createScene()
@@ -58,7 +56,6 @@ bool GameScene::init()
     // draw grid
     this->drawGrids();
     
-    log("##GAMESCENE %s :button back and replay start", __FUNCTION__);
     // button back
     auto backButton = Button::create("game_btn_back.png", "", "", TextureResType::PLIST);
     backButton->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
@@ -77,7 +74,6 @@ bool GameScene::init()
     replayButton->addTouchEventListener(CC_CALLBACK_2(GameScene::touchButtonEvent, this));
     addChild(replayButton, ZORDER_GAME::ZORDER_BUTTON_REPLAY);
     
-    log("##GAMESCENE %s :button back and replay done", __FUNCTION__);
     // load physics shapes cache
     GB2ShapeCache::getInstance()->addShapesWithFile("physicshapes.plist");
     
@@ -443,8 +439,10 @@ void GameScene::onTouchEnded(Touch* touch, Event* event) {
         
         // draw sprite use render texture
         auto _image = target->newImage();
+        _image->retain();
         auto _key = to_string((int) time(NULL));
         auto _texture2D = Director::getInstance()->getTextureCache()->addImage(_image, _key);
+        _image->release();
         CC_SAFE_DELETE(_image);
         auto texture2D = Sprite::createWithTexture(_texture2D, bodyRectangle);
         texture2D->setAnchorPoint(anchorPoint);
@@ -452,6 +450,7 @@ void GameScene::onTouchEnded(Touch* touch, Event* event) {
         newBody->SetUserData(texture2D);
         texture2D->setTag(TAG_GAME::TAG_PLATFORM);
         listNameTexture.push_back(_key);
+        Director::getInstance()->getTextureCache()->removeTexture(_texture2D);
     }
     target->clear(0, 0, 0, 0);
 }
@@ -634,43 +633,17 @@ void GameScene::removeTiledMap()
 {
     log("##GAMESCENE %s start", __FUNCTION__);
     log("##GAMESCENE %s size map %zd", __FUNCTION__, map->getChildrenCount());
-    
-    //remove all body physics
-//    for (b2Body *body = world->GetBodyList(); body != NULL; body = body->GetNext()) {
-//        if (body->GetUserData() != NULL) {
-//            Node *sprite = (Node *) body->GetUserData();
-//            if (sprite->getTag() == TAG_GAME::TAG_PLATFORM) {
-//                Texture2D* texture = ((Sprite*)sprite)->getTexture();
-//                Director::getInstance()->getTextureCache()->removeTexture(texture);
-//            }
-//            map->removeChild(sprite);
-//        }
-//        world->DestroyBody(body);
-//    }
-    
-    for(long i = map->getChildrenCount()-1; i > 0; i--){
-        Node *sprite = (Node *) map->getChildren().at(i);
-        log("get node");
-        if (sprite->getTag() == TAG_GAME::TAG_PLATFORM) {
-            log("is platform");
-            Texture2D* texture = ((Sprite*)sprite)->getTexture();
-            map->removeChild(sprite);
-            Director::getInstance()->getTextureCache()->removeTexture(texture);
-            log("remove texture");
-        }
-//        map->removeChild(sprite);
-    }
-    
-    log("##GAMESCENE %s size map after remove physic %zd", __FUNCTION__, map->getChildrenCount());
-//    map->removeAllChildrenWithCleanup(false);
+
+    map->removeAllChildrenWithCleanup(true);
     log("##GAMESCENE %s size map after removeall %zd", __FUNCTION__, map->getChildrenCount());
     this->removeChild(map);
     log("remove map done");
     
-//    for (int i = 0; i < listNameTexture.size(); i++) {
-//        Director::getInstance()->getTextureCache()->removeTextureForKey(listNameTexture.at(i));
-//    }
-    listNameTexture.clear();
+    //    for (int i = 0; i < listNameTexture.size(); i++) {
+    //        Director::getInstance()->getTextureCache()->removeTextureForKey(listNameTexture.at(i));
+    //    }
+    //    listNameTexture.clear();
+    
     log("##GAMESCENE %s : %s", __FUNCTION__, Director::getInstance()->getTextureCache()->getCachedTextureInfo().c_str());
     log("##GAMESCENE %s end", __FUNCTION__);
 }

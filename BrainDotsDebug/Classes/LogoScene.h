@@ -36,6 +36,8 @@ private:
     
     void transferData();
     
+    void moveDataToSDcard(std::string filename);
+    
     void loadResources();
     
     void loadImage(Texture2D* texture);

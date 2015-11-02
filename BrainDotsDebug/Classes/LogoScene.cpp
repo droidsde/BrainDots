@@ -27,17 +27,23 @@ bool LogoScene::init()
     return true;
 }
 
-void LogoScene::transferData()
+void LogoScene::moveDataToSDcard(std::string filename)
 {
-#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
     ssize_t fileSize;
-    unsigned char *fileData = FileUtils::getInstance()->getFileData("loading4.gif", "rb", &fileSize);
+    unsigned char *fileData = FileUtils::getInstance()->getFileData(filename, "rb", &fileSize);
     if (fileData != NULL) {
-        auto pw = fopen("/mnt/sdcard/loading4.gif","wb");
+        auto pw = fopen( to_string("/mnt/sdcard/"+filename).c_str() ,"wb");
         fwrite(fileData, 1, fileSize, pw);
         fclose(pw);
         CC_SAFE_DELETE_ARRAY(fileData);
     }
+}
+
+void LogoScene::transferData()
+{
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+    moveDataToSDcard("loading4.gif");
+    moveDataToSDcard("electricity.gif");
 #endif
     
     //download image of information

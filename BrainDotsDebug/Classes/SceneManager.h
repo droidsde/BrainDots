@@ -65,6 +65,7 @@ public:
     void loadCurrentLanguage(std::string jsonFile);
     
     bool checkFileExist(std::string filename);
+    
 private:
   
     static SceneManager* _sceneManager;
